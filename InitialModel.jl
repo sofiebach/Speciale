@@ -86,7 +86,7 @@ function writeSolution(filename, sol)
     close(outFile)
 end
 
-writeSolution("solution.txt", sol)
+writeSolution("output/solution.txt", sol)
 
 
 

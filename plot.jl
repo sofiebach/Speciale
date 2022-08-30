@@ -50,7 +50,7 @@ function readSolution(filename)
     end
     return x
 end
-x = readSolution("solution.txt")
+x = readSolution("output/solution.txt")
 
 # Overview of inventory
 inventory_check = zeros(C, timesteps)
