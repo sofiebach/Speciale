@@ -52,9 +52,8 @@ function readSolution(filename)
 end
 x = readSolution("solution.txt")
 
-# Overview
-V = zeros(C, timesteps)
-
+# Overview of inventory
+inventory_check = zeros(C, timesteps)
 for t = start:stop
     for p = 1:length(P)
         if x[t,p] > 0
@@ -62,8 +61,8 @@ for t = start:stop
             for l in L
                 for c = 1:C
                     grp = u[l_idx,p,c] * x[t,p]
-                    V[c, t+l] += grp
-                    if V[c, t+l] > I[t+l,c]
+                    inventory_check[c, t+l] += grp
+                    if inventory_check[c, t+l] > I[t+l,c]
                         println("p: ", p)
                         println("c: ", c)
                         println("t: ", t)
@@ -71,6 +70,26 @@ for t = start:stop
                     end
                 end
                 l_idx += 1
+            end   
+        end
+    end
+end
+
+# Overview of staffing
+staffing_check = zeros(timesteps)
+for t = start:stop
+    for p = 1:length(P)
+        if x[t,p] > 0
+            q_idx = 1
+            work = w[p]
+            for q in Q
+                staffing_check[t+q] += work
+                if staffing_check[t+q] > H[t+q]
+                    println("t: ", t)
+                    println("p: ", p)
+                    println("q: ", q)
+                end
+                q_idx += 1
             end   
         end
     end
