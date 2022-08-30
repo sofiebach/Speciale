@@ -6,9 +6,15 @@ P = [1,2,3,4,5,6] #two priorities, 3 channels #[DR1 kernen, DR1 perspektiv, DR2-
 C = 3 #number of channels
 M = 0
 
-L = [-1,0,1]
-L_boundary = [1]
-Q = [-3,-2]
+L_lower = -1
+L_upper = 1
+L = collect(L_lower:L_upper)
+L_zero = indexin(0,L)[]
+
+
+Q_lower = -3
+Q_upper = -2
+Q = collect(Q_lower:Q_upper)
 
 timeperiod = 10
 
@@ -42,9 +48,14 @@ u[:,:,3] = [0 0 0 0 0 0; 0 0 0 0 0 0; 0 0 0 0 0 0]
 
 # Inventory from t = start:stop
 @constraint(model, [t=start:stop, c = 1:C], sum(u[l,p,c] * x[t-L[l],p] for l = 1:length(L) for p = 1:length(P)) <= I[t,c])
-@constraint(model, [t=(stop+1):timesteps, c = 1:C], sum(u[l,p,c] * x[t-L_boundary[l],p] for l = 1:length(L_boundary) for p = 1:length(P)) <= I[t,c])
+# Inventory for boundaries
+@constraint(model, [t=(stop+1):timesteps, c = 1:C], sum(u[l,p,c] * x[t-L[l],p] for l = (L_zero + 1):length(L) for p = 1:length(P)) <= I[t,c])
+@constraint(model, [t=1:start-1, c = 1:C], sum(u[l,p,c] * x[t-L[l],p] for l = 1:(L_zero - 1) for p = 1:length(P)) <= I[t,c])
 
-@constraint(model, [t=1:(stop - start)], sum(w[p] * x[t-Q[q],p] for p=1:length(P) for q = 1:length(Q)) <= H[t])
+# Staff from t = start:stop
+@constraint(model, [t=1:(stop+Q_upper)], sum(w[p] * x[t-Q[q],p] for p=1:length(P) for q = 1:length(Q)) <= H[t])
+
+
 
 @constraint(model, [p=1:length(P)], sum(x[t,p] for t = start:stop) >= S[p] - f[p])
 
