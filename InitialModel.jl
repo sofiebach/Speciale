@@ -26,16 +26,13 @@ S = [1,5,2,0,3,0] #zeros(6) #[1,1,0,1,1,1]
 w = [100,80,50,50,60,10] #weekly cost
 H = ones(length(T)) * (100 + M)
 u = zeros(length(L), length(P), C)
-u[:,1,:] = [47 80 30; 0 0 0; 0 0 0]
-u[:,2,:] = [0 64 85; 0 7 10; 0 0 0]
-u[:,3,:] = [11 32 11; 17 48 17; 0 0 0]
-u[:,4,:] = [0 38 44; 0 25 29; 0 0 0]
-u[:,5,:] = [45 80 31; 0 0 0; 0 0 0]
-u[:,6,:] = [0 0 0; 0 47 60; 0 0 0]
+
+u[:,:,1] = [47 0 11 0 45 0; 80 64 32 38 80 0; 30 85 11 44 31 0]
+u[:,:,2] = [0 0 17 0 0 0; 0 7 48 25 0 47; 0 10 17 29 0 60]
+u[:,:,3] = [0 0 0 0 0 0; 0 0 0 0 0 0; 0 0 0 0 0 0]
 
 @variable(model, x[1:length(T), 1:length(P)] >= 0, Int)
 @variable(model, f[1:length(P)] >= 0, Int)
-
 
 @objective(model, Max, sum(x[t,p] for t = time_start:time_end for p = 1:length(P)) - sum(f[p] for p = 1:length(P)))
 
