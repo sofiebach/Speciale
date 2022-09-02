@@ -18,7 +18,7 @@ x, obj = readSolution("output/solution.txt")
 
 # Overview of inventory
 function checkSolution(filename)
-    x = readSolution(filename)
+    x, _ = readSolution(filename)
     inventory_check = zeros(C, T)
     inventory_used = zeros(C, T)
     for t = start:stop
