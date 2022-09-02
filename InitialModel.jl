@@ -28,22 +28,29 @@ model = Model(GLPK.Optimizer)
 @constraint(model, [p=1:P], sum(x[t,p] for t = start:stop) >= S[p] - f[p])
 
 JuMP.optimize!(model)
-println("Objective: ", objective_value(model))
-sol = zeros(Int, T, P)
-for t = 1:T
-    for p = 1:P
-        if JuMP.value(x[t,p]) > 0.5
-            println("At time ", t, " we have prioritet ", p, " with value: ", JuMP.value(x[t,p]))
-            sol[t,p] = JuMP.value(x[t,p])
+
+function print_solution(model)
+    println("Objective: ", objective_value(model))
+    sol = zeros(Int, T, P)
+    for t = 1:T
+        for p = 1:P
+            if JuMP.value(x[t,p]) > 0.5
+                println("At time ", t, " we have prioritet ", p, " with value: ", JuMP.value(x[t,p]))
+                sol[t,p] = JuMP.value(x[t,p])
+            end
         end
     end
+
+    for p = 1:P
+        if JuMP.value(f[p]) > 0
+            println("Penalty for priority ", p , " with value: ", JuMP.value(f[p]))
+        end
+    end
+
+    return sol
 end
 
-for p = 1:P
-    if JuMP.value(f[p]) > 0
-        println("Penalty for priority ", p , " with value: ", JuMP.value(f[p]))
-    end
-end
+sol = print_solution(model)
 
 # Write solution
 function writeSolution(filename, sol)

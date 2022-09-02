@@ -29,17 +29,17 @@ function readInstance(filename)
     H = parse.(Int,split(readline(f)))
     readline(f) # blank
     readline(f) # comment
-    I = zeros(Int, T, n_channels)
+    I = zeros(Int, T, C)
     for c in 1:C
         I[:,c] = parse.(Int,split(readline(f)))
     end
     readline(f) # blank
     readline(f) # comment
     air_weeks = collect(L_lower:L_upper)
-    u = zeros(Int, length(air_weeks), n_priorities, n_channels)
+    u = zeros(Int, length(air_weeks), P, C)
     for c = 1:C
         line = parse.(Int,split(readline(f)))
-        u[:,:,c] = reshape(line, (length(air_weeks), n_priorities))
+        u[:,:,c] = reshape(line, (length(air_weeks), P))
     end
 
     return P,C,timeperiod,L_lower,L_upper,L,L_zero,Q_lower,Q_upper,Q,start,stop,T,S,w,H,I,u
