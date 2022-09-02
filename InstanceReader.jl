@@ -1,6 +1,4 @@
 
-filename = "simulated_data/data.txt"
-
 function readInstance(filename)
     f = open(filename)
     readline(f) # comment
@@ -44,7 +42,7 @@ function readInstance(filename)
         u[:,:,c] = reshape(line, (length(air_weeks), n_priorities))
     end
 
-    return P,C,timeperiod,L_lower,L_upper,L,Q_lower,Q_upper,Q,start,stop,T,S,w,H,I,u
+    return P,C,timeperiod,L_lower,L_upper,L,L_zero,Q_lower,Q_upper,Q,start,stop,T,S,w,H,I,u
 end
 
-P,C,timeperiod,L_lower,L_upper,L,Q_lower,Q_upper,Q,start,stop,T,S,w,H,I,u = readInstance(filename)
+#P,C,timeperiod,L_lower,L_upper,L,Q_lower,Q_upper,Q,start,stop,T,S,w,H,I,u = readInstance(filename)
