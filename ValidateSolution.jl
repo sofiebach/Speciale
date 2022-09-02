@@ -8,12 +8,13 @@ P,C,timeperiod,L_lower,L_upper,L,L_zero,Q_lower,Q_upper,Q,start,stop,T,S,w,H,I,u
 function readSolution(filename)
     x = zeros(Int, T, P)
     f = open(filename)
+    obj = parse.(Float64, readline(f))
     for i in 1:T
         x[i,:] = parse.(Int,split(readline(f)))
     end
-    return x
+    return x, obj
 end
-x = readSolution("output/solution.txt")
+x, obj = readSolution("output/solution.txt")
 
 # Overview of inventory
 inventory_check = zeros(C, T)

@@ -55,6 +55,7 @@ sol = print_solution(model)
 # Write solution
 function writeSolution(filename, sol)
     outFile = open(filename, "w")
+    write(outFile, join(objective_value(model)," ")*"\n")
     for t = 1:T
         write(outFile,join(sol[t,:]," ")*"\n")
     end
@@ -62,6 +63,3 @@ function writeSolution(filename, sol)
 end
 
 writeSolution("output/solution.txt", sol)
-
-
-
