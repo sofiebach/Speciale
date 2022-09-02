@@ -17,6 +17,7 @@ x = readSolution("output/solution.txt")
 
 # Overview of inventory
 inventory_check = zeros(C, T)
+inventory_dif = zeros(C, T)
 for t = start:stop
     for p = 1:P
         if x[t,p] > 0
@@ -25,6 +26,7 @@ for t = start:stop
                 for c = 1:C
                     grp = u[l_idx,p,c] * x[t,p]
                     inventory_check[c, t+l] += grp
+                    inventory_dif[c, t+l] = I[t+l,c] - inventory_check[c, t+l]
                     if inventory_check[c, t+l] > I[t+l,c]
                         println("p: ", p)
                         println("c: ", c)
@@ -40,6 +42,7 @@ end
 
 # Overview of staffing
 staffing_check = zeros(T)
+staffing_dif = zeros(T)
 for t = start:stop
     for p = 1:P
         if x[t,p] > 0
@@ -47,6 +50,7 @@ for t = start:stop
             work = w[p]
             for q in Q
                 staffing_check[t+q] += work
+                staffing_dif[t+q] = H[t+q] - staffing_check[t+q]
                 if staffing_check[t+q] > H[t+q]
                     println("t: ", t)
                     println("p: ", p)
