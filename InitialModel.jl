@@ -1,12 +1,12 @@
-using JuMP, GLPK
+using JuMP, Gurobi
 
-include("InstanceReader.jl")
+include("ReadWrite.jl")
 
 filename = "simulated_data/data.txt"
 
 P,C,timeperiod,L_lower,L_upper,L,L_zero,Q_lower,Q_upper,Q,start,stop,T,S,w,H,I,u = readInstance(filename)
 
-model = Model(GLPK.Optimizer)
+model = Model(Gurobi.Optimizer)
 
 @variable(model, x[1:T, 1:P] >= 0, Int)
 @variable(model, f[1:P] >= 0, Int)
@@ -52,14 +52,4 @@ end
 
 sol = print_solution(model)
 
-# Write solution
-function writeSolution(filename, sol)
-    outFile = open(filename, "w")
-    write(outFile, join(objective_value(model)," ")*"\n")
-    for t = 1:T
-        write(outFile,join(sol[t,:]," ")*"\n")
-    end
-    close(outFile)
-end
-
-writeSolution("output/solution.txt", sol)
+writeSolution("output/solution.txt", sol, P, C, timeperiod,L_lower,L_upper,L_zero,Q_lower,Q_upper, start, stop, T)
