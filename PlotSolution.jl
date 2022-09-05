@@ -1,12 +1,9 @@
-include("ValidateSolution.jl")
+include("ReadWrite.jl")
 using Luxor
 
 
-x, obj = readSolution("output/solution.txt")
-start = 4
-stop = 13
-T = 14
-P = 6
+x, obj, P, C, timeperiod, L_lower, L_upper, Q_lower, Q_upper, start, stop, T, u = readSolution("output/solution.txt")
+
 
 function drawSolution(x, obj, start, stop)
     scale = 100

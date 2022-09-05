@@ -1,6 +1,6 @@
 using JuMP, Gurobi
 
-include("InstanceReader.jl")
+include("ReadWrite.jl")
 
 filename = "simulated_data/data.txt"
 
@@ -52,14 +52,4 @@ end
 
 sol = print_solution(model)
 
-# Write solution
-function writeSolution(filename, sol)
-    outFile = open(filename, "w")
-    write(outFile, join(objective_value(model)," ")*"\n")
-    for t = 1:T
-        write(outFile,join(sol[t,:]," ")*"\n")
-    end
-    close(outFile)
-end
-
-writeSolution("output/solution.txt", sol)
+writeSolution("output/solution.txt", sol, P, C, timeperiod,L_lower,L_upper,L_zero,Q_lower,Q_upper, start, stop, T)

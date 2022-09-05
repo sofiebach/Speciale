@@ -1,20 +1,8 @@
-include("InstanceReader.jl")
+include("ReadWrite.jl")
 
 filename = "simulated_data/data.txt"
 
-P,C,timeperiod,L_lower,L_upper,L,L_zero,Q_lower,Q_upper,Q,start,stop,T,S,w,H,I,u = readInstance(filename)
-
-# Output
-function readSolution(filename)
-    x = zeros(Int, T, P)
-    f = open(filename)
-    obj = parse.(Float64, readline(f))
-    for i in 1:T
-        x[i,:] = parse.(Int,split(readline(f)))
-    end
-    return x, obj
-end
-x, obj = readSolution("output/solution.txt")
+x, obj, P, C, timeperiod, L_lower, L_upper, Q_lower, Q_upper, start, stop, T, u = readSolution("output/solution.txt")
 
 # Overview of inventory
 function checkSolution(filename)
