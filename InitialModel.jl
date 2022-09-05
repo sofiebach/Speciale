@@ -1,4 +1,4 @@
-using JuMP, GLPK
+using JuMP, Gurobi
 
 include("InstanceReader.jl")
 
@@ -6,7 +6,7 @@ filename = "simulated_data/data.txt"
 
 P,C,timeperiod,L_lower,L_upper,L,L_zero,Q_lower,Q_upper,Q,start,stop,T,S,w,H,I,u = readInstance(filename)
 
-model = Model(GLPK.Optimizer)
+model = Model(Gurobi.Optimizer)
 
 @variable(model, x[1:T, 1:P] >= 0, Int)
 @variable(model, f[1:P] >= 0, Int)
