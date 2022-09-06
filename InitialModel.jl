@@ -62,22 +62,23 @@ function print_solution(model)
 
     for p = 1:P
         k = zeros(Int, P)
-        if JuMP.value(k[p]) > 0
+        if JuMP.value(k[p]) > 0.5
             println("Penalty for priority ", p , " with value: ", JuMP.value(k[p]))
             k[p] = JuMP.value(k[p])
         end
     end
     for t = 1:T
         for m = 1:M
-            if JuMP.value(f[t,m]) > 0
+            if JuMP.value(f[t,m]) > 0.5
                println("Number of freelance for media ", m , " at time ", t, ": ", JuMP.value(f[t,m]))
+               f[t,m] = JuMP.value(f[t,m])
             end
         end
     end
     println("Number of campaigns: ", sum(sol))
-    return sol
+    return sol, k, f
 end
 
 sol = print_solution(model)
 
-writeSolution("output/solution.txt", sol, P, C, M, timeperiod,L_lower,L_upper,L_zero,Q_lower,Q_upper, start, stop, T)
+writeSolution("output/solution.txt", sol, k, f, P, C, M, timeperiod,L_lower,L_upper,L_zero,Q_lower,Q_upper, start, stop, T)
