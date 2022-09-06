@@ -4,7 +4,7 @@ filename = "simulated_data/data.txt"
 
 # Overview of inventory
 function checkSolution(filename)
-    x, _, P, C, M, _, L_lower, L_upper, Q_lower, Q_upper, _, _, T, _, I, H= readSolution(filename)
+    x, _, f, k, P, C, M, _, L_lower, L_upper, Q_lower, Q_upper, _, _, T, _, I, H= readSolution(filename)
     inventory_check = zeros(C, T)
     inventory_used = zeros(C, T)
     for t = start:stop
@@ -65,6 +65,6 @@ function checkSolution(filename)
     #println("Staff 50: ", staffing_used[50])
 end
 
-x, obj, P, C, M, timeperiod, L_lower, L_upper, Q_lower, Q_upper, start, stop, T, u, I, H = readSolution("output/solution.txt")
+x, obj, f, k, P, C, M, timeperiod, L_lower, L_upper, Q_lower, Q_upper, start, stop, T, u, I, H = readSolution("output/solution.txt")
 checkSolution("output/solution.txt")
 

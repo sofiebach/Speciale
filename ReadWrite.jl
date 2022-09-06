@@ -52,7 +52,7 @@ end
 #P,C,M,timeperiod,L_lower,L_upper,L,L_zero,Q_lower,Q_upper,Q,start,stop,T,S,w,H,I,u = readInstance(filename)
 
 # Write solution
-function writeSolution(filename, sol, P, C, M, timeperiod, L_lower, L_upper, L_zero, Q_lower,Q_upper, start, stop, T)
+function writeSolution(filename, sol, k, f, P, C, M, timeperiod, L_lower, L_upper, L_zero, Q_lower,Q_upper, start, stop, T)
     outFile = open(filename, "w")
     write(outFile, "P, C, M, timeperiod" * "\n")
     write(outFile, join([P, C, M, timeperiod]," ")*"\n\n")
@@ -62,7 +62,17 @@ function writeSolution(filename, sol, P, C, M, timeperiod, L_lower, L_upper, L_z
 
     write(outFile, join(objective_value(model)," ")*"\n")
     for t = 1:T
-        write(outFile,join(sol[t,:]," ")*"\n")
+        write(outFile,join(sol[t,:]," ") * "\n")
+    end
+    write(outFile, "\n")
+
+    write(outFile, "Penalty for undone jobs" * "\n")
+    write(outFile,join(k," ")*"\n")
+    write(outFile, "\n")
+
+    write(outFile, "Freelancers hired" * "\n")
+    for t = 1:T
+        write(outFile,join(f[t,:]," ")*"\n")
     end
     write(outFile, "\n")
 
@@ -99,6 +109,8 @@ end
 
 
 
+filename = "output/solution.txt"
+
 # Read solution
 function readSolution(filename)
     f = open(filename)
@@ -115,6 +127,13 @@ function readSolution(filename)
     end
     readline(f) # blank
     readline(f) # comment
+    k = parse.(Int,split(readline(f)))
+    readline(f) # blank
+    readline(f) # comment
+    f = zeros(Int, T, M)
+    for t = 1:T
+        f[t,:] = parse.(Int,split(readline(f)))
+    end
     L_lower, L_upper, L_zero = parse.(Int,split(readline(f)))
     readline(f) # blank
     readline(f) # comment
@@ -122,6 +141,7 @@ function readSolution(filename)
     readline(f) # blank
     readline(f) # comment
     L = collect(L_lower:L_upper)
+    
     u = zeros(Float64, length(L), P, C)
     for c = 1:C
         line = parse.(Float64,split(readline(f)))
@@ -139,6 +159,6 @@ function readSolution(filename)
     for m = 1:M
         H[:,m] = parse.(Float64,split(readline(f)))
     end
-    return x, obj, P, C, M, timeperiod, L_lower, L_upper, Q_lower, Q_upper, start, stop, T, u, I, H
+    return x, obj, f, k, P, C, M, timeperiod, L_lower, L_upper, Q_lower, Q_upper, start, stop, T, u, I, H
 
 end

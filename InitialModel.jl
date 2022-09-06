@@ -81,6 +81,6 @@ function print_solution(model)
     return sol, k1, f1
 end
 
-sol = print_solution(model)
+sol, k1, f1 = print_solution(model)
 
-#writeSolution("output/solution.txt", sol, k, f, P, C, M, timeperiod,L_lower,L_upper,L_zero,Q_lower,Q_upper, start, stop, T)
+writeSolution("output/solution.txt", sol, k1, f1, P, C, M, timeperiod,L_lower,L_upper,L_zero,Q_lower,Q_upper, start, stop, T)
