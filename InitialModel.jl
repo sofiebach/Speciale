@@ -51,8 +51,8 @@ JuMP.optimize!(model)
 function print_solution(model)
     println("Objective: ", objective_value(model))
     sol = zeros(Int, T, P)
-    for t = 1:T
-        for p = 1:P
+    for p = 1:P
+        for t = 1:T
             if JuMP.value(x[t,p]) > 0.5
                 println("At time ", t, " we have priority ", p, " with value: ", JuMP.value(x[t,p]))
                 sol[t,p] = JuMP.value(x[t,p])
@@ -60,13 +60,14 @@ function print_solution(model)
         end
     end
 
+    k = zeros(Int, P)
     for p = 1:P
-        k = zeros(Int, P)
         if JuMP.value(k[p]) > 0.5
             println("Penalty for priority ", p , " with value: ", JuMP.value(k[p]))
             k[p] = JuMP.value(k[p])
         end
     end
+    f = zeros(Int, T, M)
     for t = 1:T
         for m = 1:M
             if JuMP.value(f[t,m]) > 0.5
@@ -81,4 +82,4 @@ end
 
 sol = print_solution(model)
 
-writeSolution("output/solution.txt", sol, k, f, P, C, M, timeperiod,L_lower,L_upper,L_zero,Q_lower,Q_upper, start, stop, T)
+#writeSolution("output/solution.txt", sol, k, f, P, C, M, timeperiod,L_lower,L_upper,L_zero,Q_lower,Q_upper, start, stop, T)
