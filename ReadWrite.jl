@@ -102,9 +102,9 @@ function readSolution(filename)
     readline(f) # blank
     readline(f) # comment
     air_weeks = collect(L_lower:L_upper)
-    u = zeros(Int, length(air_weeks), P, C)
+    u = zeros(Float64, length(air_weeks), P, C)
     for c = 1:C
-        line = parse.(Int,split(readline(f)))
+        line = parse.(Float64,split(readline(f)))
         u[:,:,c] = reshape(line, (length(air_weeks), P))
     end
     return x, obj, P, C, timeperiod, L_lower, L_upper, Q_lower, Q_upper, start, stop, T, u
