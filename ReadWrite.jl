@@ -52,10 +52,10 @@ end
 #P,C,M,timeperiod,L_lower,L_upper,L,L_zero,Q_lower,Q_upper,Q,start,stop,T,S,w,H,I,u = readInstance(filename)
 
 # Write solution
-function writeSolution(filename, sol, P, C, timeperiod, L_lower, L_upper, L_zero, Q_lower,Q_upper, start, stop, T)
+function writeSolution(filename, sol, P, C, M, timeperiod, L_lower, L_upper, L_zero, Q_lower,Q_upper, start, stop, T)
     outFile = open(filename, "w")
-    write(outFile, "P, C, timeperiod" * "\n")
-    write(outFile, join([P, C, timeperiod]," ")*"\n\n")
+    write(outFile, "P, C, M, timeperiod" * "\n")
+    write(outFile, join([P, C, M, timeperiod]," ")*"\n\n")
 
     write(outFile, "START, STOP, T" * "\n")
     write(outFile, join([start, stop, T]," ") * "\n\n")
@@ -80,14 +80,30 @@ function writeSolution(filename, sol, P, C, timeperiod, L_lower, L_upper, L_zero
     for c = 1:C
         write(outFile, join(u[:,:,c], " ") * "\n")
     end
+    write(outFile, "\n")
+
+    write(outFile, "INVENTORY" * "\n")
+    for c = 1:C
+        write(outFile, join(I[:,c], " ") * "\n")
+    end
+    write(outFile, "\n")
+
+    write(outFile, "STAFFING" * "\n")
+    for m = 1:M
+        write(outFile, join(H[:,m], " ") * "\n")
+    end
+    write(outFile, "\n")
+
     close(outFile)
 end
+
+
 
 # Read solution
 function readSolution(filename)
     f = open(filename)
     readline(f) # comment
-    P, C, timeperiod = parse.(Int,split(readline(f)))
+    P, C, M, timeperiod = parse.(Int,split(readline(f)))
     readline(f) # blank
     readline(f) # comment
     start, stop, T = parse.(Int,split(readline(f)))
@@ -111,6 +127,18 @@ function readSolution(filename)
         line = parse.(Float64,split(readline(f)))
         u[:,:,c] = reshape(line, (length(L), P))
     end
-    return x, obj, P, C, timeperiod, L_lower, L_upper, Q_lower, Q_upper, start, stop, T, u
+    readline(f) # blank
+    readline(f) # comment
+    I = zeros(Float64, T, C)
+    for c in 1:C
+        I[:,c] = parse.(Float64,split(readline(f)))
+    end
+    readline(f) # blank
+    readline(f) # comment
+    H = zeros(Float64, T, M)
+    for m = 1:M
+        H[:,m] = parse.(Float64,split(readline(f)))
+    end
+    return x, obj, P, C, M, timeperiod, L_lower, L_upper, Q_lower, Q_upper, start, stop, T, u, I, H
 
 end
