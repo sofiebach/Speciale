@@ -60,9 +60,11 @@ function writeSolution(filename, sol, k, f, P, C, M, timeperiod, L_lower, L_uppe
     write(outFile, "START, STOP, T" * "\n")
     write(outFile, join([start, stop, T]," ") * "\n\n")
 
-    write(outFile, join(objective_value(model)," ")*"\n")
-    for t = 1:T
-        write(outFile,join(sol[t,:]," ") * "\n")
+    write(outFile, "Objective value \n")
+    write(outFile, join(objective_value(model)," ")*"\n\n")
+    write(outFile, "Solution \n")
+    for p = 1:P
+        write(outFile,join(sol[:,p]," ") * "\n")
     end
     write(outFile, "\n")
 
@@ -71,8 +73,8 @@ function writeSolution(filename, sol, k, f, P, C, M, timeperiod, L_lower, L_uppe
     write(outFile, "\n")
 
     write(outFile, "Freelancers hired" * "\n")
-    for t = 1:T
-        write(outFile,join(f[t,:]," ")*"\n")
+    for m = 1:M
+        write(outFile,join(f[:,m]," ")*"\n")
     end
     write(outFile, "\n")
 
@@ -108,9 +110,6 @@ function writeSolution(filename, sol, k, f, P, C, M, timeperiod, L_lower, L_uppe
 end
 
 
-
-filename = "output/solution.txt"
-
 # Read solution
 function readSolution(filename)
     f = open(filename)
@@ -120,20 +119,25 @@ function readSolution(filename)
     readline(f) # comment
     start, stop, T = parse.(Int,split(readline(f)))
     readline(f) # blank
+    readline(f) # comment
     obj = parse.(Float64, readline(f))
+    readline(f) # blank
+    readline(f) # comment
     x = zeros(Int, T, P)
-    for i in 1:T
-        x[i,:] = parse.(Int,split(readline(f)))
+    for p in 1:P
+        x[:,p] = parse.(Int,split(readline(f)))
     end
     readline(f) # blank
     readline(f) # comment
     k = parse.(Int,split(readline(f)))
     readline(f) # blank
     readline(f) # comment
-    f = zeros(Int, T, M)
-    for t = 1:T
-        f[t,:] = parse.(Int,split(readline(f)))
+    f1 = zeros(Int, T, M)
+    for m = 1:M
+        f1[:,m] = parse.(Int,split(readline(f)))
     end
+    readline(f) # blank
+    readline(f) # comment
     L_lower, L_upper, L_zero = parse.(Int,split(readline(f)))
     readline(f) # blank
     readline(f) # comment
@@ -159,6 +163,6 @@ function readSolution(filename)
     for m = 1:M
         H[:,m] = parse.(Float64,split(readline(f)))
     end
-    return x, obj, f, k, P, C, M, timeperiod, L_lower, L_upper, Q_lower, Q_upper, start, stop, T, u, I, H
+    return x, obj, f1, k, P, C, M, timeperiod, L_lower, L_upper, Q_lower, Q_upper, start, stop, T, u, I, H
 
 end
