@@ -1,8 +1,10 @@
 using XLSX
 
 function read_DR_data()
+    
     P = 12 # skal sættes op, når vi ved noget om Binge, Stacking osv.
     C = 12
+    M = 4 # medias
     L_lower = -2
     L_upper = 5
     L = collect(L_lower:L_upper)
@@ -28,15 +30,16 @@ function read_DR_data()
     end
 
     # Read production hours
-    # w[p,j] is production hours of priority p on platform j (platforms are TV, RADIO, BANNER, SOME)
+    # w[p,m] is production hours of priority p on media m (platforms are TV, RADIO, BANNER, SOME)
     w = XLSX.readdata("data/data_staffing_constraint.xlsx", "Producertimer", "D2:G40")
     w = convert(Array{Float64,2}, w)
 
     # Read staffing
-    # H[j,t] is weekly staffing (hours) on platform j (platforms are TV, RADIO, BANNER, SOME) at time t
+    # H[t,m] is weekly staffing (hours) on platform m (medias are TV, RADIO, BANNER, SOME) at time t
     H = XLSX.readdata("data/data_staffing_constraint.xlsx", "Bemanding", "E2:E5")
     H = convert(Array{Float64,2}, H)
     H = repeat(H, 1, T)
+    H = transpose(H)
 
     # Read scope
     # S[p] is scope for priority p
@@ -49,6 +52,6 @@ function read_DR_data()
         I[:, c] = rand(10:100, T)*7
     end
 
-    return P,C,timeperiod,L_lower,L_upper,L,L_zero,Q_lower,Q_upper,Q,start,stop,T,S[1:P],w[1:P,:],H,I,u
+    return P,C,M,timeperiod,L_lower,L_upper,L,L_zero,Q_lower,Q_upper,Q,start,stop,T,S[1:P],w[1:P,:],H,I,u
 end
 
