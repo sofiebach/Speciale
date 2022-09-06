@@ -47,9 +47,9 @@ function read_DR_data()
     S = convert(Array{Float64,2}, S)
 
     # Simulate I for now
-    I = zeros(Int, T, C)
+    I = zeros(Float64, T, C)
     for c = 1:C
-        I[:, c] = rand(10:100, T)*7
+        I[:, c] = rand(10:100, T)*7.0
     end
 
     return P,C,M,timeperiod,L_lower,L_upper,L,L_zero,Q_lower,Q_upper,Q,start,stop,T,S[1:P],w[1:P,:],H,I,u

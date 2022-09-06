@@ -2,7 +2,7 @@
 function readInstance(filename)
     f = open(filename)
     readline(f) # comment
-    P, C, timeperiod = parse.(Int,split(readline(f)))
+    P, C, M, timeperiod = parse.(Int,split(readline(f)))
     readline(f) # blank
     readline(f) # comment
     L_lower, L_upper, L_zero = parse.(Int,split(readline(f)))
@@ -20,38 +20,42 @@ function readInstance(filename)
     start, stop, T = parse.(Int,split(readline(f)))
     readline(f) # blank
     readline(f) # comment
-    S = parse.(Int,split(readline(f)))
+    S = parse.(Float64,split(readline(f)))
     readline(f) # blank
     readline(f) # comment
-    w = parse.(Int,split(readline(f)))
+    w = parse.(Float64,split(readline(f)))
     readline(f) # blank
     readline(f) # comment
-    H = parse.(Int,split(readline(f)))
+    H = zeros(Float64, T, M)
+    for m = 1:M
+        H[:,m] = parse.(Float64,split(readline(f)))
+    end
+    #H = parse.(Int,split(readline(f)))
     readline(f) # blank
     readline(f) # comment
-    I = zeros(Int, T, C)
+    I = zeros(Float64, T, C)
     for c in 1:C
-        I[:,c] = parse.(Int,split(readline(f)))
+        I[:,c] = parse.(Float64,split(readline(f)))
     end
     readline(f) # blank
     readline(f) # comment
-    air_weeks = collect(L_lower:L_upper)
-    u = zeros(Int, length(air_weeks), P, C)
+    L = collect(L_lower:L_upper)
+    u = zeros(Float64, length(L), P, C)
     for c = 1:C
-        line = parse.(Int,split(readline(f)))
-        u[:,:,c] = reshape(line, (length(air_weeks), P))
+        line = parse.(Float64,split(readline(f)))
+        u[:,:,c] = reshape(line, (length(L), P))
     end
 
-    return P,C,timeperiod,L_lower,L_upper,L,L_zero,Q_lower,Q_upper,Q,start,stop,T,S,w,H,I,u
+    return P,C,M,timeperiod,L_lower,L_upper,L,L_zero,Q_lower,Q_upper,Q,start,stop,T,S,w,H,I,u
 end
-
-#P,C,timeperiod,L_lower,L_upper,L,Q_lower,Q_upper,Q,start,stop,T,S,w,H,I,u = readInstance(filename)
+#filename = "simulated_data/data.txt"
+#P,C,M,timeperiod,L_lower,L_upper,L,L_zero,Q_lower,Q_upper,Q,start,stop,T,S,w,H,I,u = readInstance(filename)
 
 # Write solution
-function writeSolution(filename, sol, n_priorities, n_channels, n_weeks, min_air_week, max_air_week, air_zero, min_prod_week,max_prod_week, start, stop, T)
+function writeSolution(filename, sol, P, C, timeperiod, L_lower, L_upper, L_zero, Q_lower,Q_upper, start, stop, T)
     outFile = open(filename, "w")
-    write(outFile, "N_PRIORITIES, N_CHANNELS, N_WEEKS" * "\n")
-    write(outFile, join([n_priorities, n_channels, n_weeks]," ")*"\n\n")
+    write(outFile, "P, C, timeperiod" * "\n")
+    write(outFile, join([P, C, timeperiod]," ")*"\n\n")
 
     write(outFile, "START, STOP, T" * "\n")
     write(outFile, join([start, stop, T]," ") * "\n\n")
@@ -62,15 +66,15 @@ function writeSolution(filename, sol, n_priorities, n_channels, n_weeks, min_air
     end
     write(outFile, "\n")
 
-    write(outFile, "MIN_AIR_WEEK, MAX_AIR_WEEK, L0" * "\n")
-    write(outFile, join([min_air_week, max_air_week, air_zero]," ")*"\n\n")
+    write(outFile, "L_lower, L_upper, L0" * "\n")
+    write(outFile, join([L_lower, L_upper, L_zero]," ")*"\n\n")
 
-    write(outFile, "MIN_PROD_WEEK, MAX_PROD_WEEK" * "\n")
-    write(outFile, join([min_prod_week, max_prod_week]," ")*"\n\n")
+    write(outFile, "Q_lower, Q_upper" * "\n")
+    write(outFile, join([Q_lower, Q_upper]," ")*"\n\n")
 
     # Time periods incl. prod and air
-    start = abs(min_prod_week) + 1
-    stop = abs(min_prod_week) + n_weeks
+    start = abs(Q_lower) + 1
+    stop = abs(Q_lower) + timeperiod
 
     write(outFile, "CONSUMPTION" * "\n")
     for c = 1:C
@@ -101,11 +105,11 @@ function readSolution(filename)
     Q_lower, Q_upper = parse.(Int,split(readline(f)))
     readline(f) # blank
     readline(f) # comment
-    air_weeks = collect(L_lower:L_upper)
-    u = zeros(Float64, length(air_weeks), P, C)
+    L = collect(L_lower:L_upper)
+    u = zeros(Float64, length(L), P, C)
     for c = 1:C
         line = parse.(Float64,split(readline(f)))
-        u[:,:,c] = reshape(line, (length(air_weeks), P))
+        u[:,:,c] = reshape(line, (length(L), P))
     end
     return x, obj, P, C, timeperiod, L_lower, L_upper, Q_lower, Q_upper, start, stop, T, u
 
