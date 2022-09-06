@@ -8,15 +8,19 @@ filename = "simulated_data/data.txt"
 # P,C,timeperiod,L_lower,L_upper,L,L_zero,Q_lower,Q_upper,Q,start,stop,T,S,w,H,I,u = readInstance(filename)
 P,C,M,timeperiod,L_lower,L_upper,L,L_zero,Q_lower,Q_upper,Q,start,stop,T,S,w,H,I,u = read_DR_data()
 
-GRP_matrix = zeros(Int, T, T)
+GRP_matrix = zeros(Float64, T, T, P, C)
 for t_col = start:stop
     row_start = t_col + L_lower
     row_stop = min(T, row_start + length(L) - 1)
     for t_row = row_start:row_stop
-        GRP_matrix[t_row, t_col] = 1
+        for c = 1:C
+            for p = 1:P
+                l = L_zero + t_row-t_col
+                GRP_matrix[t_row, t_col, p, c] = u[l,p,c]
+            end
+        end
     end
 end
-GRP_matrix
 
 model = Model(Gurobi.Optimizer)
 
@@ -30,7 +34,7 @@ model = Model(Gurobi.Optimizer)
 @constraint(model, [t = (stop + 1):T], sum(x[t,p] for p = 1:P) == 0)
 
 # Inventory from t = start:stop
-@constraint(model, [t=1:T, c=1:C], sum(GRP_matrix[t,t2]*x[t2,p]))
+@constraint(model, [t=1:T, c=1:C], sum(GRP_matrix[t,t2,p,c]*x[t2,p] for t2=1:T for p=1:P) <= I[t,c])
 # @constraint(model, [t=(start+1):(stop-1), c = 1:C], sum(u[l,p,c] * x[t-L[l],p] for l = 1:length(L) for p = 1:P) <= I[t,c])
 # Inventory for boundaries
 # @constraint(model, [t=stop:T, c = 1:C], sum(u[l,p,c] * x[t-L[l],p] for l = (t - stop + L_zero):length(L) for p = 1:P) <= I[t,c])
