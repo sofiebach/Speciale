@@ -6,7 +6,7 @@ include("ReadData.jl")
 filename = "simulated_data/data.txt"
 
 # P,C,timeperiod,L_lower,L_upper,L,L_zero,Q_lower,Q_upper,Q,start,stop,T,S,w,H,I,u = readInstance(filename)
-P,C,timeperiod,L_lower,L_upper,L,L_zero,Q_lower,Q_upper,Q,start,stop,T,S,w,H,I,u = read_DR_data()
+P,C,M,timeperiod,L_lower,L_upper,L,L_zero,Q_lower,Q_upper,Q,start,stop,T,S,w,H,I,u = read_DR_data()
 
 model = Model(Gurobi.Optimizer)
 
@@ -25,8 +25,9 @@ model = Model(Gurobi.Optimizer)
 @constraint(model, [t=1:start, c = 1:C], sum(u[l,p,c] * x[t-L[l],p] for l = 1:(t - 1 + L_zero) for p = 1:P) <= I[t,c])
 
 # Staff from t = start:stop
-@constraint(model, [t=1:(stop+Q_upper)], sum(w[p] * x[t-Q[q],p] for p=1:P for q = 1:length(Q)) <= H[t])
+@constraint(model, [t=1:(stop+Q_upper), m=1:M], sum(w[p,m] * x[t-Q[q],p] for p=1:P for q = 1:length(Q)) <= H[t,m])
 
+# Scope constraint
 @constraint(model, [p=1:P], sum(x[t,p] for t = start:stop) >= S[p] - f[p])
 
 JuMP.optimize!(model)
@@ -37,7 +38,7 @@ function print_solution(model)
     for t = 1:T
         for p = 1:P
             if JuMP.value(x[t,p]) > 0.5
-                println("At time ", t, " we have prioritet ", p, " with value: ", JuMP.value(x[t,p]))
+                println("At time ", t, " we have priority ", p, " with value: ", JuMP.value(x[t,p]))
                 sol[t,p] = JuMP.value(x[t,p])
             end
         end
