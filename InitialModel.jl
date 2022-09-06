@@ -11,9 +11,10 @@ P,C,M,timeperiod,L_lower,L_upper,L,L_zero,Q_lower,Q_upper,Q,start,stop,T,S,w,H,I
 model = Model(Gurobi.Optimizer)
 
 @variable(model, x[1:T, 1:P] >= 0, Int)
-@variable(model, f[1:P] >= 0, Int)
+@variable(model, f[1:T,1:M] >= 0, Int)
+@variable(model, k[1:P] >= 0, Int)
 
-@objective(model, Max, sum(x[t,p] for t = start:stop for p = 1:P) - sum(f[p] for p = 1:P))
+@objective(model, Max, sum(x[t,p] for t = start:stop for p = 1:P) - sum(k[p] for p = 1:P) - sum(f[t,m] for t = 1:T for m = 1:M))
 
 @constraint(model, [t = 1:(start - 1)], sum(x[t,p] for p = 1:P) == 0)
 @constraint(model, [t = (stop + 1):T], sum(x[t,p] for p = 1:P) == 0)
@@ -25,10 +26,10 @@ model = Model(Gurobi.Optimizer)
 @constraint(model, [t=1:start, c = 1:C], sum(u[l,p,c] * x[t-L[l],p] for l = 1:(t - 1 + L_zero) for p = 1:P) <= I[t,c])
 
 # Staff from t = start:stop
-@constraint(model, [t=1:(stop+Q_upper), m=1:M], sum(w[p,m] * x[t-Q[q],p] for p=1:P for q = 1:length(Q)) <= H[t,m])
+@constraint(model, [t=1:(stop+Q_upper), m=1:M], sum(w[p,m] * x[t-Q[q],p] for p=1:P for q = 1:length(Q)) <= H[t,m] + 7*3.5*f[t,m])
 
 # Scope constraint
-@constraint(model, [p=1:P], sum(x[t,p] for t = start:stop) >= S[p] - f[p])
+@constraint(model, [p=1:P], sum(x[t,p] for t = start:stop) >= S[p] - k[p])
 
 JuMP.optimize!(model)
 
@@ -45,8 +46,15 @@ function print_solution(model)
     end
 
     for p = 1:P
-        if JuMP.value(f[p]) > 0
-            println("Penalty for priority ", p , " with value: ", JuMP.value(f[p]))
+        if JuMP.value(k[p]) > 0
+            println("Penalty for priority ", p , " with value: ", JuMP.value(k[p]))
+        end
+    end
+    for t = 1:T
+        for m = 1:M
+            if JuMP.value(f[t,m]) > 0
+               println("Number of freelance for media ", m , " at time ", t, ": ", JuMP.value(f[t,m]))
+            end
         end
     end
     println("Number of campaigns: ", sum(sol))
