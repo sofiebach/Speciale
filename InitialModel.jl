@@ -61,8 +61,10 @@ function print_solution(model)
     end
 
     for p = 1:P
+        k = zeros(Int, P)
         if JuMP.value(k[p]) > 0
             println("Penalty for priority ", p , " with value: ", JuMP.value(k[p]))
+            k[p] = JuMP.value(k[p])
         end
     end
     for t = 1:T
@@ -78,4 +80,4 @@ end
 
 sol = print_solution(model)
 
-writeSolution("output/solution.txt", sol, P, C, timeperiod,L_lower,L_upper,L_zero,Q_lower,Q_upper, start, stop, T)
+writeSolution("output/solution.txt", sol, P, C, M, timeperiod,L_lower,L_upper,L_zero,Q_lower,Q_upper, start, stop, T)
