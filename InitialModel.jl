@@ -56,3 +56,5 @@ end
 sol = print_solution(model)
 
 writeSolution("output/solution.txt", sol, P, C, timeperiod,L_lower,L_upper,L_zero,Q_lower,Q_upper, start, stop, T)
+
+println("Hej")
