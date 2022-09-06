@@ -7,21 +7,30 @@ x, obj, P, C, timeperiod, L_lower, L_upper, Q_lower, Q_upper, start, stop, T, u 
 
 function drawSolution(x, obj, start, stop)
     scale = 100
-    height = sum(x)
-    c = 1
-    w = 4
+    height = sum(x)+2
+    c = 3
+    w = L_upper
     Drawing((T+w)*scale, height*scale, "output/schedule.png")
-    background("gray80") # color of background
+    background("white") # color of background
     origin()
 
     
 
     #transform([1 0 0 -1 0 0])
     translate(-(T+w)*scale/2, -height*scale/2)
-    colors = ["blue", "blue", "red", "red", "green", "green"]
+    colors = vcat(repeat(["blue"],8,), repeat(["red"], 4)) 
+    rect(0,(c-1)*scale,(T+w)*scale,1, :fill)
   
+    
+    fontsize(70)
+    sethue("black")
+    #text("HEJ", Point(100,100), halign=:center, valign = :top)
     for t = 1:T+w
-        rect((t-1) * scale,0,1,(T+w) * scale, :fill)
+        time = t-start+1
+        rect((t-1) * scale,(c-1) * scale ,1,(T+w) * scale, :fill)
+        if time > 0
+            text(string(time), Point((t-1)*scale,1 * scale), halign=:center)
+        end
     end
 
     for t = 1:T

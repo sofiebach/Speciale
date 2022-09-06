@@ -10,15 +10,15 @@ n_priorities = 6
 n_channels = 3
 
 # Time period excl prod and air
-n_weeks = 10
+n_weeks = 52
 
 # Min and max airing week
-min_air_week = -1
-max_air_week = 1
+min_air_week = -2
+max_air_week = 5
 
 # Min and max production week
-min_prod_week = -3
-max_prod_week = -2
+min_prod_week = -4
+max_prod_week = -3
 
 # Write parameters to file
 write(data_file, "N_PRIORITIES, N_CHANNELS, N_WEEKS" * "\n")
