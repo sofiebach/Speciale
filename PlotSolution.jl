@@ -6,7 +6,7 @@ data, sol = readSolution("output/solution.txt")
 
 function drawSolution(data, sol)
     scalar = 100
-    height = 50#sum(sol.x)+2
+    height = 100
     c = 2
     w = data.L_upper
     Drawing((data.T+w)*scalar, height*scalar, "output/schedule.png")
@@ -17,52 +17,56 @@ function drawSolution(data, sol)
 
     #transform([1 0 0 -1 0 0])
     translate(-(data.T+w)*scalar/2, -height*scalar/2)
-    #colors = vcat(repeat(["blue"],7,), repeat(["red"], 5)),repeat(["purple"], 2), repeat(["green"], 3),repeat(["pink"], 4), repeat(["yellow"], 4), repeat(["grey"], 1),repeat(["orange"], 2),repeat(["green"], 1)) 
-    colors = ["black", "blue", "red", "green", "yellow", "orange", "purple", "cyan", "magenta", "lime", "grey", "white"]
+    colors = vcat(repeat(["blue"],7,), repeat(["red"], 5),repeat(["purple"], 2), repeat(["green"], 3),repeat(["pink"], 4), repeat(["yellow"], 4), repeat(["grey"], 1),repeat(["orange"], 2), repeat(["green"], 1))
+    #colors = ["black", "blue", "red", "green", "yellow", "orange", "purple"]#, "cyan", "magenta", "lime", "grey", "white"]
     
     rect(0,(c-1)*scalar,(data.T+w)*scalar,1, :fill)
   
-    
     fontsize(70)
     sethue("black")
     #text("HEJ", Point(100,100), halign=:center, valign = :top)
     for t = 1:data.T+w
         time = t-data.start+1
-        rect((t-1) * scalar,(c-1) * scalar ,1,(height) * scalar, :fill)
+        #rect((t-1) * scalar,(c-1) * scalar ,1,(height) * scalar, :fill)
         if time > 0
-            text(string(time), Point((t-1)*scalar,1 * scalar), halign=:center)
+            text(string(time), Point((t)*scalar,1 * scalar), halign=:center)
         end
     end
 
-    row_start = 3
-    for p = 2:2
-        ends = ones(1)*5
+    row_start = 2
+    for p = 1:data.P
+        ends = ones(1)*w
         for t = 1:data.T
             if sol.x[t,p] != 0
                 for n = 1:sol.x[t,p]
                     isPlaced = false
-                    for e in 1:length(ends)
+                    for e = 1:length(ends)
                         if t >= ends[e]
-                            println("Ends: ", ends[e])
-                            println("T: ", t)
+                            println("Put in same row: ", row_start+e-1)
+                            println("TIME: ", t)
+                            println("END: ", ends[e])
                             setcolor(colors[p])
                             setopacity(0.5)
-                            rect((t-1) * scalar, (row_start+e-1) * scalar, w * scalar, 0.7  * scalar,:fill)
+                            rect(t * scalar, (row_start+e-1) * scalar, w * scalar, 0.7  * scalar,:fill)
                             sethue("black")
-                            rect((t-1) * scalar, (row_start+e-1) * scalar, w * scalar, 0.7  * scalar,:stroke)
-                            ends[e] = ends[e] + w
+                            rect(t * scalar, (row_start+e-1) * scalar, w * scalar, 0.7  * scalar,:stroke)
+                            ends[e] = t + w
                             isPlaced = true
                             break
                         end
                     end
-                    if isPlaced == false    
+                    if isPlaced == false
+                        c += 1
+                        println("Put in new row : ", c)
+
                         sethue(colors[p])
                         setopacity(0.5)
-                        rect((t-1) * scalar, (c) * scalar, w * scalar, 0.7  * scalar,:fill)
+                        rect(t * scalar, (c) * scalar, w * scalar, 0.7  * scalar,:fill)
                         sethue("black")
-                        rect((t-1) * scalar, (c) * scalar, w * scalar, 0.7  * scalar,:stroke)
-                        c += 1
-                        append!(ends,(t-1+w))
+                        rect(t * scalar, (c) * scalar, w * scalar, 0.7  * scalar,:stroke)
+                        
+                        append!(ends,(t+w))
+                        println("End of new row", ends[end])
                     end
                     #print(ends)
                 end
