@@ -98,7 +98,6 @@ function read_DR_data()
         data.I[:, c] = repeat([average[c]], data.T)
     end
 
-    #GRP_matrix = zeros(Float64, T, T, P, C)
     for t_col = data.start:data.stop
         row_start = t_col + data.L_lower
         row_stop = min(data.T, row_start + length(data.L) - 1)

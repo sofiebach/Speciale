@@ -11,8 +11,9 @@ model = Model(optimizer_with_attributes(Gurobi.Optimizer, "TimeLimit" => 60))
 @variable(model, x[1:data.T, 1:data.P] >= 0, Int)
 @variable(model, f[1:data.T,1:data.M] >= 0, Int)
 @variable(model, k[1:data.P] >= 0, Int)
-
-@objective(model, Max, sum(x[t,p] for t = data.start:data.stop for p = 1:data.P) - sum(k[p] for p = 1:data.P) - sum(f[t,m] for t = 1:data.T for m = 1:data.M))
+penalty_scope = 50
+penalty_freelancer = 10
+@objective(model, Max, sum(x[t,p] for t = data.start:data.stop for p = 1:data.P) - penalty_scope*sum(k[p] for p = 1:data.P) - penalty_freelancer*sum(f[t,m] for t = 1:data.T for m = 1:data.M))
 
 @constraint(model, [t = 1:(data.start - 1)], sum(x[t,p] for p = 1:data.P) == 0)
 @constraint(model, [t = (data.stop + 1):data.T], sum(x[t,p] for p = 1:data.P) == 0)
