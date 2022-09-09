@@ -16,22 +16,20 @@ mutable struct Instance
     start::Int64
     stop::Int64
     T::Int64
-    S::Array{Float64,2}
+    S::Array{Float64,1}
     w::Array{Float64,2}
     H::Array{Float64,2}
     I::Array{Float64,2}
     u::Array{Float64, 3}
-    GRP_matrix::Array{Float64, 4}
     Instance(P,C,M,timeperiod,L_lower,L_upper,Q_lower,Q_upper,T) = new(P,C,M,timeperiod,
         L_lower,L_upper,collect(L_lower:L_upper),indexin(0,collect(L_lower:L_upper))[],
         Q_lower,Q_upper,collect(Q_lower:Q_upper),
         abs(Q_lower)+1,abs(Q_lower)+timeperiod,T,
-        zeros(Float64, T, P),
+        zeros(Float64, P),
         zeros(Float64, P, M),
         zeros(Float64, T, M),
         zeros(Float64, T, C),
-        zeros(Float64, length(collect(L_lower:L_upper)), P, C),
-        zeros(Float64, T, T, P, C))
+        zeros(Float64, length(collect(L_lower:L_upper)), P, C))
 end
 
 # Struct for holding the instance
@@ -70,7 +68,7 @@ function read_DR_data()
 
     # Read production hours
     # w[p,m] is production hours of priority p on media m (platforms are TV, RADIO, BANNER, SOME)
-    data.w = convert(Array{Float64,2},XLSX.readdata("data/data_staffing_constraint.xlsx", "Producertimer", "D2:G38"))
+    data.w = convert(Array{Float64,2},XLSX.readdata("data/data_staffing_constraint.xlsx", "Producertimer", "D2:G38"))[1:P,:]
 
     # Read staffing
     # H[t,m] is weekly staffing (hours) on platform m (medias are TV, RADIO, BANNER, SOME) at time t
@@ -78,7 +76,7 @@ function read_DR_data()
 
     # Read scope
     # S[p] is scope for priority p
-    data.S = convert(Array{Float64,2}, XLSX.readdata("data/data_staffing_constraint.xlsx", "Scope", "D2:D38"))
+    data.S = convert(Array{Float64,2}, XLSX.readdata("data/data_staffing_constraint.xlsx", "Scope", "D2:D38"))[1:P]
 
     # Simulate I for now
     average = [154 16 6 6 3 50 111 12 2 1 10 10]*7.0 # Banner og SOME er opfundet
@@ -96,19 +94,6 @@ function read_DR_data()
     #12	SOME
     for c = 1:data.C
         data.I[:, c] = repeat([average[c]], data.T)
-    end
-
-    for t_col = data.start:data.stop
-        row_start = t_col + data.L_lower
-        row_stop = min(data.T, row_start + length(data.L) - 1)
-        for t_row = row_start:row_stop
-            for c = 1:data.C
-                for p = 1:data.P
-                    l = data.L_zero + t_row-t_col
-                    data.GRP_matrix[t_row, t_col, p, c] = data.u[l,p,c]
-                end
-            end
-        end
     end
 
     return data
@@ -210,6 +195,15 @@ function writeSolution(filename, data, sol)
     end
     write(outFile, "\n")
 
+    write(outFile, "PRODUCTION HOURS" * "\n")
+    for m = 1:data.M
+        write(outFile, join(data.w[:,m], " ") * "\n")
+    end
+    write(outFile, "\n")
+
+    write(outFile, "SCOPE" * "\n")
+    write(outFile, join(data.S, " ") * "\n\n")
+
     write(outFile, "Objective value \n")
     write(outFile, join(sol.obj," ")*"\n\n")
     write(outFile, "Solution \n")
@@ -258,6 +252,14 @@ function readSolution(filename)
     for m = 1:data.M
         data.H[:,m] = parse.(Float64,split(readline(f)))
     end
+    readline(f) # blank
+    readline(f) # comment
+    for m = 1:data.M
+        data.w[:,m] = parse.(Float64,split(readline(f)))
+    end
+    readline(f) # blank
+    readline(f) # comment
+    data.S = parse.(Float64,split(readline(f)))
     readline(f) # blank
     readline(f) # comment
     sol = Sol(data.T,data.P,data.M)

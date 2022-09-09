@@ -1,27 +1,24 @@
 include("ReadWrite.jl")
 
-filename = "simulated_data/data.txt"
-
-# Overview of inventory
 function checkSolution(filename)
-    x, _, f, k, P, C, M, _, L_lower, L_upper, Q_lower, Q_upper, _, _, T, _, I, H= readSolution(filename)
-    inventory_check = zeros(C, T)
-    inventory_used = zeros(C, T)
-    for t = start:stop
-        for p = 1:P
-            if x[t,p] > 0
+    data, sol = readSolution(filename)
+
+    # Overview of inventory
+    inventory_check = zeros(data.T, data.C)
+    for t = 1:data.T
+        for p = 1:data.P
+            if sol.x[t,p] > 0
                 l_idx = 1
-                for l in (collect(L_lower:L_upper))
-                    for c = 1:C
-                        grp = u[l_idx,p,c] * x[t,p]
-                        inventory_check[c, t+l] += grp
-                        inventory_used[c, t+l] = 1 - (I[t+l,c] - inventory_check[c, t+l])/I[t+l,c]
-                        if inventory_check[c, t+l] > I[t+l,c]
+                for l in data.L
+                    for c = 1:data.C
+                        grp = data.u[l_idx,p,c] * sol.x[t,p]
+                        inventory_check[t+l,c] += grp
+                        if inventory_check[t+l, c] > data.I[t+l,c]
                             println("Inventory constraint exceeded!")
-                            println("p: ", p)
-                            println("c: ", c)
-                            println("t: ", t)
-                            println("l: ", l)
+                            #println("p: ", p)
+                            #println("c: ", c)
+                            #println("t: ", t)
+                            #println("l: ", l)
                         end
                     end
                     l_idx += 1
@@ -29,25 +26,26 @@ function checkSolution(filename)
             end
         end
     end
+    inventory_used = inventory_check ./ data.I
 
     # Overview of staffing
-    staffing_check = zeros(T,M)
-    staffing_used = zeros(T,M)
-    for t = start:stop
-        for p = 1:P
-            if x[t,p] > 0
+    staffing_check = zeros(data.T,data.M)
+    staff_incl_freelancer = data.H + sol.f*7.0*3.5 # freelancer * 7 hours * 3,5 days (avg days per week) 
+    for t = 1:data.T
+        for p = 1:data.P
+            if sol.x[t,p] > 0
                 q_idx = 1
-                work = w[p]
-                for q in Q
-                    for m in 1:M
+                for q in data.Q
+                    for m in 1:data.M
+                        #println(data.w[p,m])
+                        work = data.w[p,m]
                         staffing_check[t+q,m] += work
-                        staffing_used[t+q,m] = 1 - (H[t+q,m] - staffing_check[t+q,m])/H[t+q,m]
-                        if staffing_check[t+q,m] > H[t+q,m]
+                        if staffing_check[t+q,m] > staff_incl_freelancer[t+q,m]
                             println("Staff constraint exceeded!")
-                            println("t: ", t)
-                            println("p: ", p)
-                            println("q: ", q)
-                            println("m: ", m)
+                            #println("t: ", t)
+                            #println("p: ", p)
+                            #println("q: ", q)
+                            #println("m: ", m)
                         end
                     end
                     q_idx += 1
@@ -55,16 +53,21 @@ function checkSolution(filename)
             end
         end
     end
-    println("Inventory used (%):")
-    display(inventory_used * 100)
-    println("Staff used (%): ")
-    println(staffing_used * 100)
+    staffing_used = staffing_check ./ staff_incl_freelancer
 
-    #println("Staff 50: ", staffing_check[50])
-    #println("H 50: ", H)
-    #println("Staff 50: ", staffing_used[50])
+    #println("Inventory used (%):")
+    #display(inventory_used * 100)
+    max_inventory = maximum(inventory_used)
+    max_inventory_idx = findfirst(x -> x == maximum(inventory_used), inventory_used)
+    println("Maximum inventory used is ", max_inventory, " on channel ", max_inventory_idx[1], " at time ", max_inventory_idx[2], "\n\n")
+
+    #println("Staffing used (%):")
+    #display(staffing_used * 100)
+    max_staff = maximum(staffing_used)
+    max_staff_idx = findfirst(x -> x == maximum(staffing_used), staffing_used)
+    println("Maximum staffing used is ", max_staff, " on media ", max_staff_idx[2], " at time ", max_staff_idx[1])
+    
 end
 
-x, obj, f, k, P, C, M, timeperiod, L_lower, L_upper, Q_lower, Q_upper, start, stop, T, u, I, H = readSolution("output/solution.txt")
 checkSolution("output/solution.txt")
 

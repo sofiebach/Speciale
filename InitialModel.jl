@@ -6,6 +6,20 @@ include("ReadWrite.jl")
 # data = readInstance(filename)
 data = read_DR_data()
 
+GRP_matrix = zeros(Float64, data.T, data.T, data.P, data.C)
+for t_col = data.start:data.stop
+    row_start = t_col + data.L_lower
+    row_stop = min(data.T, row_start + length(data.L) - 1)
+    for t_row = row_start:row_stop
+        for c = 1:data.C
+            for p = 1:data.P
+                l = data.L_zero + t_row-t_col
+                GRP_matrix[t_row, t_col, p, c] = data.u[l,p,c]
+            end
+        end
+    end
+end
+
 model = Model(optimizer_with_attributes(Gurobi.Optimizer, "TimeLimit" => 60))
 
 @variable(model, x[1:data.T, 1:data.P] >= 0, Int)
@@ -19,7 +33,7 @@ penalty_freelancer = 10
 @constraint(model, [t = (data.stop + 1):data.T], sum(x[t,p] for p = 1:data.P) == 0)
 
 # Inventory from t = start:stop
-@constraint(model, [t=1:data.T, c=1:data.C], sum(data.GRP_matrix[t,t2,p,c]*x[t2,p] for t2=1:data.T for p=1:data.P) <= data.I[t,c])
+@constraint(model, [t=1:data.T, c=1:data.C], sum(GRP_matrix[t,t2,p,c]*x[t2,p] for t2=1:data.T for p=1:data.P) <= data.I[t,c])
 # @constraint(model, [t=(start+1):(stop-1), c = 1:C], sum(u[l,p,c] * x[t-L[l],p] for l = 1:length(L) for p = 1:P) <= I[t,c])
 # Inventory for boundaries
 # @constraint(model, [t=stop:T, c = 1:C], sum(u[l,p,c] * x[t-L[l],p] for l = (t - stop + L_zero):length(L) for p = 1:P) <= I[t,c])
@@ -58,10 +72,11 @@ function print_solution(model, sol)
         for m = 1:sol.M
             if JuMP.value(f[t,m]) > 0.5
                 sol.f[t,m] = JuMP.value(f[t,m])
-                println("Number of freelance for media ", m , " at time ", t, ": ", sol.f[t,m])
+                #println("Number of freelance for media ", m , " at time ", t, ": ", sol.f[t,m])
             end
         end
     end
+    println("Number of freelancers: ", sum(sol.f))
     println("Number of campaigns: ", sum(sol.x))
     return sol
 end
@@ -70,4 +85,4 @@ sol = print_solution(model,sol)
 
 writeSolution("output/solution.txt", data, sol)
 
-data1, sol1 = readSolution("output/solution.txt")
+#data1, sol1 = readSolution("output/solution.txt")
