@@ -72,10 +72,11 @@ function print_solution(model, sol)
         for m = 1:sol.M
             if JuMP.value(f[t,m]) > 0.5
                 sol.f[t,m] = JuMP.value(f[t,m])
-                println("Number of freelance for media ", m , " at time ", t, ": ", sol.f[t,m])
+                #println("Number of freelance for media ", m , " at time ", t, ": ", sol.f[t,m])
             end
         end
     end
+    println("Number of freelancers: ", sum(sol.f))
     println("Number of campaigns: ", sum(sol.x))
     return sol
 end
