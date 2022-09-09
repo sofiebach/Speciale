@@ -2,7 +2,7 @@ using XLSX
 
 function read_DR_data()
     
-    P = 12 # skal sættes op, når vi ved noget om Binge, Stacking osv.
+    P = 29 # skal sættes op, når vi ved noget om Binge, Stacking osv.
     C = 12
     M = 4 # medias
     L_lower = -2
@@ -31,7 +31,7 @@ function read_DR_data()
 
     # Read production hours
     # w[p,m] is production hours of priority p on media m (platforms are TV, RADIO, BANNER, SOME)
-    w = XLSX.readdata("data/data_staffing_constraint.xlsx", "Producertimer", "D2:G40")
+    w = XLSX.readdata("data/data_staffing_constraint.xlsx", "Producertimer", "D2:G38")
     w = convert(Array{Float64,2}, w)
 
     # Read staffing
@@ -43,7 +43,7 @@ function read_DR_data()
 
     # Read scope
     # S[p] is scope for priority p
-    S = XLSX.readdata("data/data_staffing_constraint.xlsx", "Scope", "D2:D40")
+    S = XLSX.readdata("data/data_staffing_constraint.xlsx", "Scope", "D2:D38")
     S = convert(Array{Float64,2}, S)
 
     # Simulate I for now
