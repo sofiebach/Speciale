@@ -5,38 +5,34 @@ using Luxor
 data, sol = readSolution("output/solution.txt")
 
 function drawSolution(data, sol)
+    mapping = XLSX.readdata("data/data_staffing_constraint.xlsx", "Mapping", "B2:C38")[1:data.P,:]
+    BC_names = unique(mapping[:,1])
+    BC = []
+    for bc in BC_names
+        priorities = []
+        for i = 1:data.P
+            if mapping[i,1] == bc
+                priorities = push!(priorities, i)
+            end
+        end
+        BC = push!(BC, priorities)
+    end
+
     scalar = 100
     height = 50
     c = 2
     w = data.L_upper
     Drawing((data.T+w)*scalar, height*scalar, "output/schedule.png")
     background("white") # color of background
-    origin()
+    origin() 
 
-    BC_names = ["DR1","DR2","DR2+","DR3","Ramasjang","Ultra","DR","DRTV"]
-
-    BC = []
-    BC = push!(BC, collect(1:7))
-    BC = push!(BC, collect(8:11))
-    BC = push!(BC, [13,14])
-    BC = push!(BC, vcat(collect(15:17),[29]))
-    BC = push!(BC, collect(18:21))
-    BC = push!(BC, collect(22:25))
-    BC = push!(BC, [26])
-    BC = push!(BC, [27,28])  
-
-    #transform([1 0 0 -1 0 0])
     translate(-(data.T+w)*scalar/2, -height*scalar/2)
-    #colors = vcat(repeat(["blue"],7,), repeat(["red"], 5),repeat(["purple"], 2), repeat(["green"], 3),repeat(["pink"], 4), repeat(["yellow"], 4), repeat(["grey"], 1),repeat(["orange"], 2), repeat(["green"], 1))
-    #colors = ["black", "blue", "red", "green", "yellow", "orange", "purple"]#, "cyan", "magenta", "lime", "grey", "white"]
-    
-    colors = ["blue", "red", "green", "yellow", "orange", "purple","cyan", "magenta", "lime"]
 
-    #rect(0,(1.3)*scalar,(data.T+w)*scalar,5, :fill)
+    colors = ["blue", "red", "green", "yellow", "orange", "purple","cyan", "magenta", "lime"]
   
     fontsize(70)
     sethue("black")
-    #text("HEJ", Point(100,100), halign=:center, valign = :top)
+
     for t = 1:data.T+w
         time = t-data.start+1
         #rect((t-1) * scalar,(c-1) * scalar ,1,(height) * scalar, :fill)
@@ -55,18 +51,17 @@ function drawSolution(data, sol)
         for t = 1:data.T
             for p in BC[bc]
                 if sol.x[t,p] != 0
+                    priority = mapping[p,2]
                     for n = 1:sol.x[t,p]
                         isPlaced = false
                         for e = 1:length(ends)
                             if t >= ends[e]
-                                println("Put in same row: ", row_start+e-1)
-                                println("TIME: ", t)
-                                println("END: ", ends[e])
                                 setcolor(colors[bc])
                                 setopacity(0.5)
-                                rect(t * scalar, (row_start+e-1) * scalar, w * scalar, 0.8  * scalar,:fill)
+                                rect(t*scalar, (row_start+e-1)*scalar, w*scalar, 0.8*scalar,:fill)
                                 sethue("black")
-                                rect(t * scalar, (row_start+e-1) * scalar, w * scalar, 0.8  * scalar,:stroke)
+                                rect(t*scalar, (row_start+e-1)*scalar, w*scalar, 0.8*scalar,:stroke)
+                                text(string(priority), Point(t*scalar, (row_start+e-1)*scalar), halign=:left)
                                 ends[e] = t + w
                                 isPlaced = true
                                 break
@@ -74,61 +69,25 @@ function drawSolution(data, sol)
                         end
                         if isPlaced == false
                             c += 1
-                            println("Put in new row : ", c)
-
                             sethue(colors[bc])
                             setopacity(0.5)
-                            rect(t * scalar, (c) * scalar, w * scalar, 0.8  * scalar,:fill)
+                            rect(t*scalar, c*scalar, w*scalar, 0.8*scalar,:fill)
                             sethue("black")
-                            rect(t * scalar, (c) * scalar, w * scalar, 0.8  * scalar,:stroke)
-
+                            rect(t*scalar, c*scalar, w*scalar, 0.8*scalar,:stroke)
+                            text(string(priority), Point(t*scalar, c*scalar), halign=:left)
                             append!(ends,(t+w))
-                            println("End of new row", ends[end])
                         end
-                        #print(ends)
                     end
                 end
             end
-            
         end
-        
         c = c+2    
         row_start = row_start + length(ends) + 1
     end
 
     finish()
     preview()
-    #transform([1 0 0 -1 0 0])
 
-    #sethue("black")
-#
-    #transform([1 0 0 -1 0 0])
-    #translate(-data.W*scale/2, -stripheight*scale/2)
-    #setopacity(0.5)
-#
-    #colors = ["black", "blue", "red", "green", "yellow", "orange", "purple", "cyan", "magenta", "lime"]
-#
-    #for i in 1:data.n
-    #    sethue(colors[i%10 + 1])
-    #    rect(xcoord[i]*scale, ycoord[i]*scale, data.w[i]*scale, data.h[i]*scale,:fill)
-    #    sethue("black")
-    #    rect(xcoord[i]*scale, ycoord[i]*scale, data.w[i]*scale, data.h[i]*scale,:stroke)
-    #end
-#
-    ##We need to flip the coordinate system back so numbers are written correctly
-    #transform([1 0 0 -1 0 0])
-    #fontsize(15)
-    #for i in 1:data.n
-    #    #Notice (x,-y+5). -y because items were drawn on flipped coordinate system
-    #    #+5 to move the numbers closer to the center
-    #    text(string(i), Point((xcoord[i]+data.w[i]/2)*scale, -(ycoord[i]+data.h[i]/2)*scale + 5), halign=:center)
-    #end
-    #scale(1,-1)
-    #transform([1 0 0 -1 0 0])
-    #terminates and commits the drawing
-    #finish()
-    #makes a preview in e.g. Atom plot pannel
-    #preview()
 end
 
 drawSolution(data,sol)
