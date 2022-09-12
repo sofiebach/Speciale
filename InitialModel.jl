@@ -6,20 +6,6 @@ include("ReadWrite.jl")
 # data = readInstance(filename)
 data = read_DR_data()
 
-GRP_matrix = zeros(Float64, data.T, data.T, data.P, data.C)
-for t_col = data.start:data.stop
-    row_start = t_col + data.L_lower
-    row_stop = min(data.T, row_start + length(data.L) - 1)
-    for t_row = row_start:row_stop
-        for c = 1:data.C
-            for p = 1:data.P
-                l = data.L_zero + t_row-t_col
-                GRP_matrix[t_row, t_col, p, c] = data.u[l,p,c]
-            end
-        end
-    end
-end
-
 model = Model(optimizer_with_attributes(Gurobi.Optimizer, "TimeLimit" => 60))
 
 @variable(model, x[1:data.T, 1:data.P] >= 0, Int)
@@ -29,21 +15,19 @@ penalty_scope = 50
 penalty_freelancer = 10
 @objective(model, Max, sum(x[t,p] for t = data.start:data.stop for p = 1:data.P) - penalty_scope*sum(k[p] for p = 1:data.P) - penalty_freelancer*sum(f[t,m] for t = 1:data.T for m = 1:data.M))
 
+#It is not possible to slack on Flagskib DR1 and DR2 (p=1 and p=8)
+@constraint(model, [p in [1,8]], k[p] == 0)
+
+# Nothing can be planned before start and after stop
 @constraint(model, [t = 1:(data.start - 1)], sum(x[t,p] for p = 1:data.P) == 0)
 @constraint(model, [t = (data.stop + 1):data.T], sum(x[t,p] for p = 1:data.P) == 0)
 
-# Inventory from t = start:stop
-@constraint(model, [t=1:data.T, c=1:data.C], sum(GRP_matrix[t,t2,p,c]*x[t2,p] for t2=1:data.T for p=1:data.P) <= data.I[t,c])
-# t2 = max(t+L_lower, 1):min(T, t+L_upper)
-
-
-# @constraint(model, [t=(start+1):(stop-1), c = 1:C], sum(u[l,p,c] * x[t-L[l],p] for l = 1:length(L) for p = 1:P) <= I[t,c])
-# Inventory for boundaries
-# @constraint(model, [t=stop:T, c = 1:C], sum(u[l,p,c] * x[t-L[l],p] for l = (t - stop + L_zero):length(L) for p = 1:P) <= I[t,c])
-# @constraint(model, [t=1:start, c = 1:C], sum(u[l,p,c] * x[t-L[l],p] for l = 1:(t - 1 + L_zero) for p = 1:P) <= I[t,c])
+# Inventory constraint
+@constraint(model, [t=1:data.T, c=1:data.C], sum(data.u[t-t2+data.L_zero,p,c]*x[t2,p] for p = 1:data.P for t2 = max(t-data.L_upper, data.start):min(data.stop,t-data.L_lower)) <= data.I[t,c])
 
 # Staff from t = start:stop
-@constraint(model, [t=1:(data.stop+data.Q_upper), m=1:data.M], sum(data.w[p,m] * x[t-data.Q[q],p] for p=1:data.P for q = 1:length(data.Q)) <= data.H[t,m] + 7*3.5*f[t,m]) # freelancer * 7 hours * 3,5 days (avg days per week) 
+#@constraint(model, [t=1:(data.stop+data.Q_upper), m=1:data.M], sum(data.w[p,m] * x[t-data.Q[q],p] for p=1:data.P for q = 1:length(data.Q)) <= data.H[t,m] + 7*3.5*f[t,m]) # freelancer * 7 hours * 3,5 days (avg days per week) 
+@constraint(model, [t=1:data.T, m=1:data.M], sum(data.w[p,m] * x[t2,p] for p=1:data.P for t2 = 1:max(t-data.Q_upper, data.start):min(data.stop,t-data.Q_lower)) <= data.H[t,m] + 7*3.5*f[t,m]) # freelancer * 7 hours * 3,5 days (avg days per week) 
 
 # Scope constraint
 @constraint(model, [p=1:data.P], sum(x[t,p] for t = data.start:data.stop) >= data.S[p] - k[p])

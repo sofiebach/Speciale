@@ -34,21 +34,20 @@ function checkSolution(filename)
     for t = 1:data.T
         for p = 1:data.P
             if sol.x[t,p] > 0
-                q_idx = 1
                 for q in data.Q
                     for m in 1:data.M
                         #println(data.w[p,m])
-                        work = data.w[p,m]
+                        work = data.w[p,m] * sol.x[t,p]
                         staffing_check[t+q,m] += work
                         if staffing_check[t+q,m] > staff_incl_freelancer[t+q,m]
                             println("Staff constraint exceeded!")
-                            #println("t: ", t)
-                            #println("p: ", p)
-                            #println("q: ", q)
-                            #println("m: ", m)
+                            println("t: ", t)
+                            println("p: ", p)
+                            println("q: ", q)
+                            println("m: ", m)
+                            break
                         end
                     end
-                    q_idx += 1
                 end   
             end
         end
