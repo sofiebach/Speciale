@@ -1,6 +1,6 @@
 include("ReadWrite.jl")
 using Luxor
-
+using ColorSchemes
 
 data, sol = readSolution("output/solution.txt")
 
@@ -18,34 +18,51 @@ function drawSolution(data, sol)
         BC = push!(BC, priorities)
     end
 
+    P_names = unique(mapping[:,2])
+    
+    #col = ["blue","red","green","yellow","orange","purple","cyan","magenta","lime","gray","pink"]
+    #col = ColorSchemes.mk_12[1:length(P_names)]
+    col = ColorScheme(distinguishable_colors(length(P_names)+1))[2:(length(P_names)+1)]
+    
     scalar = 100
-    height = 50
+    height = 80
+    h = 0.8
     c = 2
-    w = data.L_upper
+    w = length(data.L)
     Drawing((data.T+w)*scalar, height*scalar, "output/schedule.png")
     background("white") # color of background
     origin() 
 
     translate(-(data.T+w)*scalar/2, -height*scalar/2)
 
-    colors = ["blue", "red", "green", "yellow", "orange", "purple","cyan", "magenta", "lime"]
-  
     fontsize(70)
     sethue("black")
 
-    for t = 1:data.T+w
+    for t = 1:data.stop+w
         time = t-data.start+1
         #rect((t-1) * scalar,(c-1) * scalar ,1,(height) * scalar, :fill)
         if time > 0
-            text(string(time), Point((t)*scalar,1 * scalar), halign=:center)
+            text(string(time), Point(-data.L_lower*scalar+(t)*scalar,1 * scalar), halign=:center)
         end
     end
+    #rect((data.stop+w)*scalar+h*scalar,0,5,height*scalar, :fill)
 
     row_start = 2
 
     fontsize(80)
+
+    #for prio = 1:length(P_names)
+    #    setcolor("black")
+    #    text(string(P_names[prio]), Point((data.stop+w)*scalar+h*scalar, h*scalar+h*prio*scalar), halign=:left)
+    #    setcolor(col[prio])
+    #    setopacity(0.5)
+    #    rect((data.stop+w)*scalar+h*scalar, h*prio*scalar, w*scalar, h*scalar,:fill)
+    #end
+
     for bc = 1:length(BC)
-        rect(0,(c-0.5)*scalar,(data.T+w)*scalar,5, :fill)
+        sethue("black")
+        setopacity(1)
+        rect(0,(c-0.5)*scalar,(data.stop+w)*scalar+h*scalar,5, :fill)
         text(string(BC_names[bc]), Point((0.5)*scalar,(c+0.5) * scalar), halign=:left)
         ends = ones(1)*w
         for t = 1:data.T
@@ -55,13 +72,20 @@ function drawSolution(data, sol)
                     for n = 1:sol.x[t,p]
                         isPlaced = false
                         for e = 1:length(ends)
-                            if t >= ends[e]
-                                setcolor(colors[bc])
+                            if (t+data.L_lower) >= ends[e]
+                                for prio = 1:length(P_names)
+                                    if mapping[p,2] == P_names[prio]
+                                        setcolor(col[prio])
+                                    end
+                                end
+                                #setcolor(colors[bc])
                                 setopacity(0.5)
-                                rect(t*scalar, (row_start+e-1)*scalar, w*scalar, 0.8*scalar,:fill)
+                                #rect(t*scalar, (row_start+e-1)*scalar, w*scalar, h*scalar,:fill)
+                                rect(-data.L_lower*scalar+(t+data.L_lower)*scalar, (row_start+e-1)*scalar, w*scalar, h*scalar,:fill)
                                 sethue("black")
-                                rect(t*scalar, (row_start+e-1)*scalar, w*scalar, 0.8*scalar,:stroke)
-                                text(string(priority), Point(t*scalar, (row_start+e-1)*scalar), halign=:left)
+                                #rect(t*scalar, (row_start+e-1)*scalar, w*scalar, h*scalar,:stroke)
+                                rect(-data.L_lower*scalar+(t+data.L_lower)*scalar, (row_start+e-1)*scalar, w*scalar, h*scalar,:stroke)
+                                text(string(priority), Point(-data.L_lower*scalar+(t+data.L_lower)*scalar, h*scalar+(row_start+e-1)*scalar), halign=:left)
                                 ends[e] = t + w
                                 isPlaced = true
                                 break
@@ -69,12 +93,19 @@ function drawSolution(data, sol)
                         end
                         if isPlaced == false
                             c += 1
-                            sethue(colors[bc])
+                            for prio = 1:length(P_names)
+                                if mapping[p,2] == P_names[prio]
+                                    setcolor(col[prio])
+                                end
+                            end
+                            #sethue(colors[bc])
                             setopacity(0.5)
-                            rect(t*scalar, c*scalar, w*scalar, 0.8*scalar,:fill)
+                            #rect(t*scalar, c*scalar, w*scalar, h*scalar,:fill)
+                            rect(-data.L_lower*scalar+(t+data.L_lower)*scalar, c*scalar, w*scalar, h*scalar,:fill)
                             sethue("black")
-                            rect(t*scalar, c*scalar, w*scalar, 0.8*scalar,:stroke)
-                            text(string(priority), Point(t*scalar, c*scalar), halign=:left)
+                            #rect(t*scalar, c*scalar, w*scalar, h*scalar,:stroke)
+                            rect(-data.L_lower*scalar+(t+data.L_lower)*scalar, c*scalar, w*scalar, h*scalar,:stroke)
+                            text(string(priority), Point(-data.L_lower*scalar+(t+data.L_lower)*scalar, h*scalar+c*scalar), halign=:left)
                             append!(ends,(t+w))
                         end
                     end
