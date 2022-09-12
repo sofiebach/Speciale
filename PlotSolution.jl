@@ -13,6 +13,8 @@ function drawSolution(data, sol)
     background("white") # color of background
     origin()
 
+    BC_names = ["DR1","DR2","DR2+","DR3","Ramasjang","Ultra","DR","DRTV"]
+
     BC = []
     BC = push!(BC, collect(1:7))
     BC = push!(BC, collect(8:11))
@@ -30,7 +32,7 @@ function drawSolution(data, sol)
     
     colors = ["blue", "red", "green", "yellow", "orange", "purple","cyan", "magenta", "lime"]
 
-    rect(0,(c-1)*scalar,(data.T+w)*scalar,1, :fill)
+    #rect(0,(1.3)*scalar,(data.T+w)*scalar,5, :fill)
   
     fontsize(70)
     sethue("black")
@@ -45,7 +47,10 @@ function drawSolution(data, sol)
 
     row_start = 2
 
+    fontsize(80)
     for bc = 1:length(BC)
+        rect(0,(c-0.5)*scalar,(data.T+w)*scalar,5, :fill)
+        text(string(BC_names[bc]), Point((0.5)*scalar,(c+0.5) * scalar), halign=:left)
         ends = ones(1)*w
         for t = 1:data.T
             for p in BC[bc]
@@ -59,9 +64,9 @@ function drawSolution(data, sol)
                                 println("END: ", ends[e])
                                 setcolor(colors[bc])
                                 setopacity(0.5)
-                                rect(t * scalar, (row_start+e-1) * scalar, w * scalar, 0.7  * scalar,:fill)
+                                rect(t * scalar, (row_start+e-1) * scalar, w * scalar, 0.8  * scalar,:fill)
                                 sethue("black")
-                                rect(t * scalar, (row_start+e-1) * scalar, w * scalar, 0.7  * scalar,:stroke)
+                                rect(t * scalar, (row_start+e-1) * scalar, w * scalar, 0.8  * scalar,:stroke)
                                 ends[e] = t + w
                                 isPlaced = true
                                 break
@@ -73,9 +78,9 @@ function drawSolution(data, sol)
 
                             sethue(colors[bc])
                             setopacity(0.5)
-                            rect(t * scalar, (c) * scalar, w * scalar, 0.7  * scalar,:fill)
+                            rect(t * scalar, (c) * scalar, w * scalar, 0.8  * scalar,:fill)
                             sethue("black")
-                            rect(t * scalar, (c) * scalar, w * scalar, 0.7  * scalar,:stroke)
+                            rect(t * scalar, (c) * scalar, w * scalar, 0.8  * scalar,:stroke)
 
                             append!(ends,(t+w))
                             println("End of new row", ends[end])
@@ -86,8 +91,9 @@ function drawSolution(data, sol)
             end
             
         end
-        c = c+1    
-        row_start = row_start + length(ends)
+        
+        c = c+2    
+        row_start = row_start + length(ends) + 1
     end
 
     finish()
