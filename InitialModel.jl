@@ -34,6 +34,9 @@ penalty_freelancer = 10
 
 # Inventory from t = start:stop
 @constraint(model, [t=1:data.T, c=1:data.C], sum(GRP_matrix[t,t2,p,c]*x[t2,p] for t2=1:data.T for p=1:data.P) <= data.I[t,c])
+# t2 = max(t+L_lower, 1):min(T, t+L_upper)
+
+
 # @constraint(model, [t=(start+1):(stop-1), c = 1:C], sum(u[l,p,c] * x[t-L[l],p] for l = 1:length(L) for p = 1:P) <= I[t,c])
 # Inventory for boundaries
 # @constraint(model, [t=stop:T, c = 1:C], sum(u[l,p,c] * x[t-L[l],p] for l = (t - stop + L_zero):length(L) for p = 1:P) <= I[t,c])
