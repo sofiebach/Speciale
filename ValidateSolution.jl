@@ -68,5 +68,5 @@ function checkSolution(data, sol)
     return inventory_used, staffing_used
 end
 
-checkSolution("output/solution.txt")
+checkSolution(data,sol)
 
