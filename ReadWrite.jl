@@ -68,7 +68,7 @@ function read_DR_data()
 
     # Read production hours
     # w[p,m] is weekly production hours of priority p on media m (platforms are TV, RADIO, BANNER, SOME)
-    per_week = 1 #data.Q_upper-data.Q_lower+1
+    per_week = data.Q_upper-data.Q_lower+1
     data.w = convert(Array{Float64,2},XLSX.readdata("data/data_staffing_constraint.xlsx", "Producertimer", "D2:G38"))[1:P,:]./per_week
 
     # Read staffing
