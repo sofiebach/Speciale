@@ -58,13 +58,13 @@ function checkSolution(data, sol)
     #display(inventory_used * 100)
     max_inventory = maximum(inventory_used)
     max_inventory_idx = findfirst(x -> x == maximum(inventory_used), inventory_used)
-    println("Maximum inventory used is ", max_inventory, " on channel ", max_inventory_idx[2], " at time ", max_inventory_idx[1], "\n\n")
+    #println("Maximum inventory used is ", max_inventory, " on channel ", max_inventory_idx[2], " at time ", max_inventory_idx[1], "\n\n")
 
     #println("Staffing used (%):")
     #display(staffing_used * 100)
     max_staff = maximum(staffing_used)
     max_staff_idx = findfirst(x -> x == maximum(staffing_used), staffing_used)
-    println("Maximum staffing used is ", max_staff, " on media ", max_staff_idx[2], " at time ", max_staff_idx[1])
+    #println("Maximum staffing used is ", max_staff, " on media ", max_staff_idx[2], " at time ", max_staff_idx[1])
     return inventory_used, staffing_used
 end
 

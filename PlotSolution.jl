@@ -1,6 +1,7 @@
 include("ReadWrite.jl")
 using Luxor
 using ColorSchemes
+using PlotlyJS
 
 data, sol = readSolution("output/solution.txt")
 
@@ -118,7 +119,44 @@ function drawSolution(data, sol)
 
     finish()
     preview()
-
 end
 
 drawSolution(data,sol)
+
+function drawHeatmap(data, sol)
+    inventory_used, staff_used = checkSolution(data, sol)
+    mapping = XLSX.readdata("data/data_staffing_constraint.xlsx", "Mapping", "B2:C38")[1:data.P,:]
+    BC_names = unique(mapping[:,1])
+    channels = ["DR1","DR2","Ramasjang","P1","P2","P3","P4","P5","P6","P8","Banner","SOME"]
+    media = ["TV", "Radio", "Banner", "SOME"]
+    BC = []
+    for bc in BC_names
+        priorities = []
+        for i = 1:data.P
+            if mapping[i,1] == bc
+                priorities = push!(priorities, i)
+            end
+        end
+        BC = push!(BC, priorities)
+    end
+    
+    plot_inventory = plot(heatmap(   
+            x = collect(1:data.T),
+            y = channels,
+            z = transpose(inventory_used)
+            ))
+    
+    plot_staff = plot(heatmap(
+        x = collect(1:data.T),
+        y = media,
+        z = transpose(staff_used)
+        ))
+
+    p = [plot_inventory; plot_staff]
+    relayout!(p, title_text="Capacity for channel inventory and staff",xaxis_title="Lorte akse")
+    p
+end
+
+data, sol = readSolution("output/solution.txt")
+drawHeatmap(data,sol)
+
