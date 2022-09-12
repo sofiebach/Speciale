@@ -1,8 +1,8 @@
 include("ReadWrite.jl")
 
-function checkSolution(filename)
-    data, sol = readSolution(filename)
+data, sol = readSolution("output/solution.txt")
 
+function checkSolution(data, sol)
     # Overview of inventory
     inventory_check = zeros(data.T, data.C)
     for t = 1:data.T
@@ -65,8 +65,8 @@ function checkSolution(filename)
     max_staff = maximum(staffing_used)
     max_staff_idx = findfirst(x -> x == maximum(staffing_used), staffing_used)
     println("Maximum staffing used is ", max_staff, " on media ", max_staff_idx[2], " at time ", max_staff_idx[1])
-    
+    return inventory_used, staffing_used
 end
 
-checkSolution("output/solution.txt")
+checkSolution(data,sol)
 
