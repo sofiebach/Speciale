@@ -1,7 +1,3 @@
-include("ReadWrite.jl")
-
-data, sol = readSolution("output/solution.txt")
-
 function checkSolution(data, sol)
     # Overview of inventory
     inventory_check = zeros(data.T, data.C)
@@ -67,6 +63,4 @@ function checkSolution(data, sol)
     #println("Maximum staffing used is ", max_staff, " on media ", max_staff_idx[2], " at time ", max_staff_idx[1])
     return inventory_used, staffing_used
 end
-
-checkSolution(data,sol)
 

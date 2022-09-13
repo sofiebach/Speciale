@@ -1,10 +1,29 @@
-include("ReadWrite.jl")
-include("ValidateSolution.jl")
 using Luxor
 using PlotlyJS
 using Colors
 
-data, sol = readSolution("output/solution.txt")
+function print_solution(sol)
+    println("Objective: ", sol.obj)
+    for p = 1:sol.P
+        println("Priority ", p, " is scheduled ", sum(sol.x[:,p]), " times")
+    end
+
+    for p = 1:sol.P
+        if sol.k[p] > 0.5
+            println("Penalty for priority ", p , " with value: ", sol.k[p])
+        end
+    end
+    for m = 1:sol.M
+        for t = 1:sol.T 
+            if sol.f[t,m] > 0.5
+                #println("Number of freelance for media ", m , " at time ", t, ": ", sol.f[t,m])
+            end
+        end
+        println("Number of freelance hours for media ", m, " is: ", sum(sol.f[:,m]))
+    end
+    
+    println("Total number of campaigns: ", sum(sol.x))
+end
 
 function drawSolution(data, sol)
     mapping = XLSX.readdata("data/data_staffing_constraint.xlsx", "Mapping", "B2:C38")[1:data.P,:]
@@ -122,10 +141,6 @@ function drawSolution(data, sol)
     preview()
 end
 
-drawSolution(data,sol)
-
-
-
 function drawHeatmap(data, sol)
     inventory_used, staff_used = checkSolution(data, sol)
     mapping = XLSX.readdata("data/data_staffing_constraint.xlsx", "Mapping", "B2:C38")[1:data.P,:]
@@ -159,7 +174,4 @@ function drawHeatmap(data, sol)
     relayout!(p, title_text="Capacity for channel inventory and staff",xaxis_title="Lorte akse")
     p
 end
-
-data, sol = readSolution("output/solution.txt")
-drawHeatmap(data,sol)
 
