@@ -173,5 +173,6 @@ function drawHeatmap(data, sol)
     p = [plot_inventory; plot_staff]
     relayout!(p, title_text="Capacity for channel inventory and staff",xaxis_title="Lorte akse")
     p
+    savefig(p, "output/heatmap.png")
 end
 
