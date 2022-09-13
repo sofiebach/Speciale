@@ -61,7 +61,7 @@ function read_DR_data()
     prefix = "Priority "
     for p = 1:data.P
         sheet_name = prefix * string(p)
-        consumption = XLSX.readdata("data/Inventory-consumptiom.xlsx", sheet_name, "C4:J15")
+        consumption = XLSX.readdata("data/data_inventory_consumption.xlsx", sheet_name, "C4:J15")
         consumption = convert(Array{Float64,2}, consumption)
         data.u[:,p,:] = transpose(consumption)
     end

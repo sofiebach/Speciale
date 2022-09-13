@@ -1,7 +1,8 @@
 include("ReadWrite.jl")
+include("ValidateSolution.jl")
 using Luxor
-using ColorSchemes
 using PlotlyJS
+using Colors
 
 data, sol = readSolution("output/solution.txt")
 
@@ -23,10 +24,10 @@ function drawSolution(data, sol)
     
     #col = ["blue","red","green","yellow","orange","purple","cyan","magenta","lime","gray","pink"]
     #col = ColorSchemes.mk_12[1:length(P_names)]
-    col = ColorScheme(distinguishable_colors(length(P_names)+1))[2:(length(P_names)+1)]
+    col = distinguishable_colors(length(P_names)+1)[2:(length(P_names)+1)]
     
     scalar = 100
-    height = 80
+    height = 100
     h = 0.8
     c = 2
     w = length(data.L)
@@ -63,7 +64,7 @@ function drawSolution(data, sol)
     for bc = 1:length(BC)
         sethue("black")
         setopacity(1)
-        rect(0,(c-0.5)*scalar,(data.stop+w)*scalar+h*scalar,5, :fill)
+        Luxor.rect(0,(c-0.5)*scalar,(data.stop+w)*scalar+h*scalar,5, :fill)
         text(string(BC_names[bc]), Point((0.5)*scalar,(c+0.5) * scalar), halign=:left)
         ends = ones(1)*w
         for t = 1:data.T
@@ -82,10 +83,10 @@ function drawSolution(data, sol)
                                 #setcolor(colors[bc])
                                 setopacity(0.5)
                                 #rect(t*scalar, (row_start+e-1)*scalar, w*scalar, h*scalar,:fill)
-                                rect(-data.L_lower*scalar+(t+data.L_lower)*scalar, (row_start+e-1)*scalar, w*scalar, h*scalar,:fill)
+                                Luxor.rect(-data.L_lower*scalar+(t+data.L_lower)*scalar, (row_start+e-1)*scalar, w*scalar, h*scalar,:fill)
                                 sethue("black")
                                 #rect(t*scalar, (row_start+e-1)*scalar, w*scalar, h*scalar,:stroke)
-                                rect(-data.L_lower*scalar+(t+data.L_lower)*scalar, (row_start+e-1)*scalar, w*scalar, h*scalar,:stroke)
+                                Luxor.rect(-data.L_lower*scalar+(t+data.L_lower)*scalar, (row_start+e-1)*scalar, w*scalar, h*scalar,:stroke)
                                 text(string(priority), Point(-data.L_lower*scalar+(t+data.L_lower)*scalar, h*scalar+(row_start+e-1)*scalar), halign=:left)
                                 ends[e] = t + w
                                 isPlaced = true
@@ -102,10 +103,10 @@ function drawSolution(data, sol)
                             #sethue(colors[bc])
                             setopacity(0.5)
                             #rect(t*scalar, c*scalar, w*scalar, h*scalar,:fill)
-                            rect(-data.L_lower*scalar+(t+data.L_lower)*scalar, c*scalar, w*scalar, h*scalar,:fill)
+                            Luxor.rect(-data.L_lower*scalar+(t+data.L_lower)*scalar, c*scalar, w*scalar, h*scalar,:fill)
                             sethue("black")
                             #rect(t*scalar, c*scalar, w*scalar, h*scalar,:stroke)
-                            rect(-data.L_lower*scalar+(t+data.L_lower)*scalar, c*scalar, w*scalar, h*scalar,:stroke)
+                            Luxor.rect(-data.L_lower*scalar+(t+data.L_lower)*scalar, c*scalar, w*scalar, h*scalar,:stroke)
                             text(string(priority), Point(-data.L_lower*scalar+(t+data.L_lower)*scalar, h*scalar+c*scalar), halign=:left)
                             append!(ends,(t+w))
                         end
@@ -123,12 +124,14 @@ end
 
 drawSolution(data,sol)
 
+
+
 function drawHeatmap(data, sol)
     inventory_used, staff_used = checkSolution(data, sol)
     mapping = XLSX.readdata("data/data_staffing_constraint.xlsx", "Mapping", "B2:C38")[1:data.P,:]
     BC_names = unique(mapping[:,1])
-    channels = ["DR1","DR2","Ramasjang","P1","P2","P3","P4","P5","P6","P8","Banner","SOME"]
-    media = ["TV", "Radio", "Banner", "SOME"]
+    channels = XLSX.readdata("data/data_inventory_consumption.xlsx", "Mapping", "B2:B13")[1:data.C]
+    media = XLSX.readdata("data/data_staffing_constraint.xlsx", "Bemanding", "A2:A5")[1:data.M]
     BC = []
     for bc in BC_names
         priorities = []
