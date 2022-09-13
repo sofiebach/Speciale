@@ -9,11 +9,12 @@ data = read_DR_data()
 model = Model(optimizer_with_attributes(Gurobi.Optimizer, "TimeLimit" => 60))
 
 @variable(model, x[1:data.T, 1:data.P] >= 0, Int)
-@variable(model, f[1:data.T,1:data.M] >= 0, Int)
+@variable(model, f[1:data.T,1:data.M] >= 0, Int) # freelance hours
 @variable(model, k[1:data.P] >= 0, Int)
-penalty_scope = 50
-penalty_freelancer = 10
-@objective(model, Max, sum(x[t,p] for t = data.start:data.stop for p = 1:data.P) - penalty_scope*sum(k[p] for p = 1:data.P) - penalty_freelancer*sum(f[t,m] for t = 1:data.T for m = 1:data.M))
+penalty_scope = ones(Int, data.P)*50
+penalty_freelancer = ones(Int, data.M)*1 # hourly cost of penalty_freelancer
+
+@objective(model, Max, sum(x[t,p] for t = data.start:data.stop for p = 1:data.P) - sum(k[p]*penalty_scope[p] for p = 1:data.P) - sum(f[t,m]*penalty_freelancer[m] for t = 1:data.T for m = 1:data.M))
 
 #It is not possible to slack on Flagskib DR1 and DR2 (p=1 and p=8)
 @constraint(model, [p in [1,8]], k[p] == 0)
@@ -26,8 +27,7 @@ penalty_freelancer = 10
 @constraint(model, [t=1:data.T, c=1:data.C], sum(data.u[t-t2+data.L_zero,p,c]*x[t2,p] for p = 1:data.P for t2 = max(t-data.L_upper, data.start):min(data.stop,t-data.L_lower)) <= data.I[t,c])
 
 # Staff from t = start:stop
-#@constraint(model, [t=1:(data.stop+data.Q_upper), m=1:data.M], sum(data.w[p,m] * x[t-data.Q[q],p] for p=1:data.P for q = 1:length(data.Q)) <= data.H[t,m] + 7*3.5*f[t,m]) # freelancer * 7 hours * 3,5 days (avg days per week) 
-@constraint(model, [t=1:data.T, m=1:data.M], sum(data.w[p,m] * x[t2,p] for p=1:data.P for t2 = max(t-data.Q_upper, data.start):min(data.stop,t-data.Q_lower)) <= data.H[t,m] + 7*3.5*f[t,m]) # freelancer * 7 hours * 3,5 days (avg days per week) 
+@constraint(model, [t=1:data.T, m=1:data.M], sum(data.w[p,m] * x[t2,p] for p=1:data.P for t2 = max(t-data.Q_upper, data.start):min(data.stop,t-data.Q_lower)) <= data.H[t,m] + f[t,m]) 
 
 # Scope constraint
 @constraint(model, [p=1:data.P], sum(x[t,p] for t = data.start:data.stop) >= data.S[p] - k[p])
@@ -63,7 +63,8 @@ function print_solution(model, sol)
             end
         end
     end
-    println("Number of freelancers: ", sum(sol.f))
+    println("Number of freelance hours: ", sum(sol.f))
+    println("Number of freelance days: ", sum(sol.f)/7)
     println("Number of campaigns: ", sum(sol.x))
     return sol
 end
