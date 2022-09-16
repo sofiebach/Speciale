@@ -81,18 +81,7 @@ function read_DR_data()
 
     # Simulate I for now
     average = [154 16 6 6 3 50 111 12 2 1 10 10]*7.0 # Banner og SOME er opfundet
-    #1	DR1
-    #2	DR2
-    #3	Ramasjang
-    #4	P1
-    #5	P2
-    #6	P3
-    #7	P4
-    #8	P5
-    #9	P6
-    #10	P8
-    #11	Banner
-    #12	SOME
+    # [DR1, DR2, Ramasjang, P1, P2, P3, P4, P5, P6, P8, Banner, SOME]
     for c = 1:data.C
         data.I[:, c] = repeat([average[c]], data.T)
     end
