@@ -171,8 +171,35 @@ function drawHeatmap(data, sol)
         ))
 
     p = [plot_inventory; plot_staff]
-    relayout!(p, title_text="Capacity for channel inventory and staff",xaxis_title="Lorte akse")
+    PlotlyJS.relayout!(p, title_text="Capacity for channel inventory and staff",xaxis_title="Lorte akse")
     p
-    #savefig(p, "output/heatmap.png")
+    savefig(p, "output/heatmap.png")
+end
+
+
+function plotScope(data, sol)
+    total = sum(sol.x, dims=1)
+    mapping = XLSX.readdata("data/data_staffing_constraint.xlsx", "Mapping", "B2:C38")[1:data.P,:]
+    BC_names = unique(mapping[:,1])
+    campaign_names = unique(mapping[:,2])
+    output = zeros(Float64, length(BC_names), length(campaign_names))*NaN
+    for p = 1:data.P
+        for bc = 1:length(BC_names)
+            for campaign = 1:length(campaign_names)
+                if mapping[p,1] == BC_names[bc] && mapping[p,2] == campaign_names[campaign]
+                    output[bc, campaign] = total[p] - data.S[p]
+                end
+            end
+        end
+    end
+
+    p = plot(heatmap(
+        x = campaign_names,
+        y = BC_names,
+        z = output,
+        theme="plotly_white"))
+    p
+    savefig(p, "output/scope.png")
+
 end
 

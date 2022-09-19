@@ -44,15 +44,14 @@ mutable struct Sol
     Sol(T,P,M) = new(0.0, zeros(Int64,T,P), zeros(Int64,T,M), zeros(Int64,P), P, T, M)
 end
 
-function read_DR_data()
-    P = 29 # skal sættes op, når vi ved noget om Binge, Stacking osv.
+function read_DR_data(P)
     C = 12
     M = 4 # medias
     L_lower = -2
     L_upper = 5
     Q_lower = -4
     Q_upper = -3
-    timeperiod = 52
+    timeperiod = 53
     T = abs(Q_lower) + timeperiod + L_upper
 
     data = Instance(P,C,M,timeperiod,L_lower,L_upper,Q_lower,Q_upper,T)
@@ -80,7 +79,8 @@ function read_DR_data()
     data.S = convert(Array{Float64,2}, XLSX.readdata("data/data_staffing_constraint.xlsx", "Scope", "D2:D38"))[1:P]
 
     # Simulate I for now
-    average = [154 16 6 6 3 50 111 12 2 1 10 10]*7.0 # Banner og SOME er opfundet
+    average = [154 16 22 6 3 50 111 12 2 1 10 10]*7.0
+    #average = [154 16 6 6 3 50 111 12 2 1 10 10]*7.0 # Banner og SOME er opfundet
     # [DR1, DR2, Ramasjang, P1, P2, P3, P4, P5, P6, P8, Banner, SOME]
     for c = 1:data.C
         data.I[:, c] = repeat([average[c]], data.T)
