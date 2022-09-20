@@ -191,7 +191,7 @@ function drawHeatmap(data, sol)
 
     p = [plot_inventory; plot_staff]
     PlotlyJS.relayout!(p, title_text="Capacity for channel inventory and staff",xaxis_title="Lorte akse")
-    p
+    display(p)
     #savefig(p, "output/heatmap.png")
 end
 
@@ -217,7 +217,7 @@ function plotScope(data, sol)
         y = BC_names,
         z = output,
         theme="plotly_white"))
-    p
+    display(p)
     #savefig(p, "output/scope.png")
 
 end
