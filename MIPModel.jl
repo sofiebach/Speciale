@@ -8,7 +8,8 @@ function MIP(data, time_limit)
     @variable(model, f[1:data.T,1:data.M] >= 0, Int) # freelance hours
     @variable(model, k[1:data.P] >= 0, Int)
 
-    penalty_scope = round.(sum(sum(data.u, dims=1),dims=3))
+    b = vcat(1:10,12)
+    penalty_scope = round.(sum(sum(data.u[:,:,b], dims=1),dims=3)) # 1:10 to not include SOME and Banner
     penalty_freelancer = ones(Int, data.M)*1 # hourly cost of penalty_freelancer
 
     @objective(model, Max, sum(x[t,p] for t = data.start:data.stop for p = 1:data.P) - sum(k[p]*penalty_scope[p] for p = 1:data.P) - sum(f[t,m]*penalty_freelancer[m] for t = 1:data.T for m = 1:data.M))
