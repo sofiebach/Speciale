@@ -44,13 +44,15 @@ function drawSolution(data, sol)
     end
 
     P_names = unique(mapping[:,2])
+    num_P_names = length(P_names)
     
     #col = ["blue","red","green","yellow","orange","purple","cyan","magenta","lime","gray","pink"]
     w = length(data.L)
     c = 2
     row_start = 2
     height = 0
-    for bc = 1:length(BC)
+    num_BC = length(BC)
+    for bc = 1:num_BC
         ends = ones(1)
         for t = 1:data.T
             for p in BC[bc]
@@ -58,7 +60,8 @@ function drawSolution(data, sol)
                     priority = mapping[p,2]
                     for n = 1:sol.x[t,p]
                         isPlaced = false
-                        for e = 1:length(ends)
+                        len_ends = length(ends)
+                        for e = 1:len_ends
                             if (t+data.L_lower) >= ends[e]
 
                                 ends[e] = t + w + data.L_lower
@@ -105,7 +108,7 @@ function drawSolution(data, sol)
     row_start = 2
     fontsize(80)
 
-    for bc = 1:length(BC)
+    for bc = 1:num_BC
         sethue("black")
         setopacity(1)
         Luxor.rect(0,(c-0.5)*scalar,(data.T+w)*scalar,5, :fill)
@@ -117,9 +120,10 @@ function drawSolution(data, sol)
                     priority = mapping[p,2]
                     for n = 1:sol.x[t,p]
                         isPlaced = false
-                        for e = 1:length(ends)
+                        len_ends = length(ends)
+                        for e = 1:len_ends
                             if (t+data.L_lower) >= ends[e]
-                                for prio = 1:length(P_names)
+                                for prio = 1:num_P_names
                                     if mapping[p,2] == P_names[prio]
                                         setcolor(col[prio])
                                     end
@@ -138,7 +142,7 @@ function drawSolution(data, sol)
                         end
                         if isPlaced == false
                             c += 1
-                            for prio = 1:length(P_names)
+                            for prio = 1:num_P_names
                                 if mapping[p,2] == P_names[prio]
                                     setcolor(col[prio])
                                 end
@@ -213,11 +217,13 @@ function plotScope(data, sol)
     total = sum(sol.x, dims=1)
     mapping = XLSX.readdata("data/data_staffing_constraint.xlsx", "Mapping", "B2:C38")[1:data.P,:]
     BC_names = unique(mapping[:,1])
+    num_BC = length(BC_names)
     campaign_names = unique(mapping[:,2])
+    num_campaigns = length(campaign_names)
     output = zeros(Float64, length(BC_names), length(campaign_names))*NaN
     for p = 1:data.P
-        for bc = 1:length(BC_names)
-            for campaign = 1:length(campaign_names)
+        for bc = 1:num_BC
+            for campaign = 1:num_campaigns
                 if mapping[p,1] == BC_names[bc] && mapping[p,2] == campaign_names[campaign]
                     output[bc, campaign] = total[p] - data.S[p]
                 end
