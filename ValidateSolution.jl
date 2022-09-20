@@ -1,5 +1,6 @@
 function checkSolution(data, sol)
     # Overview of inventory
+    eps = 1e-6
     inventory_check = zeros(data.T, data.C)
     for t = 1:data.T
         for p = 1:data.P
@@ -9,7 +10,7 @@ function checkSolution(data, sol)
                     for c = 1:data.C
                         grp = data.u[l_idx,p,c] * sol.x[t,p]
                         inventory_check[t+l,c] += grp
-                        if inventory_check[t+l, c] > data.I[t+l,c]
+                        if inventory_check[t+l, c] > data.I[t+l,c] + eps
                             println("Inventory constraint exceeded!")
                             #println("p: ", p)
                             #println("c: ", c)
@@ -35,7 +36,7 @@ function checkSolution(data, sol)
                         #println(data.w[p,m])
                         work = data.w[p,m] * sol.x[t,p]
                         staffing_check[t+q,m] += work
-                        if staffing_check[t+q,m] > staff_incl_freelancer[t+q,m]
+                        if staffing_check[t+q,m] > staff_incl_freelancer[t+q,m] + eps
                             println("Staff constraint exceeded!")
                             println("t: ", t)
                             println("p: ", p)
