@@ -42,14 +42,43 @@ function drawSolution(data, sol)
     P_names = unique(mapping[:,2])
     
     #col = ["blue","red","green","yellow","orange","purple","cyan","magenta","lime","gray","pink"]
-    #col = ColorSchemes.mk_12[1:length(P_names)]
-    col = distinguishable_colors(length(P_names)+1)[2:(length(P_names)+1)]
-    
-    scalar = 100
-    height = 100
-    h = 0.8
-    c = 2
     w = length(data.L)
+    c = 2
+    row_start = 2
+    height = 0
+    for bc = 1:length(BC)
+        ends = ones(1)
+        for t = 1:data.T
+            for p in BC[bc]
+                if sol.x[t,p] != 0
+                    priority = mapping[p,2]
+                    for n = 1:sol.x[t,p]
+                        isPlaced = false
+                        for e = 1:length(ends)
+                            if (t+data.L_lower) >= ends[e]
+
+                                ends[e] = t + w + data.L_lower
+                                isPlaced = true
+                                break
+                            end
+                        end
+                        if isPlaced == false
+                            c += 1
+                            append!(ends,(t+w+data.L_lower))
+                        end
+                    end
+                end
+            end
+        end
+        c = c+2    
+        row_start = row_start + length(ends) + 1
+        height = row_start
+    end
+
+    scalar = 100
+    h = 0.8
+    col = distinguishable_colors(length(P_names)+1)[2:(length(P_names)+1)]
+
     Drawing((data.T+w)*scalar, height*scalar, "output/schedule.png")
     background("white") # color of background
     origin() 
@@ -58,34 +87,26 @@ function drawSolution(data, sol)
 
     fontsize(70)
     sethue("black")
-
+    offset = 2 
+    
     for t = 1:data.stop+w
         time = t-data.start+1
         #rect((t-1) * scalar,(c-1) * scalar ,1,(height) * scalar, :fill)
         if time > 0
-            text(string(time), Point(-data.L_lower*scalar+(t)*scalar,1 * scalar), halign=:center)
+            text(string(time), Point((offset + t)*scalar,1 * scalar), halign=:center)
         end
     end
-    #rect((data.stop+w)*scalar+h*scalar,0,5,height*scalar, :fill)
 
+    c = 2
     row_start = 2
-
     fontsize(80)
-
-    #for prio = 1:length(P_names)
-    #    setcolor("black")
-    #    text(string(P_names[prio]), Point((data.stop+w)*scalar+h*scalar, h*scalar+h*prio*scalar), halign=:left)
-    #    setcolor(col[prio])
-    #    setopacity(0.5)
-    #    rect((data.stop+w)*scalar+h*scalar, h*prio*scalar, w*scalar, h*scalar,:fill)
-    #end
 
     for bc = 1:length(BC)
         sethue("black")
         setopacity(1)
-        Luxor.rect(0,(c-0.5)*scalar,(data.stop+w)*scalar+h*scalar,5, :fill)
+        Luxor.rect(0,(c-0.5)*scalar,(data.T+w)*scalar,5, :fill)
         text(string(BC_names[bc]), Point((0.5)*scalar,(c+0.5) * scalar), halign=:left)
-        ends = ones(1)*w
+        ends = ones(1)
         for t = 1:data.T
             for p in BC[bc]
                 if sol.x[t,p] != 0
@@ -99,15 +120,14 @@ function drawSolution(data, sol)
                                         setcolor(col[prio])
                                     end
                                 end
-                                #setcolor(colors[bc])
                                 setopacity(0.5)
-                                #rect(t*scalar, (row_start+e-1)*scalar, w*scalar, h*scalar,:fill)
-                                Luxor.rect(-data.L_lower*scalar+(t+data.L_lower)*scalar, (row_start+e-1)*scalar, w*scalar, h*scalar,:fill)
+                                Luxor.rect((offset+t+data.L_lower)*scalar, (row_start+e-1)*scalar, w*scalar, h*scalar,:fill)
                                 sethue("black")
-                                #rect(t*scalar, (row_start+e-1)*scalar, w*scalar, h*scalar,:stroke)
-                                Luxor.rect(-data.L_lower*scalar+(t+data.L_lower)*scalar, (row_start+e-1)*scalar, w*scalar, h*scalar,:stroke)
-                                text(string(priority), Point(-data.L_lower*scalar+(t+data.L_lower)*scalar, h*scalar+(row_start+e-1)*scalar), halign=:left)
-                                ends[e] = t + w
+                                setopacity(0.8)
+                                text(string(priority), Point((offset+t+data.L_lower+w/2)*scalar, (0.1 + row_start+e-1)*scalar),valign =:top, halign=:center)
+                                setopacity(1)
+                                Luxor.rect((offset+t+data.L_lower)*scalar, (row_start+e-1)*scalar, w*scalar, h*scalar,:stroke)
+                                ends[e] = t + w + data.L_lower
                                 isPlaced = true
                                 break
                             end
@@ -119,15 +139,14 @@ function drawSolution(data, sol)
                                     setcolor(col[prio])
                                 end
                             end
-                            #sethue(colors[bc])
                             setopacity(0.5)
-                            #rect(t*scalar, c*scalar, w*scalar, h*scalar,:fill)
-                            Luxor.rect(-data.L_lower*scalar+(t+data.L_lower)*scalar, c*scalar, w*scalar, h*scalar,:fill)
+                            Luxor.rect((offset+t+data.L_lower)*scalar, c*scalar, w*scalar, h*scalar,:fill)
                             sethue("black")
-                            #rect(t*scalar, c*scalar, w*scalar, h*scalar,:stroke)
-                            Luxor.rect(-data.L_lower*scalar+(t+data.L_lower)*scalar, c*scalar, w*scalar, h*scalar,:stroke)
-                            text(string(priority), Point(-data.L_lower*scalar+(t+data.L_lower)*scalar, h*scalar+c*scalar), halign=:left)
-                            append!(ends,(t+w))
+                            setopacity(0.8)
+                            text(string(priority), Point((offset+t+data.L_lower+w/2)*scalar, (0.1+c)*scalar), valign =:top, halign=:center)
+                            setopacity(1)
+                            Luxor.rect((offset+t+data.L_lower)*scalar, c*scalar, w*scalar, h*scalar,:stroke)
+                            append!(ends,(t+w+data.L_lower))
                         end
                     end
                 end
@@ -173,7 +192,7 @@ function drawHeatmap(data, sol)
     p = [plot_inventory; plot_staff]
     PlotlyJS.relayout!(p, title_text="Capacity for channel inventory and staff",xaxis_title="Lorte akse")
     p
-    savefig(p, "output/heatmap.png")
+    #savefig(p, "output/heatmap.png")
 end
 
 
@@ -199,7 +218,7 @@ function plotScope(data, sol)
         z = output,
         theme="plotly_white"))
     p
-    savefig(p, "output/scope.png")
+    #savefig(p, "output/scope.png")
 
 end
 
