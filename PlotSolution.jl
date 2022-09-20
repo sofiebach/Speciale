@@ -5,6 +5,7 @@ using Colors
 
 
 
+
 function print_solution(sol)
     println("Objective: ", sol.obj)
     for p = 1:sol.P
@@ -182,7 +183,7 @@ function drawHeatmap(data, sol)
 
 
     fig1 = make_subplots(rows=2, cols=1, subplot_titles=["Used inventory" "Used staff"])
-    dd_trace!(fig1, heatmap(x=collect(1:data.T), y=channels, z=transpose(inventory_used), coloraxis="coloraxis"), row=1, col=1)
+    add_trace!(fig1, heatmap(x=collect(1:data.T), y=channels, z=transpose(inventory_used), coloraxis="coloraxis"), row=1, col=1)
     add_trace!(fig1, heatmap(x=collect(1:data.T), y=media, z=transpose(staff_used), coloraxis="coloraxis"), row=2, col=1)
     relayout!(fig1, width=600, height=600)
     display(fig1)
