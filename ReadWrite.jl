@@ -79,10 +79,8 @@ function read_DR_data(P)
     data.S = convert(Array{Float64,2}, XLSX.readdata("data/data_staffing_constraint.xlsx", "Scope", "D2:D38"))[1:P]
 
     # Simulate I for now
-    producers = XLSX.readdata("data/data_staffing_constraint.xlsx", "Bemanding", "B5:B5")[1]
-    posts_per_producer_per_day = 3.5 / 7.0
-    average = [154 16 22 6 3 50 111 12 2 1 7118152 producers*posts_per_producer_per_day]*7.0
-    #average = [154 16 6 6 3 50 111 12 2 1 10 10]*7.0 # Banner og SOME er opfundet
+    M = 100 #Number of posts per day
+    average = [154 16 6 6 3 50 111 12 2 1 7118152 M]*7.0
     # [DR1, DR2, Ramasjang, P1, P2, P3, P4, P5, P6, P8, Banner, SOME]
     for c = 1:data.C
         data.I[:, c] = repeat([average[c]], data.T)
