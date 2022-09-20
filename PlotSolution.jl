@@ -2,6 +2,10 @@ using Luxor
 using PlotlyJS
 using Colors
 
+
+
+
+
 function print_solution(sol)
     println("Objective: ", sol.obj)
     for p = 1:sol.P
@@ -180,22 +184,31 @@ function drawHeatmap(data, sol)
         end
         BC = push!(BC, priorities)
     end
-    
-    plot_inventory = plot(heatmap(   
-            x = collect(1:data.T),
-            y = channels,
-            z = transpose(inventory_used)
-            ))
-    
-    plot_staff = plot(heatmap(
-        x = collect(1:data.T),
-        y = media,
-        z = transpose(staff_used)
-        ))
 
-    p = [plot_inventory; plot_staff]
-    PlotlyJS.relayout!(p, title_text="Capacity for channel inventory and staff",xaxis_title="Lorte akse")
-    display(p)
+
+    fig1 = make_subplots(rows=2, cols=1, subplot_titles=["Used inventory" "Used staff"])
+    add_trace!(fig1, heatmap(x=collect(1:data.T), y=channels, z=transpose(inventory_used), coloraxis="coloraxis"), row=1, col=1)
+    add_trace!(fig1, heatmap(x=collect(1:data.T), y=media, z=transpose(staff_used), coloraxis="coloraxis"), row=2, col=1)
+    relayout!(fig1, width=600, height=600)
+    display(fig1)
+    #plot_inventory = plot(heatmap(   
+    #        x = collect(1:data.T),
+    #        y = channels,
+    #        z = transpose(inventory_used),
+    #        legend = :none,
+    #        colorbar = false
+    #        ))
+#
+    #plot_staff = plot(heatmap(
+    #    x = collect(1:data.T),
+    #    y = media,
+    #    z = transpose(staff_used)
+    #    ))
+#
+    #p = [plot_inventory; plot_staff]
+    #PlotlyJS.relayout!(p, title_text="Capacity for channel inventory and staff",xaxis_title="Lorte akse", colorbar = false)
+    #p
+    #display(p)
     #savefig(p, "output/heatmap.png")
 end
 
