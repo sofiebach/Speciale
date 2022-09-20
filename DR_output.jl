@@ -90,18 +90,6 @@ function DR_plan()
         consumption_check[:,c] = consumption_check[:,c] ./ number_priorities
     end
     replace!(consumption_check, NaN=>0.0)
-
-    # Simulate I for now
-    I = zeros(Float64, T, C)
-    # average = [154 16 22 6 3 50 111 12 2 1 10 10]*7.0
-    average = [154 16 6 6 3 50 111 12 2 1 10 10]*7.0
-    for c = 1:C
-        I[:, c] = repeat([average[c]], T)
-    end
-    
-    inventory_used = inventory_check ./ I
-    
-    inventory_used[inventory_used .>= 1.0] .= 1.0
     
     BC = []
     for bc in BC_names
@@ -114,31 +102,34 @@ function DR_plan()
         BC = push!(BC, priorities)
     end
     
-    plot_inventory = plot(heatmap(   
-            x = collect(1:T),
-            y = channel_mapping,
-            z = transpose(inventory_used)
-            ))
     return inventory_check, number_priorities, consumption_check
 end
 
 
-I, S, consumption = DR_plan()
+inventory_check, number_priorities, consumption_check = DR_plan()
 
-data = read_DR_data(29)
+data = read_DR_data(37)
 
-U = zeros(Float64, data.P, data.C)
+inventory_used = inventory_check ./ data.I[data.start:data.stop,:]
 
-for p = 1:data.P 
-    for c = 1:data.C
-        U[p, c] = sum(data.u[:,p,c])
-    end
-end
+inventory_used[inventory_used .>= 1.0] .= 1.5
 
-check = U - consumption[1:data.P,:]
-
-# DER ER NOGET GALT MED c=11
-check[:,11] = zeros(Float64, data.P)
-sum(check)
-
-
+#U = zeros(Float64, data.P, data.C)
+#
+#for p = 1:data.P 
+#    for c = 1:data.C
+#        U[p, c] = sum(data.u[:,p,c])
+#    end
+#end
+#
+#check = U - consumption[1:data.P,:]
+#
+## DER ER NOGET GALT MED c=11
+#check[:,11] = zeros(Float64, data.P)
+channel_mapping = XLSX.readdata("data/data_inventory_consumption.xlsx", "Mapping", "A2:B13")
+plot_inventory = plot(heatmap(   
+            x = collect(1:53),
+            y = channel_mapping,
+            z = transpose(inventory_used)
+            ))
+plot_inventory
