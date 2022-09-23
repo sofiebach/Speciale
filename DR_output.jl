@@ -133,3 +133,4 @@ plot_inventory = plot(heatmap(
             z = transpose(inventory_used)
             ))
 plot_inventory
+savefig(plot_inventory, "output/DR_inventory.png")

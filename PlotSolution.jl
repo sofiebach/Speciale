@@ -29,7 +29,7 @@ function print_solution(sol)
     println("Total number of campaigns: ", sum(sol.x))
 end
 
-function drawSolution(data, sol)
+function drawSolution(data, sol, filename)
     mapping = XLSX.readdata("data/data_staffing_constraint.xlsx", "Mapping", "B2:C38")[1:data.P,:]
     BC_names = unique(mapping[:,1])
     BC = []
@@ -86,7 +86,7 @@ function drawSolution(data, sol)
     h = 0.8
     col = distinguishable_colors(length(P_names)+1)[2:(length(P_names)+1)]
 
-    Drawing((data.T+w)*scalar, height*scalar, "output/schedule.png")
+    Drawing((data.T+w)*scalar, height*scalar, "output/schedule_" * filename * ".png")
     background("white") # color of background
     origin() 
 
@@ -168,7 +168,7 @@ function drawSolution(data, sol)
     preview()
 end
 
-function drawHeatmap(data, sol)
+function drawHeatmap(data, sol, filename)
     inventory_used, staff_used = checkSolution(data, sol)
     mapping = XLSX.readdata("data/data_staffing_constraint.xlsx", "Mapping", "B2:C38")[1:data.P,:]
     BC_names = unique(mapping[:,1])
@@ -209,11 +209,11 @@ function drawHeatmap(data, sol)
     #PlotlyJS.relayout!(p, title_text="Capacity for channel inventory and staff",xaxis_title="Lorte akse", colorbar = false)
     #p
     #display(p)
-    #savefig(p, "output/heatmap.png")
+    savefig(fig1, "output/heatmap_" * filename * ".png", width=600, height=600)
 end
 
 
-function plotScope(data, sol)
+function plotScope(data, sol, filename)
     total = sum(sol.x, dims=1)
     mapping = XLSX.readdata("data/data_staffing_constraint.xlsx", "Mapping", "B2:C38")[1:data.P,:]
     BC_names = unique(mapping[:,1])
@@ -237,7 +237,7 @@ function plotScope(data, sol)
         z = output,
         theme="plotly_white"))
     display(p)
-    #savefig(p, "output/scope.png")
+    savefig(p, "output/scope_" * filename * ".png")
 
 end
 
