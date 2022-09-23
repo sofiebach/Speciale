@@ -191,25 +191,10 @@ function drawHeatmap(data, sol, filename)
     add_trace!(fig1, heatmap(x=collect(1:data.T), y=media, z=transpose(staff_used), coloraxis="coloraxis"), row=2, col=1)
     relayout!(fig1, width=600, height=600)
     display(fig1)
-    #plot_inventory = plot(heatmap(   
-    #        x = collect(1:data.T),
-    #        y = channels,
-    #        z = transpose(inventory_used),
-    #        legend = :none,
-    #        colorbar = false
-    #        ))
-#
-    #plot_staff = plot(heatmap(
-    #    x = collect(1:data.T),
-    #    y = media,
-    #    z = transpose(staff_used)
-    #    ))
-#
-    #p = [plot_inventory; plot_staff]
-    #PlotlyJS.relayout!(p, title_text="Capacity for channel inventory and staff",xaxis_title="Lorte akse", colorbar = false)
-    #p
-    #display(p)
-    savefig(fig1, "output/heatmap_" * filename * ".png", width=600, height=600)
+    
+    if Sys.isapple()
+        savefig(fig1, "output/heatmap_" * filename * ".png", width=600, height=600)
+    end
 end
 
 
@@ -237,7 +222,9 @@ function plotScope(data, sol, filename)
         z = output,
         theme="plotly_white"))
     display(p)
-    savefig(p, "output/scope_" * filename * ".png")
+    if Sys.isapple()
+        savefig(p, "output/scope_" * filename * ".png")
+    end
 
 end
 
