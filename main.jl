@@ -12,7 +12,7 @@ data = read_DR_data(P)
 #data.I[data.start:data.stop,:] = I
 #data.S = S[1:data.P]
 
-sol = MIP(data, 60)
+sol = MIP(data, 120)
 
 #println("DR plans: ", sum(S[1:data.P]))
 #println("MIP plans: ", sum(sol.x))
@@ -24,10 +24,8 @@ checkSolution(data,sol)
 
 
 filename = "output/solution.txt"
-#writeSolution(filename, data, sol)
-data, sol = readSolution(filename)
-
-
+writeSolution(filename, data, sol)
+#data, sol = readSolution(filename)
 
 drawSolution(data,sol)
 
