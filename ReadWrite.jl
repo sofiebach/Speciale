@@ -21,6 +21,8 @@ mutable struct Instance
     H::Array{Float64,2}
     I::Array{Float64,2}
     u::Array{Float64, 3}
+    L_l::Array{Int64, 1}
+    L_u::Array{Int64, 1}
     Instance(P,C,M,timeperiod,L_lower,L_upper,Q_lower,Q_upper,T) = new(P,C,M,timeperiod,
         L_lower,L_upper,collect(L_lower:L_upper),indexin(0,collect(L_lower:L_upper))[],
         Q_lower,Q_upper,collect(Q_lower:Q_upper),
@@ -29,7 +31,9 @@ mutable struct Instance
         zeros(Float64, P, M),
         zeros(Float64, T, M),
         zeros(Float64, T, C),
-        zeros(Float64, length(collect(L_lower:L_upper)), P, C))
+        zeros(Float64, length(collect(L_lower:L_upper)), P, C),
+        zeros(Int64, P),
+        zeros(Int64, P))
 end
 
 # Struct for holding the instance
@@ -63,6 +67,20 @@ function read_DR_data(P)
         consumption = XLSX.readdata("data/data_inventory_consumption.xlsx", sheet_name, "C4:J15")
         consumption = convert(Array{Float64,2}, consumption)
         data.u[:,p,:] = transpose(consumption)
+
+        for l = 1:(L_upper-L_lower+1)
+            if sum(data.u[l,p,:]) > 0
+                data.L_l[p] = l-data.L_zero
+                break
+            end
+        end
+        for l = (L_upper-L_lower+1):-1:(data.L_l[p]+data.L_zero)
+            if sum(data.u[l,p,:]) > 0
+                data.L_u[p] = l-data.L_zero
+                break
+            end
+        end
+
     end
 
     # Read production hours

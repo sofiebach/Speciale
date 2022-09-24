@@ -5,6 +5,7 @@ using Statistics
 include("ReadWrite.jl")
 
 function DR_plan()
+
     output = XLSX.readdata("data/kampagner_planlagt2021.xlsx", "Data (2)", "A2:H63134")
     channel_mapping = XLSX.readdata("data/data_inventory_consumption.xlsx", "Mapping", "A2:B13")
     # [DR1, DR2, Ramasjang, P1, P2, P3, P4, P5, P6, P8, Banner, SOME]
@@ -15,8 +16,12 @@ function DR_plan()
     C = size(channel_mapping)[1]
     P = size(mapping)[1]
 
+    data = read_DR_data(P)
+    dr_sol = Sol(data.T,data.P,data.M)
+
     inventory_check = zeros(Float64, T, C)
     number_priorities = zeros(Int64, P)
+    MP_ids = unique(output[:,1])
     MP_ids = unique(output[:,1])
     
     consumption_check = zeros(Float64, P, C)
@@ -62,8 +67,18 @@ function DR_plan()
                 include = true
                 # if not already counted
                 if id in MP_ids
-                    number_priorities[p] += 1
-                    deleteat!(MP_ids, findall(x->x==id,MP_ids))
+                    # Fill x in dr_sol
+                    week0 = minimum(output[output[:,1] .== id, 7]) - data.L_l[p] + data.start
+                    if week0 >= data.start && week0 <= data.stop
+                        dr_sol.x[week0, p] += 1
+
+                        # Count number of priority
+                        number_priorities[p] += 1
+                        deleteat!(MP_ids, findall(x->x==id,MP_ids))
+                    else 
+                        include = false
+                    end
+                    
                 end
 
                 # Fill consumption check
@@ -73,6 +88,12 @@ function DR_plan()
                     end
                 end
             end
+        end
+
+        # Fill k and obj in dr_sol
+        dr_sol.obj = sum(dr_sol.x)
+        for p = 1:P
+            dr_sol.k[p] = max(data.S[p] - number_priorities[p], 0)
         end
 
         # Fill inventory_check
@@ -91,46 +112,7 @@ function DR_plan()
     end
     replace!(consumption_check, NaN=>0.0)
     
-    BC = []
-    for bc in BC_names
-        priorities = []
-        for i = 1:P
-            if mapping[i,1] == bc
-                priorities = push!(priorities, i)
-            end
-        end
-        BC = push!(BC, priorities)
-    end
-    
-    return inventory_check, number_priorities, consumption_check
+    return inventory_check, number_priorities, consumption_check, dr_sol
 end
 
 
-inventory_check, number_priorities, consumption_check = DR_plan()
-
-data = read_DR_data(37)
-
-inventory_used = inventory_check ./ data.I[data.start:data.stop,:]
-
-inventory_used[inventory_used .>= 1.0] .= 1.5
-
-#U = zeros(Float64, data.P, data.C)
-#
-#for p = 1:data.P 
-#    for c = 1:data.C
-#        U[p, c] = sum(data.u[:,p,c])
-#    end
-#end
-#
-#check = U - consumption[1:data.P,:]
-#
-## DER ER NOGET GALT MED c=11
-#check[:,11] = zeros(Float64, data.P)
-channel_mapping = XLSX.readdata("data/data_inventory_consumption.xlsx", "Mapping", "A2:B13")
-plot_inventory = plot(heatmap(   
-            x = collect(1:53),
-            y = channel_mapping,
-            z = transpose(inventory_used)
-            ))
-plot_inventory
-savefig(plot_inventory, "output/DR_inventory.png")

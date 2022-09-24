@@ -1,10 +1,7 @@
 using Luxor
 using PlotlyJS
 using Colors
-
-
-
-
+include("ValidateSolution.jl")
 
 function print_solution(sol)
     println("Objective: ", sol.obj)
@@ -168,32 +165,42 @@ function drawSolution(data, sol, filename)
     preview()
 end
 
-function drawHeatmap(data, sol, filename)
-    inventory_used, staff_used = checkSolution(data, sol)
-    mapping = XLSX.readdata("data/data_staffing_constraint.xlsx", "Mapping", "B2:C38")[1:data.P,:]
-    BC_names = unique(mapping[:,1])
+function drawHeatmap(inventory_used, staff_used, data, filename)
     channels = XLSX.readdata("data/data_inventory_consumption.xlsx", "Mapping", "B2:B13")[1:data.C]
     media = XLSX.readdata("data/data_staffing_constraint.xlsx", "Bemanding", "A2:A5")[1:data.M]
-    BC = []
-    for bc in BC_names
-        priorities = []
-        for i = 1:data.P
-            if mapping[i,1] == bc
-                priorities = push!(priorities, i)
-            end
-        end
-        BC = push!(BC, priorities)
-    end
-
 
     fig1 = make_subplots(rows=2, cols=1, subplot_titles=["Used inventory" "Used staff"])
     add_trace!(fig1, heatmap(x=collect(1:data.T), y=channels, z=transpose(inventory_used), coloraxis="coloraxis"), row=1, col=1)
     add_trace!(fig1, heatmap(x=collect(1:data.T), y=media, z=transpose(staff_used), coloraxis="coloraxis"), row=2, col=1)
     relayout!(fig1, width=600, height=600)
     display(fig1)
-    
+
     if Sys.isapple()
         savefig(fig1, "output/heatmap_" * filename * ".png", width=600, height=600)
+    end
+end
+
+function heatmapStaff(staff_used, data, filename)
+    staff_used[staff_used .>= 1.0] .= 1.5
+    media = XLSX.readdata("data/data_staffing_constraint.xlsx", "Bemanding", "A2:A5")[1:data.M]
+    
+    fig1 = plot(heatmap(x=collect(1:data.T), y=media, z=transpose(staff_used), coloraxis="coloraxis"))
+    
+    display(fig1)
+    if Sys.isapple()
+        savefig(fig1, "output/heatmap_staff_" * filename * ".png", width=600, height=300)
+    end
+end
+
+function heatmapInventory(inventory_used, data, filename)
+    inventory_used[inventory_used .>= 1.0] .= 1.5
+
+    channels = XLSX.readdata("data/data_inventory_consumption.xlsx", "Mapping", "B2:B13")[1:data.C]
+
+    fig1 = plot(heatmap(x=collect(1:data.T), y=channels, z=transpose(inventory_used), coloraxis="coloraxis"))
+    display(fig1)
+    if Sys.isapple()
+        savefig(fig1, "output/heatmap_inventory_" * filename * ".png", width=600, height=300)
     end
 end
 
