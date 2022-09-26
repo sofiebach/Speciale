@@ -37,7 +37,7 @@ function Baseline(data, time_limit)
 
     # Create solution object
     sol = Sol(data.T,data.P,data.M)
-    sol.obj = sum(sol.x)
+    sol.obj = objective_value(model)
     for p = 1:sol.P
         if JuMP.value(k[p]) > 0.5
             sol.k[p] = JuMP.value(k[p])
@@ -48,6 +48,7 @@ function Baseline(data, time_limit)
             end
         end
     end
+    sol.num_campaigns = sum(sol.x)
     for t = 1:sol.T
         for m = 1:sol.M
             if JuMP.value(f[t,m]) > 0.5

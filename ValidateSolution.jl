@@ -27,7 +27,7 @@ function checkSolution(data, sol)
 
     # Overview of staffing
     staffing_check = zeros(data.T,data.M)
-    staff_incl_freelancer = data.H + sol.f*7.0*3.5 # freelancer * 7 hours * 3,5 days (avg days per week) 
+    staff_incl_freelancer = data.H + sol.f 
     for t = 1:data.T
         for p = 1:data.P
             if sol.x[t,p] > 0
@@ -38,10 +38,10 @@ function checkSolution(data, sol)
                         staffing_check[t+q,m] += work
                         if staffing_check[t+q,m] > staff_incl_freelancer[t+q,m] + eps
                             println("Staff constraint exceeded!")
-                            println("t: ", t)
-                            println("p: ", p)
-                            println("q: ", q)
-                            println("m: ", m)
+                            #println("t: ", t)
+                            #println("p: ", p)
+                            #println("q: ", q)
+                            #println("m: ", m)
                             break
                         end
                     end
