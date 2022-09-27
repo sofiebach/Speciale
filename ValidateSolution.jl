@@ -51,7 +51,7 @@ function checkSolution(data, sol)
     end
     staffing_used = staffing_check ./ staff_incl_freelancer
 
-    for m in data.m
+    for m = 1:data.M
         if sum(sol.f[:,m]) > data.F[m]
             println("Too many freelance hours!")
         end

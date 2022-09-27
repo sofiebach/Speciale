@@ -30,7 +30,7 @@ function randomInitial(data)
             r_times = shuffle(collect(data.start:data.stop))
             for t in r_times
                 if fits(data, sol, t, p_bar)
-                    insert(data, sol, p_bar, t)
+                    insert(data, sol, t, p_bar)
                     inserted = true
                     break
                 end
@@ -55,7 +55,7 @@ function randomInitial(data)
         for n = 1:n_tries
             t = rand(data.start:data.stop)
             if fits(data, sol, t, p)
-                insert(data, sol, p, t)
+                insert(data, sol, t, p)
                 inserted = true
                 break
             end
@@ -68,7 +68,7 @@ function randomInitial(data)
     return sol
 end
 
-function insert(data, sol, p, t)
+function insert(data, sol, t, p)
     sol.x[t,p] += 1
 
     # update inventory
@@ -111,6 +111,18 @@ function fits(data, sol, t, p)
         end
         l_idx += 1
     end
+
+    for t_hat = (t+data.Q_lower):(t+data.Q_upper) 
+        for m = 1:data.M
+            if sol.H_cap[t_hat, m] - data.w[p, m] < 0
+                freelancers_needed = Int(ceil(-(sol.H_cap[t_hat, m] - data.w[p, m])))
+                if sum(sol.f[:,m]) + freelancers_needed > data.F[m] 
+                    return false
+                end
+            end
+        end
+    end    
+    
     return true
 end
 
@@ -124,19 +136,19 @@ function findObjective(data, sol)
 end
 
 
-P = 37
-data = read_DR_data(P)
-
-sol = randomInitial(data)
-
-checkSolution(data, sol)
-
-drawSolution(data,sol,"random_initial")
-
-inventory_used = (data.I - sol.I_cap) ./ data.I
-heatmapInventory(inventory_used, data, "random_initial")
-
-staff_used = (data.H - sol.H_cap) ./ (data.H + sol.f)
-heatmapStaff(staff_used, data, "random_initial")
+#P = 37
+#data = read_DR_data(P)
+#
+#sol = randomInitial(data)
+#
+#checkSolution(data, sol)
+#
+#drawSolution(data,sol,"random_initial")
+#
+#inventory_used = (data.I - sol.I_cap) ./ data.I
+#heatmapInventory(inventory_used, data, "random_initial")
+#
+#staff_used = (data.H - sol.H_cap) ./ (data.H + sol.f)
+#heatmapStaff(staff_used, data, "random_initial")
 
 
