@@ -51,6 +51,12 @@ function checkSolution(data, sol)
     end
     staffing_used = staffing_check ./ staff_incl_freelancer
 
+    for m in data.m
+        if sum(sol.f[:,m]) > data.F[m]
+            println("Too many freelance hours!")
+        end
+    end
+
     #println("Inventory used (%):")
     #display(inventory_used * 100)
     max_inventory = maximum(inventory_used)

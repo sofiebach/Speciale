@@ -25,6 +25,7 @@ mutable struct Instance
     L_u::Array{Int64, 1}
     penalty_S::Array{Float64, 1}
     penalty_f::Array{Float64, 1}
+    F::Array{Int64, 1}
     Instance(P,C,M,timeperiod,L_lower,L_upper,Q_lower,Q_upper,T) = new(P,C,M,timeperiod,
         L_lower,L_upper,collect(L_lower:L_upper),indexin(0,collect(L_lower:L_upper))[],
         Q_lower,Q_upper,collect(Q_lower:Q_upper),
@@ -37,7 +38,8 @@ mutable struct Instance
         zeros(Int64, P),
         zeros(Int64, P),
         zeros(Float64, P),
-        zeros(Float64, M))
+        zeros(Float64, M),
+        zeros(Int64, M))
 end
 
 # Struct for holding the instance
@@ -114,10 +116,12 @@ function read_DR_data(P)
         data.I[:, c] = repeat([average[c]], data.T)
     end
 
-    # Penalty for freelance hours
+    # Penalty for freelance hours (can be modified)
     for m = 1:data.M
-        data.penalty_f[m] = 1.0 
+        data.penalty_f[m] = 0.1
+        data.F[m] = 100   
     end
+
 
     return data
 end
