@@ -26,13 +26,14 @@ function print_solution(sol)
     println("Total number of campaigns: ", sum(sol.x))
 end
 
-function drawSolution(data, sol, filename)
-    mapping = XLSX.readdata("data/data_staffing_constraint.xlsx", "Mapping", "B2:C38")[1:data.P,:]
+function drawTVSchedule(data, sol, filename)
+    TV_campaigns = 29
+    mapping = XLSX.readdata("data/data_staffing_constraint.xlsx", "Mapping", "B2:C30")[1:TV_campaigns,:]
     BC_names = unique(mapping[:,1])
     BC = []
     for bc in BC_names
         priorities = []
-        for i = 1:data.P
+        for i = 1:TV_campaigns
             if mapping[i,1] == bc
                 priorities = push!(priorities, i)
             end
@@ -164,6 +165,148 @@ function drawSolution(data, sol, filename)
     finish()
     preview()
 end
+
+function drawRadioSchedule(data, sol, filename)
+    radio_campaigns = 8
+    mapping = XLSX.readdata("data/data_staffing_constraint.xlsx", "Mapping", "B31:C38")[1:radio_campaigns,:]
+    BC_names = unique(mapping[:,1])
+    BC = []
+    for bc in BC_names
+        priorities = []
+        for i = 1:radio_campaigns
+            if mapping[i,1] == bc
+                priorities = push!(priorities, i)
+            end
+        end
+        BC = push!(BC, priorities)
+    end
+
+    P_names = unique(mapping[:,2])
+    num_P_names = length(P_names)
+    
+    #col = ["blue","red","green","yellow","orange","purple","cyan","magenta","lime","gray","pink"]
+    w = length(data.L)
+    c = 2
+    row_start = 2
+    height = 0
+    num_BC = length(BC)
+    for bc = 1:num_BC
+        ends = ones(1)
+        for t = 1:data.T
+            for p in BC[bc]
+                if sol.x[t,p] != 0
+                    priority = mapping[p,2]
+                    for n = 1:sol.x[t,p]
+                        isPlaced = false
+                        len_ends = length(ends)
+                        for e = 1:len_ends
+                            if (t+data.L_lower) >= ends[e]
+
+                                ends[e] = t + w + data.L_lower
+                                isPlaced = true
+                                break
+                            end
+                        end
+                        if isPlaced == false
+                            c += 1
+                            append!(ends,(t+w+data.L_lower))
+                        end
+                    end
+                end
+            end
+        end
+        c = c+2    
+        row_start = row_start + length(ends) + 1
+        height = row_start
+    end
+
+    scalar = 100
+    h = 0.8
+    col = distinguishable_colors(length(P_names)+1)[2:(length(P_names)+1)]
+
+    Drawing((data.T+w)*scalar, height*scalar, "output/schedule_" * filename * ".png")
+    background("white") # color of background
+    origin() 
+
+    translate(-(data.T+w)*scalar/2, -height*scalar/2)
+
+    fontsize(70)
+    sethue("black")
+    offset = 2 
+    
+    for t = 1:data.stop+w
+        time = t-data.start+1
+        #rect((t-1) * scalar,(c-1) * scalar ,1,(height) * scalar, :fill)
+        if time > 0
+            text(string(time), Point((offset + t)*scalar,1 * scalar), halign=:center)
+        end
+    end
+
+    c = 2
+    row_start = 2
+    fontsize(80)
+
+    for bc = 1:num_BC
+        sethue("black")
+        setopacity(1)
+        Luxor.rect(0,(c-0.5)*scalar,(data.T+w)*scalar,5, :fill)
+        text(string(BC_names[bc]), Point((0.5)*scalar,(c+0.5) * scalar), halign=:left)
+        ends = ones(1)
+        for t = 1:data.T
+            for p in BC[bc]
+                if sol.x[t,p] != 0
+                    priority = mapping[p,2]
+                    for n = 1:sol.x[t,p]
+                        isPlaced = false
+                        len_ends = length(ends)
+                        for e = 1:len_ends
+                            if (t+data.L_lower) >= ends[e]
+                                for prio = 1:num_P_names
+                                    if mapping[p,2] == P_names[prio]
+                                        setcolor(col[prio])
+                                    end
+                                end
+                                setopacity(0.5)
+                                Luxor.rect((offset+t+data.L_lower)*scalar, (row_start+e-1)*scalar, w*scalar, h*scalar,:fill)
+                                sethue("black")
+                                setopacity(0.8)
+                                text(string(priority), Point((offset+t+data.L_lower+w/2)*scalar, (0.1 + row_start+e-1)*scalar),valign =:top, halign=:center)
+                                setopacity(1)
+                                Luxor.rect((offset+t+data.L_lower)*scalar, (row_start+e-1)*scalar, w*scalar, h*scalar,:stroke)
+                                ends[e] = t + w + data.L_lower
+                                isPlaced = true
+                                break
+                            end
+                        end
+                        if isPlaced == false
+                            c += 1
+                            for prio = 1:num_P_names
+                                if mapping[p,2] == P_names[prio]
+                                    setcolor(col[prio])
+                                end
+                            end
+                            setopacity(0.5)
+                            Luxor.rect((offset+t+data.L_lower)*scalar, c*scalar, w*scalar, h*scalar,:fill)
+                            sethue("black")
+                            setopacity(0.8)
+                            text(string(priority), Point((offset+t+data.L_lower+w/2)*scalar, (0.1+c)*scalar), valign =:top, halign=:center)
+                            setopacity(1)
+                            Luxor.rect((offset+t+data.L_lower)*scalar, c*scalar, w*scalar, h*scalar,:stroke)
+                            append!(ends,(t+w+data.L_lower))
+                        end
+                    end
+                end
+            end
+        end
+        c = c+2    
+        row_start = row_start + length(ends) + 1
+    end
+
+    finish()
+    preview()
+end
+
+
 
 function drawHeatmap(inventory_used, staff_used, data, filename)
     channels = XLSX.readdata("data/data_inventory_consumption.xlsx", "Mapping", "B2:B13")[1:data.C]

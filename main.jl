@@ -16,9 +16,10 @@ inventory_used, staff_used = checkSolution(data, sol)
 # writeSolution(filename, data, sol)
 # data, sol = readSolution(filename)
 
-drawSolution(data,sol,"mip_distributed")
+drawTVSchedule(data,sol,"test")
+
+drawRadioSchedule(data,sol,"test")
 
 drawHeatmap(inventory_used, staff_used, data, "mip_distributed")
 
 #plotScope(data, sol)
-

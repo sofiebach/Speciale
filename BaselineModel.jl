@@ -74,6 +74,7 @@ print_solution(sol)
 
 checkSolution(data,sol)
 
-drawSolution(data, sol, "baseline")
+drawTVSchedule(data, sol, "baseline")
+drawRadioSchedule(data, sol, "baseline")
 
 drawHeatmap(data,sol, "baseline")

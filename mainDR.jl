@@ -8,7 +8,9 @@ data = read_DR_data(37)
 
 inventory_used, staff_used = checkSolution(data, dr_sol)
 
-drawSolution(data, dr_sol, "dr_plan")
+drawTVSchedule(data, dr_sol, "dr_plan")
+
+drawRadioSchedule(data, dr_sol, "dr_plan")
 
 heatmapStaff(staff_used, data, "dr_plan")
 

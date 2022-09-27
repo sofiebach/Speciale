@@ -142,8 +142,9 @@ end
 #sol = randomInitial(data)
 #
 #checkSolution(data, sol)
-#
-#drawSolution(data,sol,"random_initial")
+
+#drawTVSchedule(data, dr_sol, "random_initial")
+#drawRadioSchedule(data, dr_sol, "random_initial")
 #
 #inventory_used = (data.I - sol.I_cap) ./ data.I
 #heatmapInventory(inventory_used, data, "random_initial")
