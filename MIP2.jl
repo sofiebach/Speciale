@@ -11,8 +11,6 @@ function MIP2(data, time_limit)
     @variable(model, x[1:data.T, 1:data.P] >= 0, Int)
     @variable(model, f[1:data.T,1:data.M] >= 0) # freelance hours
     @variable(model, k[1:data.P] >= 0, Int)
-    @variable(model, x_max[1:data.P], Int)
-    @variable(model, x_min[1:data.P], Int)
 
     @objective(model, Min, sum(k[p]*data.penalty_S[p] for p = 1:data.P))
     @constraint(model, [p = 1:data.P, t = 1:data.T], x_max[p] >= x[t,p])
@@ -31,8 +29,9 @@ function MIP2(data, time_limit)
     # Inventory constraint
     @constraint(model, [t=1:data.T, c=1:data.C], sum(data.u[t-t2+data.L_zero,p,c]*x[t2,p] for p = 1:data.P for t2 = max(t-data.L_upper, data.start):min(data.stop,t-data.L_lower)) <= data.I[t,c])
 
-    # Staff from t = start:stop
+    # Staff constraint
     @constraint(model, [t=1:data.T, m=1:data.M], sum(data.w[p,m] * x[t2,p] for p=1:data.P for t2 = max(t-data.Q_upper, data.start):min(data.stop,t-data.Q_lower)) <= data.H[t,m] + f[t,m]) 
+    
 
     # Maximum number of freelancers
     @constraint(model, [m = 1:data.M], sum(f[t,m] for t = 1:data.T) <= data.F[m]) 
