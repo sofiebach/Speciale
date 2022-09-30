@@ -6,7 +6,7 @@ function checkSolution(data, sol)
         for p = 1:data.P
             if sol.x[t,p] > 0
                 l_idx = 1
-                for l in data.L
+                for l = data.L_lower:data.L_upper
                     for c = 1:data.C
                         grp = data.u[l_idx,p,c] * sol.x[t,p]
                         inventory_check[t+l,c] += grp
@@ -31,7 +31,7 @@ function checkSolution(data, sol)
     for t = 1:data.T
         for p = 1:data.P
             if sol.x[t,p] > 0
-                for q in data.Q
+                for q = data.Q_lower:data.Q_upper
                     for m in 1:data.M
                         #println(data.w[p,m])
                         work = data.w[p,m] * sol.x[t,p]

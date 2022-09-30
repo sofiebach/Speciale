@@ -45,7 +45,7 @@ function drawTVSchedule(data, sol, filename)
     num_P_names = length(P_names)
     
     #col = ["blue","red","green","yellow","orange","purple","cyan","magenta","lime","gray","pink"]
-    w = length(data.L)
+    w = data.L_upper - data.L_lower + 1
     c = 2
     row_start = 2
     height = 0
@@ -185,7 +185,7 @@ function drawRadioSchedule(data, sol, filename)
     num_P_names = length(P_names)
     
     #col = ["blue","red","green","yellow","orange","purple","cyan","magenta","lime","gray","pink"]
-    w = length(data.L)
+    w = data.L_upper - data.L_lower + 1
     c = 2
     row_start = 2
     height = 0
