@@ -116,7 +116,7 @@ function read_DR_data(P)
 
     # Penalty for freelance hours (can be modified)
     for m = 1:data.M
-        data.penalty_f[m] = 0.1
+        data.penalty_f[m] = 0.001
         data.F[m] = 100   
     end
 

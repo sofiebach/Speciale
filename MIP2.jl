@@ -12,9 +12,7 @@ function MIP2(data, time_limit)
     @variable(model, f[1:data.T,1:data.M] >= 0) # freelance hours
     @variable(model, k[1:data.P] >= 0, Int)
 
-    @objective(model, Min, sum(k[p]*data.penalty_S[p] for p = 1:data.P))
-    @constraint(model, [p = 1:data.P, t = 1:data.T], x_max[p] >= x[t,p])
-    @constraint(model, [p = 1:data.P, t = 1:data.T], x_min[p] <= x[t,p])
+    @objective(model, Min, sum(k[p]*data.penalty_S[p] for p = 1:data.P) + sum(f[t,m]*data.penalty_f[m] for t = 1:data.T for m = 1:data.M))
 
     #It is not possible to slack on Flagskib DR1 and DR2 (p=1 and p=8)
     @constraint(model, [p in [1,8]], k[p] == 0)
