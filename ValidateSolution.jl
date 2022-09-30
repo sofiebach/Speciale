@@ -26,7 +26,7 @@ function checkSolution(data, sol)
     inventory_used = inventory_check ./ data.I
 
     # Overview of staffing
-    staffing_check = zeros(data.T,data.M)
+    staffing_check = zeros(Float64, data.T,data.M)
     staff_incl_freelancer = data.H + sol.f 
     for t = 1:data.T
         for p = 1:data.P
@@ -38,6 +38,7 @@ function checkSolution(data, sol)
                         staffing_check[t+q,m] += work
                         if staffing_check[t+q,m] > staff_incl_freelancer[t+q,m] + eps
                             println("Staff constraint exceeded!")
+                            println("leftsside: ", staffing_check[t+q,m], " rightside: ", staff_incl_freelancer[t+q,m] + eps)
                             #println("t: ", t)
                             #println("p: ", p)
                             #println("q: ", q)

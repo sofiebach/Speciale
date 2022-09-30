@@ -47,12 +47,12 @@ mutable struct Sol
     obj::Float64
     num_campaigns::Int64
     x::Array{Int64,2}
-    f::Array{Int64,2}
+    f::Array{Float64,2}
     k::Array{Int64,1}
     P::Int64
     T::Int64
     M::Int64
-    Sol(T,P,M) = new(0.0, 0, zeros(Int64,T,P), zeros(Int64,T,M), zeros(Int64,P), P, T, M)
+    Sol(T,P,M) = new(0.0, 0, zeros(Int64,T,P), zeros(Float64,T,M), zeros(Int64,P), P, T, M)
 end
 
 function read_DR_data(P)
