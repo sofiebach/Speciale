@@ -8,11 +8,9 @@ mutable struct Instance
     timeperiod::Int64
     L_lower::Int64
     L_upper::Int64
-    L::Array{Int64,1}
     L_zero::Int64
     Q_lower::Int64
     Q_upper::Int64
-    Q::Array{Int64,1}
     start::Int64
     stop::Int64
     T::Int64
@@ -27,8 +25,8 @@ mutable struct Instance
     penalty_f::Array{Float64, 1}
     F::Array{Int64, 1}
     Instance(P,C,M,timeperiod,L_lower,L_upper,Q_lower,Q_upper,T) = new(P,C,M,timeperiod,
-        L_lower,L_upper,collect(L_lower:L_upper),indexin(0,collect(L_lower:L_upper))[],
-        Q_lower,Q_upper,collect(Q_lower:Q_upper),
+        L_lower,L_upper,indexin(0,collect(L_lower:L_upper))[],
+        Q_lower,Q_upper,
         abs(Q_lower)+1,abs(Q_lower)+timeperiod,T,
         zeros(Float64, P),
         zeros(Float64, P, M),
@@ -267,7 +265,7 @@ function readSolution(filename)
     data = Instance(P,C,M,timeperiod,L_lower,L_upper,Q_lower,Q_upper,T)
     for c = 1:C
         line = parse.(Float64,split(readline(f)))
-        data.u[:,:,c] = reshape(line, (length(data.L), data.P))
+        data.u[:,:,c] = reshape(line, (data.L_upper-data.L_lower+1, data.P))
     end
     readline(f) # blank
     readline(f) # comment
