@@ -23,7 +23,7 @@ mutable struct Instance
     L_u::Array{Int64, 1}
     penalty_S::Array{Float64, 1}
     penalty_f::Array{Float64, 1}
-    F::Array{Int64, 1}
+    F::Array{Float64, 1}
     Instance(P,C,M,timeperiod,L_lower,L_upper,Q_lower,Q_upper,T) = new(P,C,M,timeperiod,
         L_lower,L_upper,indexin(0,collect(L_lower:L_upper))[],
         Q_lower,Q_upper,

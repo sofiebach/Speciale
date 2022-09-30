@@ -58,9 +58,7 @@ function MIP2(data, time_limit)
     sol.num_campaigns = sum(sol.x)
     for t = 1:sol.T
         for m = 1:sol.M
-            if JuMP.value(f[t,m]) > 0.5
-                sol.f[t,m] = JuMP.value(f[t,m])
-            end
+            sol.f[t,m] = JuMP.value(f[t,m])
         end
     end
     return sol

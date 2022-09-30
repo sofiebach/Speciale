@@ -38,7 +38,6 @@ function checkSolution(data, sol)
                         staffing_check[t+q,m] += work
                         if staffing_check[t+q,m] > staff_incl_freelancer[t+q,m] + eps
                             println("Staff constraint exceeded!")
-                            println("leftsside: ", staffing_check[t+q,m], " rightside: ", staff_incl_freelancer[t+q,m] + eps)
                             #println("t: ", t)
                             #println("p: ", p)
                             #println("q: ", q)
