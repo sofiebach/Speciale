@@ -78,8 +78,8 @@ function insert(data, sol, t, p)
     end
 
     # update production
-    for t_hat = (t+data.Q_lower):(t+data.Q_upper) 
-        for m = 1:data.M
+    for m = 1:data.M
+        for t_hat = (t+data.Q_lower):(t+data.Q_upper)
             sol.H_cap[t_hat, m] -= data.w[p, m]
             if sol.H_cap[t_hat, m] < 0
                 sol.f[t_hat, m] = -sol.H_cap[t_hat, m]
@@ -114,9 +114,9 @@ function fits(data, sol, t, p)
         l_idx += 1
     end
 
-    freelancers_needed = 0
-    for t_hat = (t+data.Q_lower):(t+data.Q_upper) 
-        for m = 1:data.M
+    for m = 1:data.M
+        freelancers_needed = 0
+        for t_hat = (t+data.Q_lower):(t+data.Q_upper) 
             if sol.H_cap[t_hat, m] - data.w[p, m] < 0
                 freelancers_needed += -(sol.H_cap[t_hat, m] - data.w[p, m])
                 if sum(sol.f[:,m]) + freelancers_needed > data.F[m] 

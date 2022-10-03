@@ -38,10 +38,11 @@ function checkSolution(data, sol)
                         staffing_check[t+q,m] += work
                         if staffing_check[t+q,m] > staff_incl_freelancer[t+q,m] + eps
                             println("Staff constraint exceeded!")
-                            #println("t: ", t)
-                            #println("p: ", p)
-                            #println("q: ", q)
-                            #println("m: ", m)
+                            println("t: ", t)
+                            println("p: ", p)
+                            println("q: ", q)
+                            println("m: ", m)
+                            return false
                             break
                         end
                     end
@@ -56,6 +57,7 @@ function checkSolution(data, sol)
             println("Too many freelance hours!")
         end
     end
+    return true
 
     #println("Inventory used (%):")
     #display(inventory_used * 100)
