@@ -114,10 +114,11 @@ function fits(data, sol, t, p)
         l_idx += 1
     end
 
+    freelancers_needed = 0
     for t_hat = (t+data.Q_lower):(t+data.Q_upper) 
         for m = 1:data.M
             if sol.H_cap[t_hat, m] - data.w[p, m] < 0
-                freelancers_needed = -(sol.H_cap[t_hat, m] - data.w[p, m])
+                freelancers_needed += -(sol.H_cap[t_hat, m] - data.w[p, m])
                 if sum(sol.f[:,m]) + freelancers_needed > data.F[m] 
                     return false
                 end
