@@ -103,11 +103,11 @@ function LNS(data)
     return sol
 end
 
-P = 37
-data = read_DR_data(P)
-
-sol = LNS(data)
-checkSolution(data,sol)
+# P = 37
+# data = read_DR_data(P)
+# 
+# sol = LNS(data)
+# checkSolution(data,sol)
 
 # sol = randomInitial(data)
 
