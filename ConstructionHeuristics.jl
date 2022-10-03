@@ -9,14 +9,14 @@ mutable struct HeuristicSol
     obj::Float64
     num_campaigns::Int64
     x::Array{Int64,2}
-    f::Array{Int64,2}
+    f::Array{Float64,2}
     k::Array{Int64,1}
     P::Int64
     T::Int64
     M::Int64
     I_cap::Array{Float64,2}
     H_cap::Array{Float64,2}
-    HeuristicSol(data) = new(0.0, 0, zeros(Int64,data.T,data.P), zeros(Int64,data.T,data.M), zeros(Int64,data.P), data.P, data.T, data.M, deepcopy(data.I), deepcopy(data.H))
+    HeuristicSol(data) = new(0.0, 0, zeros(Int64,data.T,data.P), zeros(Float64,data.T,data.M), deepcopy(data.S), data.P, data.T, data.M, deepcopy(data.I), deepcopy(data.H))
 end
 
 function randomInitial(data)
@@ -60,9 +60,6 @@ function randomInitial(data)
                 break
             end
         end
-        if !inserted
-            sol.k[p] += 1
-        end
     end
 
     return sol
@@ -85,9 +82,14 @@ function insert(data, sol, t, p)
         for m = 1:data.M
             sol.H_cap[t_hat, m] -= data.w[p, m]
             if sol.H_cap[t_hat, m] < 0
-                sol.f[t_hat, m] = Int(ceil(-sol.H_cap[t_hat, m])) 
+                sol.f[t_hat, m] = -sol.H_cap[t_hat, m]
             end
         end
+    end
+
+    # update scope
+    if sol.k[p] > 0
+        sol.k[p] -= 1
     end
 
     findObjective(data, sol)
@@ -115,7 +117,7 @@ function fits(data, sol, t, p)
     for t_hat = (t+data.Q_lower):(t+data.Q_upper) 
         for m = 1:data.M
             if sol.H_cap[t_hat, m] - data.w[p, m] < 0
-                freelancers_needed = Int(ceil(-(sol.H_cap[t_hat, m] - data.w[p, m])))
+                freelancers_needed = -(sol.H_cap[t_hat, m] - data.w[p, m])
                 if sum(sol.f[:,m]) + freelancers_needed > data.F[m] 
                     return false
                 end
@@ -127,29 +129,27 @@ function fits(data, sol, t, p)
 end
 
 function findObjective(data, sol)
-    num_campaigns = sum(sol.x)
+    # num_campaigns = sum(sol.x)
     scope = sum(data.penalty_S .* sol.k)
-    freelance = sum(sum(sol.f, dims=1) .* data.penalty_f)
-    minmax = sum(maximum(sol.x, dims=1) - minimum(sol.x, dims=1))
-
-    sol.obj = num_campaigns - scope - freelance - minmax
+    # freelance = sum(sum(sol.f, dims=1) .* data.penalty_f)
+    # minmax = sum(maximum(sol.x, dims=1) - minimum(sol.x, dims=1))
+    sol.obj = scope
 end
 
 
-#P = 37
-#data = read_DR_data(P)
-#
-#sol = randomInitial(data)
-#
-#checkSolution(data, sol)
-
-#drawTVSchedule(data, dr_sol, "random_initial")
-#drawRadioSchedule(data, dr_sol, "random_initial")
-#
-#inventory_used = (data.I - sol.I_cap) ./ data.I
-#heatmapInventory(inventory_used, data, "random_initial")
-#
-#staff_used = (data.H - sol.H_cap) ./ (data.H + sol.f)
-#heatmapStaff(staff_used, data, "random_initial")
+# P = 37
+# data = read_DR_data(P)
+# 
+# sol = randomInitial(data)
+# 
+# checkSolution(data, sol)
+# drawTVSchedule(data, dr_sol, "random_initial")
+# drawRadioSchedule(data, dr_sol, "random_initial")
+# 
+# inventory_used = (data.I - sol.I_cap) ./ data.I
+# heatmapInventory(inventory_used, data, "random_initial")
+# 
+# staff_used = (data.H - sol.H_cap) ./ (data.H + sol.f)
+# heatmapStaff(staff_used, data, "random_initial")
 
 

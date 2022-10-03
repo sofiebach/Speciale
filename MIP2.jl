@@ -26,7 +26,7 @@ function MIP2(data, time_limit)
     @constraint(model, [t = (data.stop + 1):data.T], sum(x[t,p] for p = 1:data.P) == 0)
 
     # Maximum number of campaigns for each timestep
-    @constraint(model, [t = data.start:data.stop, p = 1:data.P], sum(x[t,p]) <= round(data.S[p]/data.timeperiod) + 1)
+    @constraint(model, [t = 1:data.T, p = 1:data.P], x[t,p] <= round(data.S[p]/data.timeperiod) + 1)
 
     # Inventory constraint
     @constraint(model, [t=1:data.T, c=1:data.C], sum(data.u[t-t2+data.L_zero,p,c]*x[t2,p] for p = 1:data.P for t2 = max(t-data.L_upper, data.start):min(data.stop,t-data.L_lower)) <= data.I[t,c])

@@ -21,11 +21,6 @@ function remove(data, sol, t, p)
     sol.x[t,p] -= 1
     sol.num_campaigns -= 1
     
-    # update k
-    if sum(sol.x[:,p]) < data.S[p]
-        sol.k[p] += 1
-    end
-    
     # update inventory
     l_idx = 1
     for t_hat = (t+data.L_lower):(t+data.L_upper)
@@ -40,11 +35,18 @@ function remove(data, sol, t, p)
         for m = 1:data.M
             sol.H_cap[t_hat, m] += data.w[p, m]
             if sol.H_cap[t_hat, m] < 0
-                sol.f[t_hat, m] = Int(ceil(-sol.H_cap[t_hat, m])) 
+                sol.f[t_hat, m] = -sol.H_cap[t_hat, m]
             else
                 sol.f[t_hat,m] = 0
             end
         end
+    end
+
+    # update scope
+    if sum(sol.x[:,p]) < data.S[p]
+        sol.k[p] += 1
+    else 
+        sol.k[p] = 0
     end
 
     # update objective
@@ -73,25 +75,45 @@ function firstFits(data, sol)
     end
 end
 
+function delta_insert(data, sol, p)
+    if sol.k[p] > 0
+        return sol.obj - data.penalty_S[p]
+    else
+        return sol.obj
+    end
+end
 
+function delta_remove(data, sol, p)
+    if sum(sol.x[:,p])-1 < data.S[p]
+        return sol.obj + data.penalty_S[p]
+    else
+        return sol.obj
+    end
+end
 
 function LNS(data)
     sol = randomInitial(data)
-    
+    #println(sol.obj)
+
     frac = 0.2
     destroy(data,sol,frac)
-    
     firstFits(data,sol)
-    
+
+    #println(sol.obj)
+    return sol
 end
 
 P = 37
 data = read_DR_data(P)
 
-sol = randomInitial(data)
-
+sol = LNS(data)
 checkSolution(data,sol)
 
-LNS(data)
+# sol = randomInitial(data)
 
-checkSolution(data,sol)
+#println(delta_insert(data, sol, 1))
+
+#insert(data,sol,10,1)
+#println(findObjective(data, sol))
+
+
