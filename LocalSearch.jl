@@ -50,6 +50,10 @@ function checkSwap(data, sol, t1, p1, t2, p2)
         return false
     end
 
+    if p1 == p2
+        return false
+    end
+
     # If t1 and t2 doesnt overlap
     if (t1+data.L_upper) < (t2+data.L_lower)
         return checkReplace(data, sol, t1, p1, p2) && checkReplace(data, sol, t2, p2, p1)
@@ -99,15 +103,18 @@ end
 
 function swap(data, sol, t1, p1, t2, p2)
     remove(data, sol, t1, p1)
+    
+    # if !checkSolution(data, sol)
+    #     println("Insert: ", p2, " at ", t1)
+    # end
+    
     remove(data, sol, t2, p2)
-    insert(data, sol, t1, p2)
-    if !checkSolution(data, sol)
-        println("Insert 1")
-    end
     insert(data, sol, t2, p1)
-    if !checkSolution(data, sol)
-        println("Insert 2")
-    end
+    insert(data, sol, t1, p2)
+    # if !checkSolution(data, sol)
+    #     println("Insert: ", p1, " at ", t2)
+    # end
+    
 end
 
 
@@ -127,6 +134,7 @@ end
 
 
 function swapInsert(data, sol)
+    best_sol = deepcopy(sol)
     temp_sol = deepcopy(sol)
     for t1 = data.start:(data.stop-1)
         P1 = findall(x->x>0, temp_sol.x[t1,:])
@@ -142,19 +150,44 @@ function swapInsert(data, sol)
                 for p2 in P2 
                     if checkSwap(data, temp_sol, t1, p1, t2, p2)
                         swap(data, temp_sol, t1, p1, t2, p2)
-                        if !checkSolution(data, sol)
-                            println("Check swap")
+                        if !checkSolution(data, temp_sol)
                             return
                         end
-                        greedyInsert(data, temp_sol)
-                        if temp_sol.obj < sol.obj
-                            swap(data, sol, t1, p1, t2, p2)
-                            greedyInsert(data, sol)
-                            #println("new obj: ", sol.obj)
-                            println("campaigns: ", sol.num_campaigns)
+                        # greedyInsert(data, temp_sol)
+                        if temp_sol.obj < best_sol.obj
+                            best_sol = deepcopy(temp_sol)
+                            #println("new obj: ", best_sol.obj)
+                            #println("campaigns: ", best_sol.num_campaigns)
                         else 
                             temp_sol = deepcopy(sol)
                         end
+                    end
+                end
+            end
+        end
+    end
+end
+
+function test(data, sol)
+    for t1 = data.start:(data.stop-1)
+        P1 = findall(x->x>0, sol.x[t1,:])
+        if length(P1) == 0
+            continue
+        end
+        for t2 = (t1+1):data.stop
+            P2 = findall(x->x>0, sol.x[t2,:])
+            if length(P2) == 0
+                continue
+            end
+            for p1 in P1
+                for p2 in P2 
+                    if checkSwap(data, sol, t1, p1, t2, p2)
+                        println("swapped")
+                        swap(data, sol, t1, p1, t2, p2)
+                        if !checkSolution(data,sol)
+                            return
+                        end
+                        greedyInsert(data, sol)
                     end
                 end
             end
@@ -168,13 +201,15 @@ data = read_DR_data(P)
 
 sol = randomInitial(data)
 checkSolution(data,sol)
-println(sol.num_campaigns)
 
-sol = LNS(data)
-checkSolution(data,sol)
+test(data,sol)
+# checkSolution(data,sol)
 
-
-swapInsert(data, sol)
-inventory_used, staffing_used = checkSolution(data,sol)
-
-findfirst(x -> x == maximum(staffing_used), staffing_used)
+# swapInsert(data, sol)
+# inventory_used, staffing_used = checkSolution(data,sol)
+sol = randomInitial(data)
+println(sum(sol.f,dims=1))
+swap(data, sol, 10, 1, 20, 2)
+println(sum(sol.f,dims=1))
+swap(data, sol, 10, 2, 20, 1)
+println(sum(sol.f,dims=1))
