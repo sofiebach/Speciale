@@ -20,53 +20,47 @@ mutable struct HeuristicSol
 end
 
 function randomInitial(data)
-    P_bar = [1, 8]
     sol = HeuristicSol(data)
     
     # Randomly insert priorities from P_bar
-    for p_bar in P_bar 
-        for s = 1:data.S[p_bar]
-            inserted = false
-            r_times = shuffle(collect(data.start:data.stop))
-            for t in r_times
-                if fits(data, sol, t, p_bar)
-                    insert(data, sol, t, p_bar)
-                    inserted = true
+    randomInsert(data, sol, data.P_bar)
+
+    # Randomly insert according to penalty
+    sorted_idx = sortperm(-data.penalty_S)
+    randomInsert(data, sol, sorted_idx)
+
+    # Check if anything "out of scope" can be inserted
+    for t = data.start:data.stop
+        sorted_idx = sortperm(-data.penalty_S)
+        for p in sorted_idx
+            if fits(data,sol,t,p) 
+                insert(data,sol,t,p)
+            end
+        end
+    end
+    
+    return sol
+end
+
+function randomInsert(data, sol, priorities)
+    for p in priorities
+        n_inserted = 0
+        r_times = shuffle(collect(data.start:data.stop))
+        for t in r_times
+            if fits(data, sol, t, p)
+                insert(data, sol, t, p)
+                n_inserted += 1
+                if n_inserted == data.S[p]
                     break
                 end
             end
         end
     end
-
-    # Compute list of priorities to choose from
-    choose_from = []
-    for p = 1:data.P 
-        if p in P_bar
-            continue
-        end
-        append!(choose_from, repeat([p], Int(data.S[p])))
-    end
-    shuffle!(choose_from)
-    
-    # Randomly insert priorities from list
-    for p in choose_from
-        inserted = false
-        n_tries = 3
-        for n = 1:n_tries
-            t = rand(data.start:data.stop)
-            if fits(data, sol, t, p)
-                insert(data, sol, t, p)
-                inserted = true
-                break
-            end
-        end
-    end
-
-    return sol
 end
 
 function insert(data, sol, t, p)
     sol.x[t,p] += 1
+    sol.num_campaigns += 1
 
     # update inventory
     l_idx = 1
@@ -93,7 +87,6 @@ function insert(data, sol, t, p)
     end
 
     findObjective(data, sol)
-    sol.num_campaigns += 1
 end
 
 
@@ -130,27 +123,19 @@ function fits(data, sol, t, p)
 end
 
 function findObjective(data, sol)
-    # num_campaigns = sum(sol.x)
+    num_campaigns = sum(sum(sol.x, dims=1) .* transpose(data.reward))
     scope = sum(data.penalty_S .* sol.k)
     # freelance = sum(sum(sol.f, dims=1) .* data.penalty_f)
-    # minmax = sum(maximum(sol.x, dims=1) - minimum(sol.x, dims=1))
-    sol.obj = scope
+    sol.obj =  scope - num_campaigns
 end
 
 
-# P = 37
-# data = read_DR_data(P)
-# 
-# sol = randomInitial(data)
-# 
-# checkSolution(data, sol)
-# drawTVSchedule(data, dr_sol, "random_initial")
-# drawRadioSchedule(data, dr_sol, "random_initial")
-# 
-# inventory_used = (data.I - sol.I_cap) ./ data.I
-# heatmapInventory(inventory_used, data, "random_initial")
-# 
-# staff_used = (data.H - sol.H_cap) ./ (data.H + sol.f)
-# heatmapStaff(staff_used, data, "random_initial")
+P = 37
+data = read_DR_data(P)
+
+sol = randomInitial(data)
+
+checkSolution(data, sol)
+
 
 
