@@ -55,6 +55,10 @@ function checkSwap(data, sol, t1, p1, t2, p2)
         return false
     end
 
+    if sol.x[t1,p1] == 0 || sol.x[t2,p2] == 0
+        return false
+    end
+
     # If t1 and t2 doesnt overlap
     if (t1+data.L_upper) < (t2+data.L_lower)
         return checkReplace(data, sol, t1, p1, p2) && checkReplace(data, sol, t2, p2, p1)
@@ -104,18 +108,9 @@ end
 
 function swap(data, sol, t1, p1, t2, p2)
     remove(data, sol, t1, p1)
-    
-    # if !checkSolution(data, sol)
-    #     println("Insert: ", p2, " at ", t1)
-    # end
-    
     remove(data, sol, t2, p2)
     insert(data, sol, t2, p1)
     insert(data, sol, t1, p2)
-    # if !checkSolution(data, sol)
-    #     println("Insert: ", p1, " at ", t2)
-    # end
-    
 end
 
 
@@ -152,10 +147,6 @@ function swapInsert(data, sol)
                 for p2 in P2 
                     if checkSwap(data, temp_sol, t1, p1, t2, p2)
                         swap(data, temp_sol, t1, p1, t2, p2)
-                        #if !checkSolution2(data, temp_sol)
-                        #    println("swap")
-                        #    return temp_sol
-                        #end
                         greedyInsert(data, temp_sol)
                         if temp_sol.obj < best_sol.obj
                             best_sol = deepcopy(temp_sol)
@@ -172,36 +163,22 @@ function swapInsert(data, sol)
     return best_sol
 end
 
-
-
-
 P = 37
 data = read_DR_data(P)
 
-sol = randomInitial(data)
+sol1 = randomInitial(data)
+println(sol1.obj)
+sol2 = swapInsert(data, sol1)
+println(sol2.obj)
 
-sol2 = swapInsert(data, sol)
+staffing_check = checkSolution(data, sol2)
+used_prod, _ = checkSolution2(data, sol2)
 
+println(minimum(staffing_check-used_prod)) # 9 og 10
+println(maximum(staffing_check-used_prod))
 
-used, cap = checkSolution2(data,sol2)
-checkSolution(data,sol2)
+(staffing_check-used_prod)[8:9,:]
 
-#checkSolution2(data,sol)
+sol2.x[11:12,:]
 
-#test(data,sol)
-# checkSolution(data,sol)
-
-
-sol = randomInitial(data)
-
-
-checkSolution(data,sol2)
-checkSolution2(data,sol2)
-
-
-sol = randomInitial(data)
-println(sum(sol.f,dims=1))
-swap(data, sol, 10, 1, 20, 2)
-println(sum(sol.f,dims=1))
-swap(data, sol, 10, 2, 20, 1)
-println(sum(sol.f,dims=1))
+# SOL ER NEGATIV

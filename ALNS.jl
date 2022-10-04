@@ -1,7 +1,7 @@
 include("ConstructionHeuristics.jl")
 include("ValidateSolution.jl")
 
-function destroy(data, sol, frac)
+function randomDestroy(data, sol, frac)
     n_destroy = round(sol.num_campaigns*frac)
     while n_destroy > 0 
         p = rand(1:data.P)
@@ -53,41 +53,50 @@ function remove(data, sol, t, p)
     findObjective(data, sol)
 end
 
+function greedyRepair(data, sol)
+    while true
+        t, p = bestInsertion(data, sol)
+        if t == 0 || p == 0
+            break
+        end
+        insert(data, sol, t, p)
+        println(sol.obj)
+    end
+end
 
-function firstFits(data, sol) 
-    # prioritize priorities with highest penalty
+function bestInsertion(data, sol)
+    best_obj = sol.obj
+    best_p = 0
+    best_t = 0
     sorted_idx = sortperm(-data.penalty_S)
-    for p in sorted_idx
-        for n = 1:sol.k[p]
-            inserted = false
-            r_times = shuffle(collect(data.start:data.stop))
-            for t in r_times
-                if fits(data,sol,t,p)
-                    insert(data,sol,t,p)
-                    inserted = true
-                    break
+    for p in sorted_idx 
+        for t = data.start:data.stop
+            if fits(data, sol, t, p) 
+                new_obj = delta_insert(data, sol, p)
+                if new_obj < best_obj
+                    best_obj = new_obj
+                    best_p = p 
+                    best_t = t 
                 end
-            end
-            if !inserted
-                break
             end
         end
     end
+    return best_t, best_p
 end
 
 function delta_insert(data, sol, p)
     if sol.k[p] > 0
-        return sol.obj - data.penalty_S[p]
+        return sol.obj - data.penalty_S[p] - data.reward[p]
     else
-        return sol.obj
+        return sol.obj - data.reward[p]
     end
 end
 
 function delta_remove(data, sol, p)
     if sum(sol.x[:,p])-1 < data.S[p]
-        return sol.obj + data.penalty_S[p]
+        return sol.obj + data.penalty_S[p] + data.reward[p]
     else
-        return sol.obj
+        return sol.obj + data.reward[p]
     end
 end
 
@@ -96,18 +105,18 @@ function LNS(data)
     #println(sol.obj)
 
     frac = 0.2
-    destroy(data,sol,frac)
-    firstFits(data,sol)
+    randomDestroy(data,sol,frac)
+    greedyRepair(data,sol)
 
     #println(sol.obj)
     return sol
 end
 
-# P = 37
-# data = read_DR_data(P)
-# 
-# sol = LNS(data)
-# checkSolution(data,sol)
+P = 37
+data = read_DR_data(P)
+
+sol = LNS(data)
+checkSolution(data, sol)
 
 # sol = randomInitial(data)
 
