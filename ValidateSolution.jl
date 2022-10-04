@@ -81,10 +81,20 @@ end
 
 function checkSolution2(data, sol)
     # Only production check
+
+    used_inv = zeros(Float64,data.T, data.C)
+    cap_inv = zeros(Float64, data.T, data.C)
+
     used_prod = zeros(Float64, data.T, data.M)
     cap_prod = zeros(Float64, data.T, data.M)
-    for t = 1:data.stop
-        
+    for t = data.start:data.stop
+    #    for l_idx = (t-data.L_upper):(t-data.L_lower)
+    #        println("t ", t, " l_idx: ", l_idx,)
+    #        used_inv[t,:] += transpose(sum(sol.x[l_idx,:].*data.u[l_idx-t+data.L_zero+1,:,:],dims=1))
+    #    end
+    #end
+
+
         # production check
         for q_idx = (t-data.Q_upper):(t-data.Q_lower)
             used_prod[t,:] += transpose(sum(sol.x[q_idx,:].*data.w,dims=1))

@@ -3,6 +3,7 @@ using XLSX
 # Struct for holding the instance
 mutable struct Instance
     P::Int64
+    P_bar::Array{Int64, 1}
     C::Int64
     M::Int64
     timeperiod::Int64
@@ -22,9 +23,10 @@ mutable struct Instance
     L_l::Array{Int64, 1}
     L_u::Array{Int64, 1}
     penalty_S::Array{Float64, 1}
+    reward::Array{Float64,1}
     penalty_f::Array{Float64, 1}
     F::Array{Float64, 1}
-    Instance(P,C,M,timeperiod,L_lower,L_upper,Q_lower,Q_upper,T) = new(P,C,M,timeperiod,
+    Instance(P,C,M,timeperiod,L_lower,L_upper,Q_lower,Q_upper,T) = new(P,[1,8],C,M,timeperiod,
         L_lower,L_upper,indexin(0,collect(L_lower:L_upper))[],
         Q_lower,Q_upper,
         abs(Q_lower)+1,abs(Q_lower)+timeperiod,T,
@@ -35,6 +37,7 @@ mutable struct Instance
         zeros(Float64, length(collect(L_lower:L_upper)), P, C),
         zeros(Int64, P),
         zeros(Int64, P),
+        zeros(Float64, P),
         zeros(Float64, P),
         zeros(Float64, M),
         zeros(Int64, M))
@@ -119,7 +122,8 @@ function read_DR_data(P)
         data.penalty_f[m] = 0.001
         data.F[m] = 100   
     end
-
+    # reward for Priority
+    data.reward = (data.penalty_S.-minimum(data.penalty_S).+1)./(maximum(data.penalty_S)-minimum(data.penalty_S))
 
     return data
 end
