@@ -38,10 +38,14 @@ function checkSolution(data, sol)
                         staffing_check[t+q,m] += work
                         if staffing_check[t+q,m] > staff_incl_freelancer[t+q,m] + eps
                             println("Staff constraint exceeded!")
-                            println("t: ", t)
-                            println("p: ", p)
-                            println("q: ", q)
+                            println("t: ", t+q)
                             println("m: ", m)
+                            println("used: ", staffing_check[t+q,m])
+                            println("cap: ", staff_incl_freelancer[t+q,m])
+                            #println("t: ", t)
+                            #println("p: ", p)
+                            #println("q: ", q)
+                            #println("m: ", m)
                             return false
                             break
                         end
@@ -71,5 +75,33 @@ function checkSolution(data, sol)
     max_staff_idx = findfirst(x -> x == maximum(staffing_used), staffing_used)
     #println("Maximum staffing used is ", max_staff, " on media ", max_staff_idx[2], " at time ", max_staff_idx[1])
     return inventory_used, staffing_used
+end
+
+
+
+function checkSolution2(data, sol)
+    # Only production check
+    used_prod = zeros(Float64, data.T, data.M)
+    cap_prod = zeros(Float64, data.T, data.M)
+    for t = 1:data.stop
+        
+        # production check
+        for q_idx = (t-data.Q_upper):(t-data.Q_lower)
+            used_prod[t,:] += transpose(sum(sol.x[q_idx,:].*data.w,dims=1))
+        end
+        cap_prod[t,:] = data.H[t,:] + sol.f[t,:]
+        for m = 1:data.M
+            if(used_prod[t,m] > cap_prod[t,m])
+                print("Staff exceeded at time ", t, " media ", m)
+            end
+        end 
+    end
+
+    for m = 1:data.M
+        if sum(sol.f[:,m]) > data.F[m]
+            println("Too many freelance hours!")
+        end
+    end
+    return used_prod, cap_prod
 end
 

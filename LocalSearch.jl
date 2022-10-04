@@ -1,5 +1,6 @@
 include("ConstructionHeuristics.jl")
 include("ALNS.jl")
+include("ValidateSolution.jl")
 
 function checkReplace(data, sol, t1, p1, p2)
     # checks if p2 can be placed at t1 INSTEAD of p1
@@ -136,6 +137,7 @@ end
 function swapInsert(data, sol)
     best_sol = deepcopy(sol)
     temp_sol = deepcopy(sol)
+    c = 1
     for t1 = data.start:(data.stop-1)
         P1 = findall(x->x>0, temp_sol.x[t1,:])
         if length(P1) == 0
@@ -150,14 +152,15 @@ function swapInsert(data, sol)
                 for p2 in P2 
                     if checkSwap(data, temp_sol, t1, p1, t2, p2)
                         swap(data, temp_sol, t1, p1, t2, p2)
-                        if !checkSolution(data, temp_sol)
-                            return
-                        end
-                        # greedyInsert(data, temp_sol)
+                        #if !checkSolution2(data, temp_sol)
+                        #    println("swap")
+                        #    return temp_sol
+                        #end
+                        greedyInsert(data, temp_sol)
                         if temp_sol.obj < best_sol.obj
                             best_sol = deepcopy(temp_sol)
-                            #println("new obj: ", best_sol.obj)
-                            #println("campaigns: ", best_sol.num_campaigns)
+                            println("new obj: ", best_sol.obj)
+                            println("campaigns: ", best_sol.num_campaigns)
                         else 
                             temp_sol = deepcopy(sol)
                         end
@@ -166,47 +169,36 @@ function swapInsert(data, sol)
             end
         end
     end
+    return best_sol
 end
 
-function test(data, sol)
-    for t1 = data.start:(data.stop-1)
-        P1 = findall(x->x>0, sol.x[t1,:])
-        if length(P1) == 0
-            continue
-        end
-        for t2 = (t1+1):data.stop
-            P2 = findall(x->x>0, sol.x[t2,:])
-            if length(P2) == 0
-                continue
-            end
-            for p1 in P1
-                for p2 in P2 
-                    if checkSwap(data, sol, t1, p1, t2, p2)
-                        println("swapped")
-                        swap(data, sol, t1, p1, t2, p2)
-                        if !checkSolution(data,sol)
-                            return
-                        end
-                        greedyInsert(data, sol)
-                    end
-                end
-            end
-        end
-    end
-end
+
 
 
 P = 37
 data = read_DR_data(P)
 
 sol = randomInitial(data)
-checkSolution(data,sol)
 
-test(data,sol)
+sol2 = swapInsert(data, sol)
+
+
+used, cap = checkSolution2(data,sol2)
+checkSolution(data,sol2)
+
+#checkSolution2(data,sol)
+
+#test(data,sol)
 # checkSolution(data,sol)
 
-# swapInsert(data, sol)
-# inventory_used, staffing_used = checkSolution(data,sol)
+
+sol = randomInitial(data)
+
+
+checkSolution(data,sol2)
+checkSolution2(data,sol2)
+
+
 sol = randomInitial(data)
 println(sum(sol.f,dims=1))
 swap(data, sol, 10, 1, 20, 2)
