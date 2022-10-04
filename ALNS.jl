@@ -1,5 +1,6 @@
 include("ConstructionHeuristics.jl")
 include("ValidateSolution.jl")
+include("MIPModel.jl")
 
 function randomDestroy(data, sol, frac)
     n_destroy = round(sol.num_campaigns*frac)
@@ -14,6 +15,7 @@ function randomDestroy(data, sol, frac)
         remove(data, sol, t, p)
         n_destroy -= 1
     end
+    println(sol.num_campaigns)
 end
 
 
@@ -51,6 +53,24 @@ function remove(data, sol, t, p)
 
     # update objective
     findObjective(data, sol)
+end
+
+
+function modelRepair(data, sol)
+    MIPdata = deepcopy(data)
+    MIPdata.I = deepcopy(sol.I_cap)
+    MIPdata.H = deepcopy(sol.H_cap)
+    MIPdata.H[MIPdata.H .< 0.0] .= 0.0
+    MIPdata.F = deepcopy(data.F - transpose(sum(sol.f, dims=1))[:,1])
+    MIPdata.S = deepcopy(sol.k)
+    
+    MIPsol = MIP(MIPdata, 5)
+
+    for p = 1:data.P, t = 1:data.T 
+        for n = 1:MIPsol.x[t,p]
+            insert(data, sol, t, p)
+        end
+    end
 end
 
 function greedyRepair(data, sol)
@@ -119,7 +139,6 @@ sol = LNS(data)
 checkSolution(data, sol)
 
 # sol = randomInitial(data)
-
 #println(delta_insert(data, sol, 1))
 
 #insert(data,sol,10,1)
