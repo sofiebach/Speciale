@@ -9,17 +9,14 @@ function MIP(data, time_limit)
     end
 
     @variable(model, x[1:data.T, 1:data.P] >= 0, Int)
-    @variable(model, f[1:data.T,1:data.M] >= 0, Int) # freelance hours
+    @variable(model, f[1:data.T,1:data.M] >= 0) # freelance hours
     @variable(model, k[1:data.P] >= 0, Int)
-    @variable(model, x_max[1:data.P], Int)
-    @variable(model, x_min[1:data.P], Int)
+    
 
-    @objective(model, Max, sum(x[t,p] for t = data.start:data.stop for p = 1:data.P) - sum(k[p]*data.penalty_S[p] for p = 1:data.P) - sum(f[t,m]*data.penalty_f[m] for t = 1:data.T for m = 1:data.M) - sum(x_max[p]- x_min[p] for p = 1:data.P))
-    @constraint(model, [p = 1:data.P, t = 1:data.T], x_max[p] >= x[t,p])
-    @constraint(model, [p = 1:data.P, t = 1:data.T], x_min[p] <= x[t,p])
+    @objective(model, Min, -sum(data.reward[p]*x[t,p] for t = data.start:data.stop for p = 1:data.P) + sum(k[p]*data.penalty_S[p] for p = 1:data.P) + sum(f[t,m]*data.penalty_f[m] for t = 1:data.T for m = 1:data.M))
 
     #It is not possible to slack on Flagskib DR1 and DR2 (p=1 and p=8)
-    @constraint(model, [p in [1,8]], k[p] == 0)
+    @constraint(model, [p in data.P_bar], k[p] == 0)
 
     # Nothing can be planned before start and after stop
     @constraint(model, [t = 1:(data.start - 1)], sum(x[t,p] for p = 1:data.P) == 0)
@@ -55,9 +52,7 @@ function MIP(data, time_limit)
     sol.num_campaigns = sum(sol.x)
     for t = 1:sol.T
         for m = 1:sol.M
-            if JuMP.value(f[t,m]) > 0.5
-                sol.f[t,m] = JuMP.value(f[t,m])
-            end
+            sol.f[t,m] = JuMP.value(f[t,m])
         end
     end
     return sol
