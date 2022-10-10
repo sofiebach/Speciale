@@ -15,9 +15,18 @@ function randomDestroy(data, sol, frac)
         remove(data, sol, t, p)
         n_destroy -= 1
     end
-    #println(sol.num_campaigns)
+    #println(sol.obj)
 end
 
+function clusterDestroy(data, sol, frac)
+    t_destroy = Int(round((data.stop - data.start)*frac))
+    rand_t = rand(data.start:(data.stop-t_destroy))
+    for t = rand_t:(rand_t+t_destroy), p = 1:data.P
+        while sol.x[t,p] > 0
+            remove(data,sol,t,p)
+        end
+    end   
+end
 
 function remove(data, sol, t, p)
     sol.x[t,p] -= 1
@@ -55,7 +64,6 @@ function remove(data, sol, t, p)
     findObjective(data, sol)
 end
 
-
 function modelRepair(data, sol)
     MIPdata = deepcopy(data)
     MIPdata.I = deepcopy(sol.I_cap)
@@ -64,7 +72,7 @@ function modelRepair(data, sol)
     MIPdata.F = deepcopy(data.F - transpose(sum(sol.f, dims=1))[:,1])
     MIPdata.S = deepcopy(sol.k)
     
-    MIPsol = MIP(MIPdata, 5)
+    MIPsol = MIP(MIPdata, 2, 0)
 
     for p = 1:data.P, t = 1:data.T 
         for n = 1:MIPsol.x[t,p]
@@ -78,16 +86,19 @@ function greedyRepair(data, sol)
         t, p = bestInsertion(data, sol, [p_bar])
         if t != 0 && p != 0
             insert(data, sol, t, p)
+            #println("Inserted ", p, " at time ", t)
         end
     end
 
-    t = 0 
-    p = 0
     sorted_idx = sortperm(-data.penalty_S)
-    while t != 0 && p != 0
+    while true
+        #println("Vi er i while")
         t, p = bestInsertion(data, sol, sorted_idx)
         if t != 0 && p != 0
             insert(data, sol, t, p)
+            #println("Inserted ", p, " at time ", t)
+        else
+            break
         end
     end
 end
@@ -129,97 +140,131 @@ function delta_remove(data, sol, p)
     end
 end
 
-function LNS(data)
-    sol = randomInitial(data)
-    #println(sol.obj)
-
-    frac = 0.2
-    randomDestroy(data,sol,frac)
-    greedyRepair(data,sol)
-
-    # check if P_bar is valid 
-
-    #println(sol.obj)
-    return sol
-end
-
-function ALNS(data, time_limit)
-    
-    it = 1
-    T = 1000
-    alpha = 0.999
-    valid = true
-    sol = randomInitial(data)
-    best_sol = deepcopy(sol)
-    temp_sol = deepcopy(sol)
-    start_time = time_ns()
-    while elapsed_time(start_time) < time_limit
-    #while it < 100
-        # Choose destroy method
-        #println("checkpoint 1")
-        frac = 0.2
-        randomDestroy(data,temp_sol,frac)
-        #println("checkpoint 2")
-        # Choose repair method
-        greedyRepair(data,temp_sol)
-        #println("checkpoint 3")
-        # Check if P_bar constraint is exceeded
-        for p_bar in data.P_bar 
-            if temp_sol.k[p_bar] > 0
-                temp_sol = deepcopy(sol)
-                valid = false
-                break
-            end
-        end
-
-        #if it % 100 == 0
-        #    println("Iteration: ", it)
-        #end
-        it += 1
-        #println(valid)
-
-        if !valid
-            continue
-        end
-        # Check acceptance criteria
-        if temp_sol.obj < sol.obj
-            sol = deepcopy(temp_sol)
-        else
-            if rand() < exp(-(temp_sol.obj-sol.obj)/T)
-                sol = deepcopy(temp_sol)
-                println("Annealing")
-            end
-        end
-
-        if temp_sol.obj < best_sol.obj
-            best_sol = deepcopy(temp_sol)
-            println("New best")
-            println(best_sol.obj)
-        end
-        #println("Iteration: ", it)
-        
-        T = alpha * T
-        #it += 1
-    end
-    return best_sol
-end
 
 function elapsed_time(start_time)
     return round((time_ns()-start_time)/1e9, digits = 3)
 end
 
+function setProb(rho, prob)
+    for i = 1:length(prob)
+        prob[i] = rho[i]/sum(rho[:])
+    end
+    return prob
+end
+
+function selectMethod(prob)
+    chosen = rand()
+    next_prob = 0
+    for i=1:length(prob)
+        next_prob += prob[i]
+        if chosen <= next_prob
+            return i
+        end
+    end
+end
+
+
+
+function ALNS(data, time_limit)
+    it = 0
+    T = 1000
+    alpha = 0.999
+    sol = randomInitial(data)
+    best_sol = deepcopy(sol)
+    temp_sol = deepcopy(sol)
+    start_time = time_ns()
+
+    rho_destroy = ones(2)
+    rho_repair = ones(2)
+
+    prob_destroy = zeros(2)
+    prob_repair = zeros(2)
+
+    prob_destroy = setProb(rho_destroy, prob_destroy)
+    prob_repair = setProb(rho_repair, prob_repair)
+
+    w1 = 10
+    w2 = 5
+    w3 = 1
+    w4 = 0
+
+    gamma = 0.9
+
+    while elapsed_time(start_time) < time_limit
+    #while it < 100
+        valid = true
+        it += 1
+        # update probabilities
+        if (it % 10 == 0)
+            prob_destroy = setProb(rho_destroy, prob_destroy)
+            prob_repair = setProb(rho_repair, prob_repair)
+        end
+
+        # Choose destroy method
+        selected_destroy = selectMethod(prob_destroy)
+        if selected_destroy == 1
+            frac = 0.1
+            clusterDestroy(data,temp_sol,frac)
+        else
+            frac = 0.1
+            randomDestroy(data,temp_sol,frac)
+        end
+        
+        # Choose repair method
+        selected_repair = selectMethod(prob_repair)
+        if selected_repair == 1
+            greedyRepair(data,temp_sol)
+
+            # Check if P_bar constraint is exceeded
+            for p_bar in data.P_bar 
+                if temp_sol.k[p_bar] > 0
+                    temp_sol = deepcopy(sol)
+                    valid = false
+                    break
+                end
+            end
+        else
+            modelRepair(data,temp_sol)
+        end
+
+        if !valid
+            continue
+        end
+
+        w = w4
+
+        # Check acceptance criteria
+        if temp_sol.obj < sol.obj
+            sol = deepcopy(temp_sol)
+            w = w2
+            #println("Better than sol")
+        else
+            if rand() < exp(-(temp_sol.obj-sol.obj)/T)
+                sol = deepcopy(temp_sol)
+                w = w3
+                #println("Annealing")
+            end
+        end
+
+        if temp_sol.obj < best_sol.obj
+            best_sol = deepcopy(temp_sol)
+            w = w1
+            println("New best")
+            println(best_sol.obj)
+        end
+        rho_destroy[selected_destroy] = gamma*rho_destroy[selected_destroy] + (1-gamma)*w
+        rho_repair[selected_repair] = gamma*rho_repair[selected_repair] + (1-gamma)*w
+        T = alpha * T
+     
+    end
+    return best_sol, prob_destroy, prob_repair
+end
+
+
+
 P = 37
 data = read_DR_data(P)
 
-sol = ALNS(data, 10)
+sol, prob_destroy, prob_repair = ALNS(data, 60)
 
-sol = LNS(data)
 checkSolution(data, sol)
-
-# sol = randomInitial(data)
-#println(delta_insert(data, sol, 1))
-
-#insert(data,sol,10,1)
-#println(findObjective(data, sol))
-
-

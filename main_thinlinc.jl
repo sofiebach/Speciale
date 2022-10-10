@@ -27,7 +27,7 @@ end
 P = 37
 data = read_DR_data(P)
 
-sol = MIP(data, 60)
+sol = MIP(data, 2, 0)
 
 println("Objective to compare with meta:")
 println(-sum(data.reward.*transpose(sol.x))+sum(sol.k.*data.penalty_S))

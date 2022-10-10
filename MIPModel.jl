@@ -1,10 +1,10 @@
 using JuMP, Gurobi
-
-function MIP(data, time_limit)
+genv = Gurobi.Env()
+function MIP(data, time_limit, log)
     if time_limit > 0
-        model = Model(optimizer_with_attributes(Gurobi.Optimizer, "TimeLimit" => time_limit))#, "LogToConsole" => 0))
+        model = Model(optimizer_with_attributes(() -> Gurobi.Optimizer(genv), "TimeLimit" => time_limit, "LogToConsole" => log, "OutputFlag" => log))
     else
-        model = Model(optimizer_with_attributes(Gurobi.Optimizer))
+        model = Model(optimizer_with_attributes(Gurobi.Optimizer, "LogToConsole" => log, "OutputFlag" => log))
     end
 
     @variable(model, x[1:data.T, 1:data.P] >= 0, Int)
