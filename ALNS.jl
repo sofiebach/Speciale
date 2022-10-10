@@ -74,11 +74,10 @@ function modelRepair(data, sol)
 end
 
 function greedyRepair(data, sol)
-    while true
+    t = 0 
+    p = 0
+    while t != 0 && p != 0
         t, p = bestInsertion(data, sol)
-        if t == 0 || p == 0
-            break
-        end
         insert(data, sol, t, p)
         println(sol.obj)
     end
@@ -100,6 +99,7 @@ function bestInsertion(data, sol)
                 end
             end
         end
+        
     end
     return best_t, best_p
 end
@@ -128,12 +128,72 @@ function LNS(data)
     randomDestroy(data,sol,frac)
     greedyRepair(data,sol)
 
+    # check if P_bar is valid 
+
     #println(sol.obj)
     return sol
 end
 
+function ALNS(data, time_limit)
+    start_time = time_ns()
+    it = 1
+    T = 1000
+    alpha = 0.999
+    valid = true
+    sol = randomInitial(data)
+    best_sol = deepcopy(sol)
+    temp_sol = deepcopy(sol)
+    while elapsed_time(start_time) < time_limit
+        # Choose destroy method
+        frac = 0.2
+        randomDestroy(data,temp_sol,frac)
+
+        # Choose repair method
+        greedyRepair(data,temp_sol)
+
+        # Check if P_bar constraint is exceeded
+        for p_bar in data.P_bar 
+            if temp_sol.k[p_bar] > 0
+                temp_sol = deepcopy(sol)
+                valid = false
+                break
+            end
+        end
+        
+        if !valid
+            continue
+        end
+        # Check acceptance criteria
+        if temp_sol.obj < sol.obj
+            sol = deepcopy(temp_sol)
+        else
+            if rand() < exp(-(temp_sol.obj-sol.obj)/T)
+                sol = deepcopy(temp_sol)
+            end
+        end
+
+        if temp_sol.obj < best_sol.obj
+            best_sol = deepcopy(temp_sol)
+            println(best_sol.obj)
+        end
+        if it % 100 == 0
+            println("Iteration: ", it)
+        end
+
+        T = alpha * T
+        it += 1
+    end
+    return best_sol
+end
+
+function elapsed_time(start_time)
+    return round((time_ns()-start_time)/1e9, digits = 3)
+end
+
 P = 37
 data = read_DR_data(P)
+
+sol = ALNS(data, 10)
 
 sol = LNS(data)
 checkSolution(data, sol)
