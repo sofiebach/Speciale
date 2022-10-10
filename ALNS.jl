@@ -28,6 +28,42 @@ function clusterDestroy(data, sol, frac)
     end   
 end
 
+function worstDestroy(data, sol, thres)
+    for t = data.start:data.stop, m = 1:data.M
+        if sol.f[t,m] > thres
+            p_worst = []
+            for t_hat = (t-data.Q_upper):(t-data.Q_lower)
+                push!(p_worst,findall(x -> x > 0, sol.x[t_hat,:].*data.w[:,m]))
+            end
+            while sol.f[t,m] > thres
+                idx = rand(1:(data.Q_upper - data.Q_lower + 1))
+                if length(p_worst[idx]) > 0
+                    p = rand(p_worst[idx])
+                    remove(data,sol,p,collect((t-data.Q_upper):(t-data.Q_lower))[idx])
+                end
+            end
+        end
+    end
+end
+
+
+function worstDestroy(data, sol, thres)
+    for t = data.start:data.stop
+        for t_hat = (t+data.Q_lower):(t+data.Q_upper), m = 1:data.M
+            p_worst = findall(x -> x > 0, sol.x[t,:].*data.w[:,m])
+            while sol.f[t_hat,m] > thres
+                p = rand(p_worst)
+                if sol.x[t,p] > 0
+                    remove(data,sol,t,p)
+                end
+                if sum(sol.x[t,p_worst]) == 0
+                    break
+                end
+            end
+        end
+    end
+end
+
 function remove(data, sol, t, p)
     sol.x[t,p] -= 1
     sol.num_campaigns -= 1
@@ -119,7 +155,6 @@ function bestInsertion(data, sol, sorted_idx)
                 end
             end
         end
-        
     end
     return best_t, best_p
 end
@@ -174,10 +209,10 @@ function ALNS(data, time_limit)
     temp_sol = deepcopy(sol)
     start_time = time_ns()
 
-    rho_destroy = ones(2)
+    rho_destroy = ones(3)
     rho_repair = ones(2)
 
-    prob_destroy = zeros(2)
+    prob_destroy = zeros(3)
     prob_repair = zeros(2)
 
     prob_destroy = setProb(rho_destroy, prob_destroy)
@@ -205,9 +240,12 @@ function ALNS(data, time_limit)
         if selected_destroy == 1
             frac = 0.1
             clusterDestroy(data,temp_sol,frac)
-        else
+        elseif selected_destroy == 2
             frac = 0.1
             randomDestroy(data,temp_sol,frac)
+        else
+            thres = 10
+            worstDestroy(data,temp_sol,thres)
         end
         
         # Choose repair method
@@ -265,6 +303,8 @@ end
 P = 37
 data = read_DR_data(P)
 
-sol, prob_destroy, prob_repair = ALNS(data, 60)
+sol = randomInitial(data)
+
+sol, prob_destroy, prob_repair = ALNS(data, 30)
 
 checkSolution(data, sol)
