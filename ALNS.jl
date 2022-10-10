@@ -15,7 +15,7 @@ function randomDestroy(data, sol, frac)
         remove(data, sol, t, p)
         n_destroy -= 1
     end
-    println(sol.num_campaigns)
+    #println(sol.num_campaigns)
 end
 
 
@@ -74,20 +74,29 @@ function modelRepair(data, sol)
 end
 
 function greedyRepair(data, sol)
+    for p_bar in data.P_bar, n = 1:sol.k[p_bar]
+        t, p = bestInsertion(data, sol, [p_bar])
+        if t != 0 && p != 0
+            insert(data, sol, t, p)
+        end
+    end
+
     t = 0 
     p = 0
+    sorted_idx = sortperm(-data.penalty_S)
     while t != 0 && p != 0
-        t, p = bestInsertion(data, sol)
-        insert(data, sol, t, p)
-        println(sol.obj)
+        t, p = bestInsertion(data, sol, sorted_idx)
+        if t != 0 && p != 0
+            insert(data, sol, t, p)
+        end
     end
 end
 
-function bestInsertion(data, sol)
+function bestInsertion(data, sol, sorted_idx)
     best_obj = sol.obj
     best_p = 0
     best_t = 0
-    sorted_idx = sortperm(-data.penalty_S)
+    
     for p in sorted_idx 
         for t = data.start:data.stop
             if fits(data, sol, t, p) 
@@ -135,7 +144,7 @@ function LNS(data)
 end
 
 function ALNS(data, time_limit)
-    start_time = time_ns()
+    
     it = 1
     T = 1000
     alpha = 0.999
@@ -143,14 +152,17 @@ function ALNS(data, time_limit)
     sol = randomInitial(data)
     best_sol = deepcopy(sol)
     temp_sol = deepcopy(sol)
+    start_time = time_ns()
     while elapsed_time(start_time) < time_limit
+    #while it < 100
         # Choose destroy method
+        #println("checkpoint 1")
         frac = 0.2
         randomDestroy(data,temp_sol,frac)
-
+        #println("checkpoint 2")
         # Choose repair method
         greedyRepair(data,temp_sol)
-
+        #println("checkpoint 3")
         # Check if P_bar constraint is exceeded
         for p_bar in data.P_bar 
             if temp_sol.k[p_bar] > 0
@@ -159,7 +171,13 @@ function ALNS(data, time_limit)
                 break
             end
         end
-        
+
+        #if it % 100 == 0
+        #    println("Iteration: ", it)
+        #end
+        it += 1
+        #println(valid)
+
         if !valid
             continue
         end
@@ -169,19 +187,19 @@ function ALNS(data, time_limit)
         else
             if rand() < exp(-(temp_sol.obj-sol.obj)/T)
                 sol = deepcopy(temp_sol)
+                println("Annealing")
             end
         end
 
         if temp_sol.obj < best_sol.obj
             best_sol = deepcopy(temp_sol)
+            println("New best")
             println(best_sol.obj)
         end
-        if it % 100 == 0
-            println("Iteration: ", it)
-        end
-
+        #println("Iteration: ", it)
+        
         T = alpha * T
-        it += 1
+        #it += 1
     end
     return best_sol
 end
