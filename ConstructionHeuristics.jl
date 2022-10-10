@@ -34,6 +34,7 @@ function randomInitial(data)
         sorted_idx = sortperm(-data.penalty_S)
         for p in sorted_idx
             if fits(data,sol,t,p) 
+                println("p: ", p)
                 insert(data,sol,t,p)
             end
         end
@@ -44,15 +45,13 @@ end
 
 function randomInsert(data, sol, priorities)
     for p in priorities
-        n_inserted = 0
         r_times = shuffle(collect(data.start:data.stop))
-        for t in r_times
+        for n = 1:data.S[p], t in r_times
+            if sol.k[p] == 0
+                break
+            end
             if fits(data, sol, t, p)
                 insert(data, sol, t, p)
-                n_inserted += 1
-                if n_inserted == data.S[p]
-                    break
-                end
             end
         end
     end
@@ -134,8 +133,8 @@ P = 37
 data = read_DR_data(P)
 
 sol = randomInitial(data)
+test = sum(sol.x,dims=1) - transpose(data.S)
 
-checkSolution(data, sol)
 
 
 

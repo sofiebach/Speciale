@@ -12,7 +12,7 @@ function checkSolution(data, sol)
         cap_inv[t,:] = data.I[t,:]
         for c = 1:data.C
             if (used_inv[t,c] > cap_inv[t,c])
-                print("Inventory exceeded at time ", t, " media ", c)
+                println("Inventory exceeded at time ", t, " media ", c)
             end
         end
       
@@ -23,7 +23,7 @@ function checkSolution(data, sol)
         cap_prod[t,:] = data.H[t,:] + sol.f[t,:]
         for m = 1:data.M
             if (used_prod[t,m] > cap_prod[t,m])
-                print("Staff exceeded at time ", t, " media ", m)
+                println("Staff exceeded at time ", t, " media ", m)
             end
         end 
     end
