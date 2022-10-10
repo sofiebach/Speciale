@@ -1,9 +1,8 @@
 using JuMP, Gurobi
 
-
 function MIP(data, time_limit)
     if time_limit > 0
-        model = Model(optimizer_with_attributes(Gurobi.Optimizer, "TimeLimit" => time_limit))
+        model = Model(optimizer_with_attributes(Gurobi.Optimizer, "TimeLimit" => time_limit))#, "LogToConsole" => 0))
     else
         model = Model(optimizer_with_attributes(Gurobi.Optimizer))
     end
