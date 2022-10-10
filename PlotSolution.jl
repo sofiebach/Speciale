@@ -35,10 +35,10 @@ function drawTVSchedule(data, sol, filename)
         priorities = []
         for i = 1:TV_campaigns
             if mapping[i,1] == bc
-                priorities = push!(priorities, i)
+                push!(priorities, i)
             end
         end
-        BC = push!(BC, priorities)
+        push!(BC, priorities)
     end
 
     P_names = unique(mapping[:,2])
@@ -175,10 +175,10 @@ function drawRadioSchedule(data, sol, filename)
         priorities = []
         for i = 1:radio_campaigns
             if mapping[i,1] == bc
-                priorities = push!(priorities, i)
+                push!(priorities, i)
             end
         end
-        BC = push!(BC, priorities)
+        push!(BC, priorities)
     end
 
     P_names = unique(mapping[:,2])
