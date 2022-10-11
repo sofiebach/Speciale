@@ -1,9 +1,5 @@
 using Random
 
-include("ReadWrite.jl")
-include("ValidateSolution.jl")
-include("PlotSolution.jl")
-
 # Struct for holding the instance
 mutable struct HeuristicSol
     obj::Float64
@@ -127,13 +123,6 @@ function findObjective(data, sol)
     # freelance = sum(sum(sol.f, dims=1) .* data.penalty_f)
     sol.obj =  scope - num_campaigns
 end
-
-
-P = 37
-data = read_DR_data(P)
-
-sol = randomInitial(data)
-test = sum(sol.x,dims=1) - transpose(data.S)
 
 
 

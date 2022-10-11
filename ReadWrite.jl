@@ -15,7 +15,7 @@ mutable struct Instance
     start::Int64
     stop::Int64
     T::Int64
-    S::Array{Float64,1}
+    S::Array{Int64,1}
     w::Array{Float64,2}
     H::Array{Float64,2}
     I::Array{Float64,2}
@@ -30,7 +30,7 @@ mutable struct Instance
         L_lower,L_upper,indexin(0,collect(L_lower:L_upper))[],
         Q_lower,Q_upper,
         abs(Q_lower)+1,abs(Q_lower)+timeperiod,T,
-        zeros(Float64, P),
+        zeros(Int64, P),
         zeros(Float64, P, M),
         zeros(Float64, T, M),
         zeros(Float64, T, C),
@@ -107,7 +107,7 @@ function read_DR_data(P)
 
     # Read scope
     # S[p] is scope for priority p
-    data.S = convert(Array{Float64,2}, XLSX.readdata("data/data_staffing_constraint.xlsx", "Scope", "D2:D38"))[1:P]
+    data.S = convert(Array{Int64,2}, XLSX.readdata("data/data_staffing_constraint.xlsx", "Scope", "D2:D38"))[1:P]
 
     # Simulate I for now
     M = 100 # Number of posts per day

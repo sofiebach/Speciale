@@ -1,7 +1,4 @@
 using Statistics
-include("ConstructionHeuristics.jl")
-include("ValidateSolution.jl")
-include("MIPModel.jl")
 
 function randomDestroy(data, sol, frac)
     n_destroy = round(sol.num_campaigns*frac)
@@ -36,6 +33,32 @@ function worstDestroy(data, sol, thres)
             p_worst = findall(x -> x > 0, sol.x[t_hat,:].*data.w[:,m])
             if length(p_worst) > 0
                 remove(data,sol,t_hat,rand(p_worst))
+            end
+        end
+    end
+end
+
+function relatedDestroy(data, sol, frac)
+    n_destroy = round(sol.num_campaigns*frac)
+    sim = findSimilarity(data)
+    tabu = []
+    while n_destroy > 0
+        idx = filter!(x -> x ∉ tabu, collect(1:data.P))
+        max_k, p_idx = findmax(sol.k[idx])
+        p = idx[p_idx]
+        push!(tabu, p)
+        p_related = sortperm(-sim[p,:])
+        for p_r in p_related 
+            if sim[p,p_r] > 0 && sum(sol.x[:,p_r]) > 0
+                n_remove = ceil(sum(sol.x[:,p_r]) / 2)
+                while n_remove > 0
+                    r_times = findall(x -> x > 0, sol.x[:,p_r])
+                    t = r_times[rand(1:length(r_times))]
+                    remove(data, sol, t, p_r)
+                    n_remove -= 1
+                    n_destroy -= 1
+                end
+                break
             end
         end
     end
@@ -165,29 +188,25 @@ function setProb(rho, prob)
 end
 
 function findSimilarity(data)
-    dist_u = zeros(data.P, data.P)
-    dist_w = zeros(data.P, data.P)
+    sim = zeros(data.P, data.P)
     for p1 = 1:(data.P-1)
         for p2 = (p1+1):data.P
-            dist_u[p1,p2] = sum(abs.(data.u[:,p1,:]-data.u[:,p2,:]))
-            dist_u[p2,p1] = sum(abs.(data.u[:,p1,:]-data.u[:,p2,:]))
+            sim_u = PearsonSimilarity(data.u[:,p1,:], data.u[:,p2,:])
+            sim_w = PearsonSimilarity(data.w[p1,:], data.w[p2,:])
+
+            sim[p1,p2] = mean([sim_u, sim_w])
+            sim[p2,p1] = mean([sim_u, sim_w])
         end 
     end
+    return sim
 end
 
-function PearsonSimilarity(data)
-    dist_u = zeros(data.P, data.P)
-    dist_w = zeros(data.P, data.P)
-    for p1 = 1:(data.P-1)
-        mu_p1 = mean(data.u[:,p1,:])
-        for p2 = (p1+1):data.P
-            mu_p2 = mean(data.u[:,p2,:])
-            t = (sum((data.u[:,p1,:].-mu_p1).*(data.u[:,p2,:].-mu_p2)))
-            n = sqrt(sum((data.u[:,p1,:].-mu_p1).^2))*sqrt(sum((data.u[:,p2,:].-mu_p2).^2))
-            dist_u[p1,p2] = t/n
-            dist_u[p2,p1] = t/n
-        end 
-    end
+function PearsonSimilarity(a, b)
+    mu_a =  mean(a)
+    mu_b = mean(b)
+    t = (sum((a.-mu_a).*(b.-mu_b)))
+    n = sqrt(sum((a.-mu_a).^2))*sqrt(sum((b.-mu_b).^2))
+    return t/n
 end
 
 function selectMethod(prob)
@@ -210,10 +229,10 @@ function ALNS(data, time_limit)
     temp_sol = deepcopy(sol)
     start_time = time_ns()
 
-    rho_destroy = ones(3)
+    rho_destroy = ones(4)
     rho_repair = ones(2)
 
-    prob_destroy = zeros(3)
+    prob_destroy = zeros(4)
     prob_repair = zeros(2)
 
     prob_destroy = setProb(rho_destroy, prob_destroy)
@@ -244,9 +263,12 @@ function ALNS(data, time_limit)
         elseif selected_destroy == 2
             frac = 0.1
             randomDestroy(data,temp_sol,frac)
-        else
+        elseif selected_destroy == 3
             thres = 10
             worstDestroy(data,temp_sol,thres)
+        else
+            frac = 0.2
+            relatedDestroy(data, sol, frac)
         end
         
         # Choose repair method
@@ -299,13 +321,3 @@ function ALNS(data, time_limit)
     return best_sol, prob_destroy, prob_repair
 end
 
-
-
-P = 37
-data = read_DR_data(P)
-
-sol = randomInitial(data)
-
-sol, prob_destroy, prob_repair = ALNS(data, 30)
-
-checkSolution(data, sol)
