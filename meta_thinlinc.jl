@@ -6,7 +6,7 @@ include("ALNS.jl")
 P = 37
 data = read_DR_data(P)
 
-sol, prob_destroy, prob_repair = ALNS(data, 120)
+sol, prob_destroy, prob_repair = ALNS(data, 3600)
 
 println("Prob destroy:")
 display(prob_destroy)

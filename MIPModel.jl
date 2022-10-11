@@ -7,7 +7,7 @@ function MIP(data, time_limit, log)
         model = Model(optimizer_with_attributes(Gurobi.Optimizer, "LogToConsole" => log, "OutputFlag" => log))
     end
 
-    @variable(model, x[1:data.T, 1:data.P] >= 0, Int)
+    @variable(model, x[1:data.T, 1:data.P] >= 0, Int64)
     @variable(model, f[1:data.T,1:data.M] >= 0) # freelance hours
     @variable(model, k[1:data.P] >= 0, Int)
     
@@ -40,12 +40,12 @@ function MIP(data, time_limit, log)
     sol.obj = objective_value(model)
     for p = 1:sol.P
         if JuMP.value(k[p]) > 0.5
-            sol.k[p] = JuMP.value(k[p])
+            sol.k[p] = Int64(round(JuMP.value(k[p])))
         end
         for t = 1:sol.T
             if JuMP.value(x[t,p]) > 0.5
-                sol.x[t,p] = JuMP.value(x[t,p])
-            end
+                sol.x[t,p] = Int64(round(JuMP.value(x[t,p])))
+            end  
         end
     end
     sol.num_campaigns = sum(sol.x)
