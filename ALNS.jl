@@ -1,3 +1,4 @@
+using Statistics
 include("ConstructionHeuristics.jl")
 include("ValidateSolution.jl")
 include("MIPModel.jl")
@@ -161,6 +162,32 @@ function setProb(rho, prob)
         prob[i] = rho[i]/sum(rho[:])
     end
     return prob
+end
+
+function findSimilarity(data)
+    dist_u = zeros(data.P, data.P)
+    dist_w = zeros(data.P, data.P)
+    for p1 = 1:(data.P-1)
+        for p2 = (p1+1):data.P
+            dist_u[p1,p2] = sum(abs.(data.u[:,p1,:]-data.u[:,p2,:]))
+            dist_u[p2,p1] = sum(abs.(data.u[:,p1,:]-data.u[:,p2,:]))
+        end 
+    end
+end
+
+function PearsonSimilarity(data)
+    dist_u = zeros(data.P, data.P)
+    dist_w = zeros(data.P, data.P)
+    for p1 = 1:(data.P-1)
+        mu_p1 = mean(data.u[:,p1,:])
+        for p2 = (p1+1):data.P
+            mu_p2 = mean(data.u[:,p2,:])
+            t = (sum((data.u[:,p1,:].-mu_p1).*(data.u[:,p2,:].-mu_p2)))
+            n = sqrt(sum((data.u[:,p1,:].-mu_p1).^2))*sqrt(sum((data.u[:,p2,:].-mu_p2).^2))
+            dist_u[p1,p2] = t/n
+            dist_u[p2,p1] = t/n
+        end 
+    end
 end
 
 function selectMethod(prob)
