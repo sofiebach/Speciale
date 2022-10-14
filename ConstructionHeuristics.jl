@@ -30,7 +30,6 @@ function randomInitial(data)
         sorted_idx = sortperm(-data.penalty_S)
         for p in sorted_idx
             if fits(data,sol,t,p) 
-                println("p: ", p)
                 insert(data,sol,t,p)
             end
         end
