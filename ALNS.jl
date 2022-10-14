@@ -159,6 +159,51 @@ function bestInsertion(data, sol, sorted_idx)
     return best_t, best_p
 end
 
+function firstRepair(data, sol)
+    for p_bar in data.P_bar, n = 1:sol.k[p_bar]
+        t, p = firstInsertion(data, sol, [p_bar])
+        if t != 0 && p != 0
+            insert(data, sol, t, p)
+            #println("Inserted ", p, " at time ", t)
+        end
+    end
+
+    shuffled_idx = shuffle(1:data.P)
+    while true
+        #println("Vi er i while")
+        t, p = firstInsertion(data, sol, shuffled_idx)
+        if t != 0 && p != 0
+            insert(data, sol, t, p)
+            #println("Inserted ", p, " at time ", t)
+        else
+            break
+        end
+    end
+end
+
+
+function firstInsertion(data, sol, shuffled_idx)
+    best_obj = sol.obj
+    best_p = 0
+    best_t = 0
+    
+    for t = data.start:data.stop
+        for p in shuffled_idx
+            if fits(data, sol, t, p) 
+                new_obj = delta_insert(data, sol, p)
+                if new_obj < best_obj
+                    best_obj = new_obj
+                    best_p = p 
+                    best_t = t
+                    break
+                end 
+            end
+        end
+    end
+    return best_t, best_p
+end
+
+
 function delta_insert(data, sol, p)
     if sol.k[p] > 0
         return sol.obj - data.penalty_S[p] - data.reward[p]
@@ -230,10 +275,10 @@ function ALNS(data, time_limit)
     start_time = time_ns()
 
     rho_destroy = ones(4)
-    rho_repair = ones(2)
+    rho_repair = ones(3)
 
     prob_destroy = zeros(4)
-    prob_repair = zeros(2)
+    prob_repair = zeros(3)
 
     prob_destroy = setProb(rho_destroy, prob_destroy)
     prob_repair = setProb(rho_repair, prob_repair)
@@ -284,6 +329,17 @@ function ALNS(data, time_limit)
                     break
                 end
             end
+        elseif selected_repair == 2
+            firstRepair(data,temp_sol)
+
+            # Check if P_bar constraint is exceeded
+            for p_bar in data.P_bar 
+                if temp_sol.k[p_bar] > 0
+                    temp_sol = deepcopy(sol)
+                    valid = false
+                    break
+                end
+            end
         else
             modelRepair(data,temp_sol)
         end
@@ -320,4 +376,3 @@ function ALNS(data, time_limit)
     end
     return best_sol, prob_destroy, prob_repair
 end
-

@@ -7,7 +7,7 @@ function MIP(data, time_limit, log)
         model = Model(optimizer_with_attributes(Gurobi.Optimizer, "LogToConsole" => log, "OutputFlag" => log))
     end
 
-    @variable(model, x[1:data.T, 1:data.P] >= 0, Int64)
+    @variable(model, x[1:data.T, 1:data.P] >= 0, Int)
     @variable(model, f[1:data.T,1:data.M] >= 0) # freelance hours
     @variable(model, k[1:data.P] >= 0, Int)
     
