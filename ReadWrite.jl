@@ -1,4 +1,5 @@
 using XLSX
+using Dates
 
 # Struct for holding the instance
 mutable struct Instance
@@ -197,6 +198,56 @@ end
 # Write solution
 function writeSolution(filename, data, sol)
     outFile = open(filename, "w")
+    write(outFile, "T P M\n")
+    write(outFile, join([data.T, data.P, data.M]," ")*"\n\n")
+
+    write(outFile, "obj\n")
+    write(outFile, join(sol.obj," ")*"\n\n")
+
+    write(outFile, "x\n")
+    for p = 1:sol.P
+        write(outFile,join(sol.x[:,p]," ") * "\n")
+    end
+    write(outFile, "\n")
+
+    write(outFile, "k\n")
+    write(outFile,join(sol.k," ")*"\n\n")
+
+    write(outFile, "f\n")
+    for m = 1:sol.M
+        write(outFile,join(sol.f[:,m]," ")*"\n")
+    end
+    close(outFile)
+end
+
+function readSolution(filename)
+    f = open(filename)
+    readline(f) # T P M
+    T, P, M = parse.(Int,split(readline(f)))
+    readline(f) # blank
+
+    sol = Sol(T,P,M)
+    readline(f) # obj
+    sol.obj = parse.(Float64, readline(f))
+    readline(f) # blank
+    readline(f) # x
+    for p in 1:P
+        sol.x[:,p] = parse.(Int,split(readline(f)))
+    end
+    readline(f) # blank
+    readline(f) # k
+    sol.k = parse.(Int,split(readline(f)))
+    readline(f) # blank
+    readline(f) # f
+    for m = 1:M
+        sol.f[:,m] = parse.(Float64,split(readline(f)))
+    end
+    return sol
+end
+
+
+function OLDwriteSolution(filename, data, sol)
+    outFile = open(filename, "w")
     write(outFile, "P, C, M, T, timeperiod" * "\n")
     write(outFile, join([data.P, data.C, data.M, data.T, data.timeperiod]," ")*"\n\n")
 
@@ -254,7 +305,7 @@ end
 
 
 # Read solution
-function readSolution(filename)
+function OLDreadSolution(filename)
     f = open(filename)
     readline(f) # comment
     P, C, M, T, timeperiod = parse.(Int,split(readline(f)))
