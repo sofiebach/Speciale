@@ -252,6 +252,56 @@ function readSolution(filename)
     return sol
 end
 
+function writeParameters(filename, params)
+    outFile = open(filename, "w")
+    write(outFile, "prob destroy\n")
+    write(outFile, join(params.prob_destroy," ")*"\n\n")
+
+    write(outFile, "prob repair\n")
+    write(outFile, join(params.prob_repair," ")*"\n\n")
+
+    write(outFile, "destroys\n")
+    write(outFile, join(params.destroys," ")*"\n\n")
+
+    write(outFile, "repairs\n")
+    write(outFile, join(params.repairs," ")*"\n\n")
+
+    write(outFile, "current objective\n")
+    write(outFile, join(params.current_obj," ")*"\n\n")
+
+    write(outFile, "curent best objective\n")
+    write(outFile, join(params.current_best," ")*"\n\n")
+
+    write(outFile, "status\n")
+    write(outFile, join(params.status," ")*"\n\n")
+    close(outFile)
+end
+
+function readParameters(filename)
+    f = open(filename)
+    readline(f) # prob_destroy
+    prob_destroy = parse.(Float64,split(readline(f)))
+    readline(f) # blank
+    readline(f) # prob_repair
+    prob_repair = parse.(Float64,split(readline(f)))
+    readline(f) # blank
+    readline(f) # destroys
+    destroys = parse.(Int,split(readline(f)))
+    readline(f) # blank
+    readline(f) # repairs
+    repairs = parse.(Int,split(readline(f)))
+    readline(f) # blank
+    readline(f) # current objective
+    current_obj = parse.(Float64,split(readline(f)))
+    readline(f) # blank
+    readline(f) # current best objective
+    current_best = parse.(Float64,split(readline(f)))
+    readline(f) # blank
+    readline(f) # status
+    status = parse.(Int,split(readline(f)))
+
+    return  (prob_destroy=prob_destroy, prob_repair=prob_repair, destroys=destroys, repairs=repairs, current_obj=current_obj, current_best=current_best, status=status)
+end
 
 function OLDwriteSolution(filename, data, sol)
     outFile = open(filename, "w")

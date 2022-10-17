@@ -290,6 +290,12 @@ function ALNS(data, time_limit)
 
     gamma = 0.9
 
+    destroys = []
+    repairs = []
+    current_obj = []
+    current_best = []
+    status = []
+
     while elapsed_time(start_time) < time_limit
     #while it < 100
         valid = true
@@ -318,9 +324,9 @@ function ALNS(data, time_limit)
         
         # Choose repair method
         selected_repair = selectMethod(prob_repair)
+        
         if selected_repair == 1
             greedyRepair(data,temp_sol)
-
             # Check if P_bar constraint is exceeded
             for p_bar in data.P_bar 
                 if temp_sol.k[p_bar] > 0
@@ -347,7 +353,9 @@ function ALNS(data, time_limit)
         if !valid
             continue
         end
-
+        append!(repairs, selected_repair)
+        append!(destroys, selected_destroy)
+        append!(current_obj, temp_sol.obj)
         w = w4
 
         # Check acceptance criteria
@@ -369,10 +377,13 @@ function ALNS(data, time_limit)
             println("New best")
             println(best_sol.obj)
         end
+        append!(status, w)
+        append!(current_best, best_sol.obj)
+
         rho_destroy[selected_destroy] = gamma*rho_destroy[selected_destroy] + (1-gamma)*w
         rho_repair[selected_repair] = gamma*rho_repair[selected_repair] + (1-gamma)*w
         T = alpha * T
      
     end
-    return best_sol, prob_destroy, prob_repair
+    return best_sol, (prob_destroy=prob_destroy, prob_repair=prob_repair, destroys=destroys, repairs=repairs, current_obj=current_obj, current_best=current_best, status=status)
 end
