@@ -110,13 +110,20 @@ function read_DR_data(P)
     # S[p] is scope for priority p
     data.S = convert(Array{Int64,2}, XLSX.readdata("data/data_staffing_constraint.xlsx", "Scope", "D2:D38"))[1:P]
 
-    # Simulate I for now
-    M = 100 # Number of posts per day
-    average = [154 16 6 6 3 50 111 12 2 1 7118152/population M]*7.0
+    # Read I
     # [DR1, DR2, Ramasjang, P1, P2, P3, P4, P5, P6, P8, Banner, SOME]
+    inventory = XLSX.readdata("data/data_lagerestimater.xlsx", "Sheet1", "B2:M54")
+    inventory = convert(Array{Float64,2}, coalesce.(inventory, NaN))
+    inventory[:,11] = inventory[:,11] / population
+    I = fill!(zeros(Float64, data.T, data.C), NaN)
+    I[data.start:data.stop, :] = inventory
+    posts_per_week = 700.0
+    I[:,12] = repeat([posts_per_week], data.T)
     for c = 1:data.C
-        data.I[:, c] = repeat([average[c]], data.T)
+        avg = mean(filter(!isnan, I[:,c]))
+        I[:, c] = replace(I[:, c], NaN => avg)
     end
+    data.I = I
 
     # Penalty for freelance hours (can be modified)
     for m = 1:data.M
