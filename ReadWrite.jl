@@ -1,5 +1,6 @@
 using XLSX
 using Dates
+using Statistics
 
 # Struct for holding the instance
 mutable struct Instance
