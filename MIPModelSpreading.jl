@@ -1,19 +1,26 @@
 using JuMP, Gurobi
 genv = Gurobi.Env()
 function MIPExpansion(data, time_limit, logging)
-    #if time_limit > 0
-    #    model = Model(optimizer_with_attributes(() -> Gurobi.Optimizer(genv), "TimeLimit" => time_limit, "LogToConsole" => logging, "OutputFlag" => logging))
-    #else
-    #    model = Model(optimizer_with_attributes(Gurobi.Optimizer, "LogToConsole" => logging, "OutputFlag" => logging))
-    #end
-    model = Model(optimizer_with_attributes(Gurobi.Optimizer, "LogToConsole" => logging, "OutputFlag" => logging, "SolutionLimit" => 1))
-    @variable(model, x[1:data.T, p = 1:data.P, 1:data.S[p]], Bin)
-    @variable(model, f[1:data.T,1:data.M] >= 0) # freelance hours
-    @variable(model, k[1:data.P] >= 0, Int)
-    @variable(model, 0 <= L[p = 1:P] <= 100, Int) # Idle time for each priority
-    
+    if time_limit > 0
+        model = Model(optimizer_with_attributes(() -> Gurobi.Optimizer(genv), "TimeLimit" => time_limit, "LogToConsole" => logging, "OutputFlag" => logging))
+    else
+        model = Model(optimizer_with_attributes(Gurobi.Optimizer, "LogToConsole" => logging, "OutputFlag" => logging))
+    end
+    #model = Model(optimizer_with_attributes(Gurobi.Optimizer, "LogToConsole" => logging, "OutputFlag" => logging, "SolutionLimit" => 1))
+    @variable(model, x[1:data.T, p = 1:data.P, 1:data.S[p]], Bin) 
+    @variable(model, f[1:data.T,1:data.M] >= 0) # Freelance hours
+    @variable(model, k[1:data.P] >= 0, Int) # Slack for scope
+    @variable(model, L[1:data.P] >= 0, Int) # Idle time for each priority
+    @variable(model, z[1:data.P], Bin) # Constrainting min idle time
+    @variable(model, g[1:data.T, 1:data.P] >= 0, Int) # Slack for maximum campaigns per week
 
-    @objective(model, Min, -sum(L[p] for p=1:data.P) -sum(data.reward[p]*sum(x[t,p,n] for n=1:data.S[p]) for t = data.start:data.stop for p = 1:data.P) + sum(k[p]*data.penalty_S[p] for p = 1:data.P) + sum(f[t,m]*data.penalty_f[m] for t = 1:data.T for m = 1:data.M))
+    
+    M_T = data.T + 1
+    M_S = maximum(data.S) + 1
+    epsilon = 0.5
+    aimed = ceil.(data.S/data.T)
+
+    @objective(model, Min, sum(g[t,p] for t=1:data.T, p=1:data.P) - sum(L[p] for p=1:data.P) - sum(data.reward[p]*sum(x[t,p,n] for n=1:data.S[p]) for t = 1:data.T for p = 1:data.P) + sum(k[p]*data.penalty_S[p] for p = 1:data.P) + sum(f[t,m]*data.penalty_f[m] for t = 1:data.T for m = 1:data.M))
 
     #It is not possible to slack on Flagskib DR1 and DR2 (p=1 and p=8)
     @constraint(model, [p in data.P_bar], k[p] == 0)
@@ -39,10 +46,18 @@ function MIPExpansion(data, time_limit, logging)
     
     # Make order of n 
     @constraint(model, [p=1:data.P, n=1:(data.S[p]-1)], sum(x[t,p,n] * t for t=1:data.T) <= sum(x[t,p,n+1] * t for t=1:data.T))
->
-    # Make idle time
-    @constraint(model, [p=1:data.P, n=1:(data.S[p]-1)], sum(x[t,p,n+1] * t for t=1:data.T) - sum(x[t,p,n] * t for t=1:data.T) >= L[p] * sum(x[t,p,n] for t = 1:data.T))
 
+    # Make idle time
+    @constraint(model, [p=1:data.P, n=1:(data.S[p]-1)], sum(x[t,p,n+1] * t for t=1:data.T) - sum(x[t,p,n] * t for t=1:data.T) + M_T*(1 - sum(x[t,p,n] for t=1:data.T)) >= L[p] )
+
+    # Activate z
+    @constraint(model, [p=1:data.P], 1-sum(x[t,p,n] for t=1:data.T, n=1:data.S[p]) <= M_S * z[p] - epsilon * (1-z[p]))
+
+    # Constraint L 
+    @constraint(model, [p=1:data.P], (1 - z[p]) * M_T >= L[p])
+
+    # Number of campaigns per week
+    @constraint(model, [p=1:data.P, t=1:data.T], sum(x[t,p,n] for n=1:data.S[p]) <= aimed[p] + g[t,p])
 
     JuMP.optimize!(model)
 
@@ -58,12 +73,15 @@ function MIPExpansion(data, time_limit, logging)
     end 
 
     for p = 1:data.P
-        if JuMP.value(L[p]) > 0.5
-            println(p)
-            println(JuMP.value(L[p]))
-        end
+
+            println(p, ": L: ", JuMP.value(L[p]), " z: ", JuMP.value(z[p]))
+        #end
     end
 
+    for p = 1:data.P
+        println(p, ": ", JuMP.value(g[t,p]))
+    
+    end
 
     # Create solution object
     sol = Sol(data.T,data.P,data.M)
