@@ -99,12 +99,12 @@ function read_DR_data(P)
     end
 
     # Read production hours
-    # w[p,m] is weekly production hours of priority p on media m (platforms are TV, RADIO, BANNER, SOME)
+    # w[p,m] is weekly production hours of priority p on media m (platforms are TV, RADIO, digital, SOME)
     per_week = data.Q_upper-data.Q_lower+1
     data.w = convert(Array{Float64,2},XLSX.readdata("data/data_staffing_constraint.xlsx", "Producertimer", "D2:G38"))[1:P,:]./per_week
 
     # Read staffing
-    # H[t,m] is weekly staffing (hours) on platform m (medias are TV, RADIO, BANNER, SOME) at time t
+    # H[t,m] is weekly staffing (hours) on platform m (medias are TV, RADIO, digital, SOME) at time t
     data.H = transpose(repeat(convert(Array{Float64,2},XLSX.readdata("data/data_staffing_constraint.xlsx", "Bemanding", "E2:E5")),1,data.T))
 
     # Read scope
@@ -112,7 +112,7 @@ function read_DR_data(P)
     data.S = convert(Array{Int64,2}, XLSX.readdata("data/data_staffing_constraint.xlsx", "Scope", "D2:D38"))[1:P]
 
     # Read I
-    # [DR1, DR2, Ramasjang, P1, P2, P3, P4, P5, P6, P8, Banner, SOME]
+    # [DR1, DR2, Ramasjang, P1, P2, P3, P4, P5, P6, P8, digital, SOME]
     inventory = XLSX.readdata("data/data_lagerestimater.xlsx", "Sheet1", "B2:M54")
     inventory = convert(Array{Float64,2}, coalesce.(inventory, NaN))
     inventory[:,11] = inventory[:,11] / population

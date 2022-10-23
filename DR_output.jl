@@ -8,7 +8,7 @@ function DR_plan()
 
     output = XLSX.readdata("data/kampagner_planlagt2021.xlsx", "Data (2)", "A2:H63134")
     channel_mapping = XLSX.readdata("data/data_inventory_consumption.xlsx", "Mapping", "A2:B13")
-    # [DR1, DR2, Ramasjang, P1, P2, P3, P4, P5, P6, P8, Banner, SOME]
+    # [DR1, DR2, Ramasjang, P1, P2, P3, P4, P5, P6, P8, digital, SOME]
     mapping = XLSX.readdata("data/data_staffing_constraint.xlsx", "Mapping", "B2:C38")
     BC_names = unique(mapping[:,1])
 
@@ -58,7 +58,7 @@ function DR_plan()
         if startswith(channel, "F ") || occursin("Facebook", channel) || channel == "Instagram"
             channel = "SOME"
         elseif occursin("banner", channel)
-            channel = "Banner"
+            channel = "Digital"
         end
 
         # Fill number_priorities

@@ -66,12 +66,12 @@ function read_DR_data(P)
     end
 
     # Read production hours
-    # w[p,m] is weekly production hours of priority p on media m (platforms are TV, RADIO, BANNER, SOME)
+    # w[p,m] is weekly production hours of priority p on media m (platforms are TV, RADIO, digital, SOME)
     per_week = data.Q_upper-data.Q_lower+1
     data.w = convert(Array{Float64,2},XLSX.readdata("data/data_staffing_constraint.xlsx", "Producertimer", "D2:G38"))[1:P,:]./per_week
 
     # Read staffing
-    # H[t,m] is weekly staffing (hours) on platform m (medias are TV, RADIO, BANNER, SOME) at time t
+    # H[t,m] is weekly staffing (hours) on platform m (medias are TV, RADIO, digital, SOME) at time t
     data.H = transpose(repeat(convert(Array{Float64,2},XLSX.readdata("data/data_staffing_constraint.xlsx", "Bemanding", "E2:E5")),1,data.T))
 
     # Read scope
@@ -81,7 +81,7 @@ function read_DR_data(P)
     # Simulate I for now
     M = 100 #Number of posts per day
     average = [154 16 6 6 3 50 111 12 2 1 7118152 M]*7.0
-    # [DR1, DR2, Ramasjang, P1, P2, P3, P4, P5, P6, P8, Banner, SOME]
+    # [DR1, DR2, Ramasjang, P1, P2, P3, P4, P5, P6, P8, digital, SOME]
     for c = 1:data.C
         data.I[:, c] = repeat([average[c]], data.T)
     end
@@ -101,8 +101,7 @@ function Baseline(data, time_limit)
     @variable(model, f[1:data.T,1:data.M] >= 0, Int)
     @variable(model, k[1:data.P] >= 0, Int)
 
-    b = vcat(1:10,12)
-    penalty_scope = round.(sum(sum(data.u[:,:,b], dims=1),dims=3)) # 1:10 to not include SOME and Banner
+    penalty_scope = round.(sum(sum(data.u[:,:,1:12], dims=1),dims=3)) # Including all channels
 
     @objective(model, Max, sum(x[t,p] for t = data.start:data.stop for p = 1:data.P) - sum(k[p]*penalty_scope[p] for p = 1:data.P))
 

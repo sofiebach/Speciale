@@ -17,9 +17,9 @@ inventory_used, staff_used = checkSolution(data, sol)
 # writeSolution(filename, data, sol)
 # data, sol = readSolution(filename)
 
-drawTVSchedule(data,sol,"MIP2")
+drawTVSchedule(data,sol,"MIP_spread")
 
-drawRadioSchedule(data,sol,"MIP2")
+drawRadioSchedule(data,sol,"MIP_spred")
 
 drawHeatmap(inventory_used, staff_used, data, "MIP2")
 

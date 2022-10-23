@@ -12,8 +12,8 @@ function Baseline(data, time_limit)
     @variable(model, f[1:data.T,1:data.M] >= 0, Int)
     @variable(model, k[1:data.P] >= 0, Int)
 
-    b = vcat(1:10,12)
-    penalty_scope = round.(sum(sum(data.u[:,:,b], dims=1),dims=3)) # 1:10 to not include SOME and Banner
+   
+    penalty_scope = round.(sum(sum(data.u[:,:,1:12], dims=1),dims=3)) # Including all channels
 
     @objective(model, Max, sum(x[t,p] for t = data.start:data.stop for p = 1:data.P) - sum(k[p]*penalty_scope[p] for p = 1:data.P))
 
