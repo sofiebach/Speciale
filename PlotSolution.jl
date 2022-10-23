@@ -181,7 +181,7 @@ function drawRadioSchedule(data, sol, filename)
         push!(BC, priorities)
     end
 
-    P_names = unique(mapping[:,2])
+    P_names = reverse!(unique(mapping[:,2]))
     num_P_names = length(P_names)
     
     #col = ["blue","red","green","yellow","orange","purple","cyan","magenta","lime","gray","pink"]
