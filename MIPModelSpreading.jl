@@ -61,27 +61,27 @@ function MIPExpansion(data, time_limit, logging)
 
     JuMP.optimize!(model)
 
-    for p = 2:2
-        for n = 1:data.S[p]
-            println(p, " ", n)
-            for t=1:data.T
-                print(JuMP.value(x[t,p,n]))
-                print(" ")
-            end
-            println("")
-        end
-    end 
+    # for p = 2:2
+    #     for n = 1:data.S[p]
+    #         println(p, " ", n)
+    #         for t=1:data.T
+    #             print(JuMP.value(x[t,p,n]))
+    #             print(" ")
+    #         end
+    #         println("")
+    #     end
+    # end 
 
-    for p = 1:data.P
+    # for p = 1:data.P
 
-            println(p, ": L: ", JuMP.value(L[p]), " z: ", JuMP.value(z[p]))
-        #end
-    end
+    #         println(p, ": L: ", JuMP.value(L[p]), " z: ", JuMP.value(z[p]))
+    #     #end
+    # end
 
-    for p = 1:data.P
-        println(p, ": ", JuMP.value(g[t,p]))
+    # for p = 1:data.P
+    #     println(p, ": ", JuMP.value(g[t,p]))
     
-    end
+    # end
 
     # Create solution object
     sol = Sol(data.T,data.P,data.M)

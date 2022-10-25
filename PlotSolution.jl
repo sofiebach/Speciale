@@ -1,6 +1,8 @@
 using Luxor
 using PlotlyJS
 using Colors
+using PyCall
+using XLSX
 include("ValidateSolution.jl")
 
 function print_solution(sol)
@@ -308,43 +310,71 @@ end
 
 
 
-function drawHeatmap(inventory_used, staff_used, data, filename)
+function drawHeatmap(inventory_used, staff_used, data, sol, filename)       
     channels = XLSX.readdata("data/data_inventory_consumption.xlsx", "Mapping", "B2:B13")[1:data.C]
     media = XLSX.readdata("data/data_staffing_constraint.xlsx", "Bemanding", "A2:A5")[1:data.M]
-
-    fig1 = make_subplots(rows=2, cols=1, subplot_titles=["Used inventory" "Used staff"])
-    add_trace!(fig1, heatmap(x=collect(1:data.T), y=channels, z=transpose(inventory_used), coloraxis="coloraxis"), row=1, col=1)
-    add_trace!(fig1, heatmap(x=collect(1:data.T), y=media, z=transpose(staff_used), coloraxis="coloraxis"), row=2, col=1)
-    relayout!(fig1, width=600, height=600)
-    display(fig1)
-
-    if Sys.isapple()
-        savefig(fig1, "output/heatmap_" * filename * ".png", width=600, height=600)
-    end
-end
-
-function heatmapStaff(staff_used, data, filename)
-    staff_used[staff_used .> 1.0] .= 1.5
-    media = XLSX.readdata("data/data_staffing_constraint.xlsx", "Bemanding", "A2:A5")[1:data.M]
     
-    fig1 = plot(heatmap(x=collect(1:data.T), y=media, z=transpose(staff_used), coloraxis="coloraxis"))
+    staff_incl_freelancer = data.H + sol.f 
+    used_cap_inv = inventory_used ./data.I
+    used_cap_prod = staff_used ./staff_incl_freelancer
+
+    pd = pyimport("pandas")
+    plt = pyimport("matplotlib.pyplot")
+    np = pyimport("numpy")
+    sns = pyimport("seaborn")
+    ticker = pyimport("matplotlib.ticker")
+
+    py"""
+    import pandas as pd
+    import numpy as np
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+    from matplotlib import ticker
     
-    display(fig1)
-    if Sys.isapple()
-        savefig(fig1, "output/heatmap_staff_" * filename * ".png", width=600, height=300)
-    end
-end
+    def heatmap(used_inv, used_prod, channels, media, filename):
+        timesteps = np.arange(1,63)
+        
+        df1 = pd.DataFrame(np.transpose(used_prod), index = media)#,  columns = timesteps)
+        df2 = pd.DataFrame(np.transpose(used_inv), index = channels)#,  columns = timesteps)
 
-function heatmapInventory(inventory_used, data, filename)
-    inventory_used[inventory_used .> 1.0] .= 1.5
+        f,(ax1,ax2) = plt.subplots(2,1, figsize = (12,8), gridspec_kw={'height_ratios': [1, 2]})
+        
+        max_total = max(df1.max().max(),df2.max().max())
+        cbar_ax = f.add_axes([.91, .05, .02, .92])
+        
+        #M = 15
+        #xticks = ticker.MaxNLocator(nbins=M, integer=True)
+        #print(xticks())
+        
 
-    channels = XLSX.readdata("data/data_inventory_consumption.xlsx", "Mapping", "B2:B13")[1:data.C]
 
-    fig1 = plot(heatmap(x=collect(1:data.T), y=channels, z=transpose(inventory_used), coloraxis="coloraxis"))
-    display(fig1)
-    if Sys.isapple()
-        savefig(fig1, "output/heatmap_inventory_" * filename * ".png", width=600, height=300)
-    end
+        
+        p1 = sns.heatmap(df1, linewidths=.5, ax = ax1, vmin=0, vmax=max_total, cbar_ax = cbar_ax, cmap = 'inferno')
+        ax1.xaxis.set_ticks(np.arange(0,62,5))
+        ax1.xaxis.set_major_formatter(ticker.FormatStrFormatter('%d'))
+        ax1.tick_params(axis = 'x', labelsize=12, rotation=0)
+        ax1.tick_params(axis = 'y', labelsize=12)
+        ax1.set_xlabel("Time (weeks)")
+        ax1.title.set_text('Production hours')
+        ax1.set_xlim([0, 62])
+    
+        p2 = sns.heatmap(df2, linewidths=.5, ax = ax2, vmin=0, vmax=max_total, cbar_ax = cbar_ax, cmap = 'inferno') 
+        ax2.xaxis.set_ticks(np.arange(0,62,5))
+        ax2.xaxis.set_major_formatter(ticker.FormatStrFormatter('%d'))
+        ax2.tick_params(axis = 'x', labelsize=12, rotation=0)
+        ax2.tick_params(axis = 'y', labelsize=12)
+        ax2.set_xlabel("Time (weeks)")
+       
+        ax2.title.set_text('Channel inventory')
+        
+        f.tight_layout(rect=[0, 0, .9, 1])
+
+        plt.savefig("output" + filename + ".png")
+        plt.show()
+    """
+
+    py"heatmap"(used_cap_inv, used_cap_prod, channels, media, filename)
+
 end
 
 
