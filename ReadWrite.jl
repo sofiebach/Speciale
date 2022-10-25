@@ -28,6 +28,7 @@ mutable struct Instance
     reward::Array{Float64,1}
     penalty_f::Array{Float64, 1}
     F::Array{Float64, 1}
+    aimed::Array{Int64,1}
     Instance(P,C,M,timeperiod,L_lower,L_upper,Q_lower,Q_upper,T) = new(P,[1,8],C,M,timeperiod,
         L_lower,L_upper,indexin(0,collect(L_lower:L_upper))[],
         Q_lower,Q_upper,
@@ -42,7 +43,8 @@ mutable struct Instance
         zeros(Float64, P),
         zeros(Float64, P),
         zeros(Float64, M),
-        zeros(Int64, M))
+        zeros(Int64, M),
+        zeros(Int64,P))
 end
 
 # Struct for holding the instance
@@ -52,10 +54,12 @@ mutable struct Sol
     x::Array{Int64,2}
     f::Array{Float64,2}
     k::Array{Int64,1}
+    L::Array{Int64, 1}
+    g::Array{Int64,2}
     P::Int64
     T::Int64
     M::Int64
-    Sol(T,P,M) = new(0.0, 0, zeros(Int64,T,P), zeros(Float64,T,M), zeros(Int64,P), P, T, M)
+    Sol(T,P,M) = new(0.0, 0, zeros(Int64,T,P), zeros(Float64,T,M), zeros(Int64,P), zeros(Int64, data.P), zeros(Int64, data.T, data.P), P, T, M)
 end
 
 function read_DR_data(P)
@@ -134,6 +138,7 @@ function read_DR_data(P)
     # reward for Priority
     data.reward = (data.penalty_S.-minimum(data.penalty_S).+1)./(maximum(data.penalty_S)-minimum(data.penalty_S))
 
+    data.aimed = ceil.(data.S/data.T)
     return data
 end
 

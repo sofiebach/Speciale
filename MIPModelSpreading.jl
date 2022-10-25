@@ -1,7 +1,9 @@
 using JuMP, Gurobi
 genv = Gurobi.Env()
-function MIPExpansion(data, time_limit, logging)
-    if time_limit > 0
+function MIPExpansion(data, time_limit, solution_count, logging)
+    if solution_count > 0
+        model = Model(optimizer_with_attributes(Gurobi.Optimizer, "LogToConsole" => logging, "OutputFlag" => logging, "SolutionLimit" => 1))
+    elseif time_limit > 0
         model = Model(optimizer_with_attributes(() -> Gurobi.Optimizer(genv), "TimeLimit" => time_limit, "LogToConsole" => logging, "OutputFlag" => logging))
     else
         model = Model(optimizer_with_attributes(Gurobi.Optimizer, "LogToConsole" => logging, "OutputFlag" => logging))
@@ -18,7 +20,7 @@ function MIPExpansion(data, time_limit, logging)
     M_T = data.T + 1
     M_S = maximum(data.S) + 1
     epsilon = 0.5
-    aimed = ceil.(data.S/data.T)
+    
 
     @objective(model, Min, sum(g[t,p] for t=1:data.T, p=1:data.P) - sum(L[p] for p=1:data.P) - sum(data.reward[p]*sum(x[t,p,n] for n=1:data.S[p]) for t = 1:data.T for p = 1:data.P) + sum(k[p]*data.penalty_S[p] for p = 1:data.P) + sum(f[t,m]*data.penalty_f[m] for t = 1:data.T for m = 1:data.M))
 
@@ -57,7 +59,7 @@ function MIPExpansion(data, time_limit, logging)
     @constraint(model, [p=1:data.P], (1 - z[p]) * M_T >= L[p])
 
     # Number of campaigns per week
-    @constraint(model, [p=1:data.P, t=1:data.T], sum(x[t,p,n] for n=1:data.S[p]) <= aimed[p] + g[t,p])
+    @constraint(model, [p=1:data.P, t=1:data.T], sum(x[t,p,n] for n=1:data.S[p]) <= data.aimed[p] + g[t,p])
 
     JuMP.optimize!(model)
 
@@ -90,10 +92,16 @@ function MIPExpansion(data, time_limit, logging)
         if JuMP.value(k[p]) > 0.5
             sol.k[p] = Int64(round(JuMP.value(k[p])))
         end
+        if JuMP.value(L[p]) > 0.5
+            sol.L[p] = Int64(round(JuMP.value(L[p])))
+        end
         for t = 1:sol.T
-            if JuMP.value(sum(x[t,p,n] for n=1:data.S[p])) > 0.5
+            if JuMP.value(sum(x[t,p,:])) > 0.5
                 sol.x[t,p] = Int64(round(JuMP.value(sum(x[t,p,n] for n=1:data.S[p]))))
-            end  
+            end 
+            if JuMP.value(g[t,p]) > 0.5
+                sol.g[t,p] = Int64(round(JuMP.value(g[t,p])))
+            end 
         end
     end
     sol.num_campaigns = sum(sol.x)

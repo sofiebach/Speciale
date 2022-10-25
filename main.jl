@@ -9,7 +9,7 @@ data = read_DR_data(P)
 
 #sol = MIP(data, 30, 0)
 
-sol = MIPExpansion(data, 1200, 1)
+sol = MIPExpansion(data, 0, 1, 1)
 
 
 
