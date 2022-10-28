@@ -9,19 +9,17 @@ function MIPExpansion(data, time_limit, solution_count, logging)
         model = Model(optimizer_with_attributes(Gurobi.Optimizer, "LogToConsole" => logging, "OutputFlag" => logging))
     end
     #model = Model(optimizer_with_attributes(Gurobi.Optimizer, "LogToConsole" => logging, "OutputFlag" => logging, "SolutionLimit" => 1))
-    @variable(model, x[1:data.T, p = 1:data.P, 1:data.S[p]], Bin) 
+    @variable(model, x[1:data.T, p = 1:data.P, 1:data.S[p]], Bin) # We can't have more than scope of each priority for now
     @variable(model, f[1:data.T,1:data.M] >= 0) # Freelance hours
     @variable(model, k[1:data.P] >= 0, Int) # Slack for scope
     @variable(model, L[1:data.P] >= 0, Int) # Idle time for each priority
-    @variable(model, z[1:data.P], Bin) # Constrainting min idle time
+    @variable(model, z[1:data.P], Bin) # Constraining min idle time
     @variable(model, g[1:data.T, 1:data.P] >= 0, Int) # Slack for maximum campaigns per week
 
-    
     M_T = data.T + 1
     M_S = maximum(data.S) + 1
     epsilon = 0.5
     
-
     @objective(model, Min, sum(g[t,p] for t=1:data.T, p=1:data.P) - sum(L[p] for p=1:data.P) - sum(data.reward[p]*sum(x[t,p,n] for n=1:data.S[p]) for t = 1:data.T for p = 1:data.P) + sum(k[p]*data.penalty_S[p] for p = 1:data.P) + sum(f[t,m]*data.penalty_f[m] for t = 1:data.T for m = 1:data.M))
 
     #It is not possible to slack on Flagskib DR1 and DR2 (p=1 and p=8)

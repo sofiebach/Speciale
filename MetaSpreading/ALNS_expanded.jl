@@ -101,6 +101,7 @@ function remove(data, sol, t, p)
         sol.g[t,p] -= 1
     end
 
+    sol.L[p] = findMinIdle(data,sol.x[:,p])
     # update objective
     findObjective(data, sol)
 end
@@ -208,7 +209,6 @@ function firstInsertion(data, sol, shuffled_idx)
     return best_t, best_p
 end
 
-
 function delta_insert(data, sol, t, p)
     if sol.k[p] > 0
         penalty_scope = data.penalty_S[p] 
@@ -220,7 +220,10 @@ function delta_insert(data, sol, t, p)
     else
         aimed_wrong = 0
     end
-    return sol.obj - data.reward[p]  - penalty_scope + aimed_wrong
+    xp = deepcopy(sol.x[:,p])
+    xp[t] += 1
+    new_idle = findMinIdle(data,xp)
+    return sol.obj - data.reward[p]  - penalty_scope + aimed_wrong + sol.L[p] - new_idle
 end
 
 function delta_remove(data, sol, t, p)
@@ -229,12 +232,15 @@ function delta_remove(data, sol, t, p)
     else
         penalty_scope = 0
     end
-    if g[t,p] > 0
+    if sol.g[t,p] > 0
         aimed_wrong = 1  #aimed wrong penalty is set to 1
     else
         aimed_wrong = 0
     end
-    return sol.obj + penalty_scope + data.reward[p] - aimed_wrong
+    xp = deepcopy(sol.x[:,p])
+    xp[t] -= 1
+    new_idle = findMinIdle(data,xp)
+    return sol.obj + penalty_scope + data.reward[p] - aimed_wrong + sol.L[p] - new_idle
 end
 
 

@@ -9,7 +9,7 @@ data = read_DR_data(P)
 
 #sol = MIP(data, 30, 0)
 
-sol = MIPExpansion(data, 0, 1, 1)
+sol = MIPExpansion(data, 2400, 0, 1)
 
 
 
@@ -30,4 +30,4 @@ drawRadioSchedule(data,sol,"MIP_spred")
 #plotScope(data, sol)
 used_inv, used_prod = checkSolution(data,sol)
 include("PlotSolution.jl")
-drawHeatmap(used_inv,used_prod,data,sol,"test1234")
+drawHeatmap(used_inv,used_prod,data,sol,"heatmaps_spread")

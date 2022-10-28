@@ -369,7 +369,7 @@ function drawHeatmap(inventory_used, staff_used, data, sol, filename)
         
         f.tight_layout(rect=[0, 0, .9, 1])
 
-        plt.savefig("output" + filename + ".png")
+        plt.savefig("output/" + filename + ".png")
         plt.show()
     """
 

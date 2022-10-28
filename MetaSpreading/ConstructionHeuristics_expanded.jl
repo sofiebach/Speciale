@@ -89,9 +89,38 @@ function insert(data, sol, t, p)
         sol.g[t,p] = 0
     end
 
+    sol.L[p] = findMinIdle(data,sol.x[:,p])
+
     findObjective(data, sol)
 end
 
+function findMinIdle(data, xp)
+    # If more priorities at same timestep
+    if sum(xp.> 1) > 0 
+        return 0
+    end
+    # If less than 2 priorities planned
+    if sum(xp) < 2
+        return 0
+    end
+
+    minT = Inf
+    t1 = findfirst(x -> x==1, xp)
+    if xp[t1] > 0
+        for t2 = (t1+1):data.stop 
+            if xp[t2] > 0
+                if t2-t1 < minT
+                    minT = t2-t1
+                end
+                t1=t2
+            end
+        end 
+    else 
+        t1 += 1
+    end
+    return minT
+end
+# np.diff(np.where(np.array(a)>0))-1
 
 function fits(data, sol, t, p)
     if t < data.start || t > data.stop
@@ -129,8 +158,9 @@ function findObjective(data, sol)
     num_campaigns = sum(sum(sol.x, dims=1) .* transpose(data.reward))
     scope = sum(data.penalty_S .* sol.k)
     aimed_wrong = sum(sum(sol.g))
+    idle_times = sum(sol.L)
     # freelance = sum(sum(sol.f, dims=1) .* data.penalty_f)
-    sol.obj =  scope - num_campaigns + aimed_wrong
+    sol.obj =  scope - num_campaigns + aimed_wrong - idle_times
 end
 
 
