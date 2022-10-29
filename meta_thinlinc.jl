@@ -1,11 +1,15 @@
 include("ReadWrite.jl")
-include("ConstructionHeuristics.jl")
-include("MIPModel.jl")
-include("ALNS.jl")
+
+include("MIPModelSpreading.jl")
+include("MetaSpreading/ALNS_expanded.jl")
+include("MetaSpreading/ConstructionHeuristics_expanded.jl")
 using Dates
 P = 37
 data = read_DR_data(P)
-timelimit = 600
+timelimit = 60
+
+
+sol = randomInitial(data)
 sol, params = ALNS(data, timelimit)
 
 

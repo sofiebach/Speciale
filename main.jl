@@ -1,13 +1,17 @@
 include("ReadWrite.jl")
+include("MIPModelSpreading.jl")
 include("MIPModel.jl")
-include("MIP2.jl")
 include("ValidateSolution.jl")
 include("PlotSolution.jl")
 
 P = 37
 data = read_DR_data(P)
 
-sol = MIP2(data, 60)
+#sol = MIP(data, 30, 0)
+
+sol = MIPExpansion(data, 2400, 0, 1)
+
+
 
 print_solution(sol)
 
@@ -17,10 +21,13 @@ inventory_used, staff_used = checkSolution(data, sol)
 # writeSolution(filename, data, sol)
 # data, sol = readSolution(filename)
 
-drawTVSchedule(data,sol,"MIP2")
+drawTVSchedule(data,sol,"MIP_spread")
 
-drawRadioSchedule(data,sol,"MIP2")
+drawRadioSchedule(data,sol,"MIP_spred")
 
-drawHeatmap(inventory_used, staff_used, data, "MIP2")
+
 
 #plotScope(data, sol)
+used_inv, used_prod = checkSolution(data,sol)
+include("PlotSolution.jl")
+drawHeatmap(used_inv,used_prod,data,sol,"heatmaps_spread")

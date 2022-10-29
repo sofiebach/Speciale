@@ -4,6 +4,7 @@ function checkSolution(data, sol)
     used_prod = zeros(Float64, data.T, data.M)
     cap_prod = zeros(Float64, data.T, data.M)
     
+    exceeded = false
     for t = 1:data.T
         # inventory check
         for l_idx = max(1,(t-data.L_upper)):min(data.T,(t-data.L_lower))
@@ -12,6 +13,7 @@ function checkSolution(data, sol)
         cap_inv[t,:] = data.I[t,:]
         for c = 1:data.C
             if (used_inv[t,c] > cap_inv[t,c])
+                exceeded = true
                 println("Inventory exceeded at time ", t, " media ", c)
             end
         end
@@ -23,6 +25,7 @@ function checkSolution(data, sol)
         cap_prod[t,:] = data.H[t,:] + sol.f[t,:]
         for m = 1:data.M
             if (used_prod[t,m] > cap_prod[t,m])
+                exceeded = true
                 println("Staff exceeded at time ", t, " media ", m)
             end
         end 
@@ -31,6 +34,7 @@ function checkSolution(data, sol)
     # freelancer check
     for m = 1:data.M
         if sum(sol.f[:,m]) > data.F[m]
+            exceeded = true
             println("Too many freelance hours!")
         end
     end
@@ -38,10 +42,13 @@ function checkSolution(data, sol)
     # scope check
     for p_bar in data.P_bar 
         if sol.k[p_bar] > 0
+            exceeded = true
             println("Scope not fulfilled for P_bar!")
         end
     end
-
+    if exceeded == false
+        println("--- Solution is valid! ---")
+    end 
     return used_inv, used_prod 
 end
 

@@ -28,6 +28,7 @@ mutable struct Instance
     reward::Array{Float64,1}
     penalty_f::Array{Float64, 1}
     F::Array{Float64, 1}
+    aimed::Array{Int64,1}
     Instance(P,C,M,timeperiod,L_lower,L_upper,Q_lower,Q_upper,T) = new(P,[1,8],C,M,timeperiod,
         L_lower,L_upper,indexin(0,collect(L_lower:L_upper))[],
         Q_lower,Q_upper,
@@ -42,7 +43,8 @@ mutable struct Instance
         zeros(Float64, P),
         zeros(Float64, P),
         zeros(Float64, M),
-        zeros(Int64, M))
+        zeros(Int64, M),
+        zeros(Int64,P))
 end
 
 # Struct for holding the instance
@@ -52,10 +54,12 @@ mutable struct Sol
     x::Array{Int64,2}
     f::Array{Float64,2}
     k::Array{Int64,1}
+    L::Array{Int64, 1}
+    g::Array{Int64,2}
     P::Int64
     T::Int64
     M::Int64
-    Sol(T,P,M) = new(0.0, 0, zeros(Int64,T,P), zeros(Float64,T,M), zeros(Int64,P), P, T, M)
+    Sol(T,P,M) = new(0.0, 0, zeros(Int64,T,P), zeros(Float64,T,M), zeros(Int64,P), zeros(Int64, data.P), zeros(Int64, data.T, data.P), P, T, M)
 end
 
 function read_DR_data(P)
@@ -99,12 +103,12 @@ function read_DR_data(P)
     end
 
     # Read production hours
-    # w[p,m] is weekly production hours of priority p on media m (platforms are TV, RADIO, BANNER, SOME)
+    # w[p,m] is weekly production hours of priority p on media m (platforms are TV, RADIO, digital, SOME)
     per_week = data.Q_upper-data.Q_lower+1
     data.w = convert(Array{Float64,2},XLSX.readdata("data/data_staffing_constraint.xlsx", "Producertimer", "D2:G38"))[1:P,:]./per_week
 
     # Read staffing
-    # H[t,m] is weekly staffing (hours) on platform m (medias are TV, RADIO, BANNER, SOME) at time t
+    # H[t,m] is weekly staffing (hours) on platform m (medias are TV, RADIO, digital, SOME) at time t
     data.H = transpose(repeat(convert(Array{Float64,2},XLSX.readdata("data/data_staffing_constraint.xlsx", "Bemanding", "E2:E5")),1,data.T))
 
     # Read scope
@@ -112,7 +116,7 @@ function read_DR_data(P)
     data.S = convert(Array{Int64,2}, XLSX.readdata("data/data_staffing_constraint.xlsx", "Scope", "D2:D38"))[1:P]
 
     # Read I
-    # [DR1, DR2, Ramasjang, P1, P2, P3, P4, P5, P6, P8, Banner, SOME]
+    # [DR1, DR2, Ramasjang, P1, P2, P3, P4, P5, P6, P8, digital, SOME]
     inventory = XLSX.readdata("data/data_lagerestimater.xlsx", "Sheet1", "B2:M54")
     inventory = convert(Array{Float64,2}, coalesce.(inventory, NaN))
     inventory[:,11] = inventory[:,11] / population
@@ -134,6 +138,7 @@ function read_DR_data(P)
     # reward for Priority
     data.reward = (data.penalty_S.-minimum(data.penalty_S).+1)./(maximum(data.penalty_S)-minimum(data.penalty_S))
 
+    data.aimed = ceil.(data.S/data.T)
     return data
 end
 
