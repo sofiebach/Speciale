@@ -7,7 +7,7 @@ include("PlotSolution.jl")
 P = 37
 data = read_DR_data(P)
 
-#sol = MIP(data, 30, 0)
+#sol = MIP(data, 30, 0, 0)
 
 sol = MIPExpansion(data, 2400, 0, 1)
 

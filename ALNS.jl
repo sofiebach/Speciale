@@ -108,7 +108,7 @@ function modelRepair(data, sol)
     MIPdata.F = deepcopy(data.F - transpose(sum(sol.f, dims=1))[:,1])
     MIPdata.S = deepcopy(sol.k)
     
-    MIPsol = MIP(MIPdata, 2, 0)
+    MIPsol = MIP(MIPdata, 0, 2, 0)
 
     for p = 1:data.P, t = 1:data.T 
         for n = 1:MIPsol.x[t,p]

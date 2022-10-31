@@ -1,16 +1,10 @@
-include("ALNS.jl")
-include("ReadWrite.jl")
-include("ConstructionHeuristics.jl")
-include("MIPModel.jl")
 
-P = 37
-data = read_DR_data(P)
 
 function tuneAcceptanceCriteria(data, temperatures, alphas)
     filename = "tuning/T_alpha"
     outFile = open(filename, "w")
-    time_limit = 10
-    num_iter = 5
+    time_limit = 30
+    num_iter = 2
 
     best_obj = Inf
     best_T = 0
@@ -120,24 +114,3 @@ function readTuneAcceptance()
     return params, objectives
 end
 
-
-# temperatures = collect(500:100:1000)
-# alphas = collect(0.70:0.02:0.99)
-temperatures = [100, 1000]
-alphas = [0.8, 0.9]
-
-T, alpha = tuneAcceptanceCriteria(data, temperatures, alphas)
-
-T_alpha, objectives1 = readTuneAcceptance()
-
-# cluster = collect(0.1:0.05:0.3)
-# random = collect(0.1:0.05:0.3)
-# worst = collect(5:1:10)
-# related = collect(0.1:0.05:0.3)
-cluster = [0.1, 0.2]
-random = [0.1, 0.2]
-worst = [5, 10]
-related = [0.1, 0.2]
-frac_cluster, frac_random, thres_worst, frac_related = tuneDestroy(data, cluster, random, worst, related)
-
-fracs, objectives2 = readTuneDestroy()
