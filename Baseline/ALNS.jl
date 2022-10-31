@@ -1,6 +1,6 @@
 using Statistics
 
-function randomDestroy(data, sol, frac)
+function randomDestroy!(data, sol, frac)
     n_destroy = round(sol.num_campaigns*frac)
     while n_destroy > 0 
         p = rand(1:data.P)
@@ -10,35 +10,35 @@ function randomDestroy(data, sol, frac)
         r_times = findall(x -> x > 0, sol.x[:,p])
 
         t = r_times[rand(1:length(r_times))]
-        remove(data, sol, t, p)
+        remove!(data, sol, t, p)
         n_destroy -= 1
     end
     #println(sol.obj)
 end
 
-function clusterDestroy(data, sol, frac)
+function clusterDestroy!(data, sol, frac)
     t_destroy = Int(round((data.stop - data.start)*frac))
     rand_t = rand(data.start:(data.stop-t_destroy))
     for t = rand_t:(rand_t+t_destroy), p = 1:data.P
         while sol.x[t,p] > 0
-            remove(data,sol,t,p)
+            remove!(data,sol,t,p)
         end
     end   
 end
 
-function worstDestroy(data, sol, thres)
+function worstDestroy!(data, sol, thres)
     for t = data.start:data.stop, m = 1:data.M
         while sol.f[t,m] > thres
             t_hat = rand((t-data.Q_upper):(t-data.Q_lower))
             p_worst = findall(x -> x > 0, sol.x[t_hat,:].*data.w[:,m])
             if length(p_worst) > 0
-                remove(data,sol,t_hat,rand(p_worst))
+                remove!(data,sol,t_hat,rand(p_worst))
             end
         end
     end
 end
 
-function relatedDestroy(data, sol, frac)
+function relatedDestroy!(data, sol, frac)
     n_destroy = round(sol.num_campaigns*frac)
     sim = findSimilarity(data)
     tabu = []
@@ -54,7 +54,7 @@ function relatedDestroy(data, sol, frac)
                 while n_remove > 0
                     r_times = findall(x -> x > 0, sol.x[:,p_r])
                     t = r_times[rand(1:length(r_times))]
-                    remove(data, sol, t, p_r)
+                    remove!(data, sol, t, p_r)
                     n_remove -= 1
                     n_destroy -= 1
                 end
@@ -64,7 +64,7 @@ function relatedDestroy(data, sol, frac)
     end
 end
 
-function remove(data, sol, t, p)
+function remove!(data, sol, t, p)
     sol.x[t,p] -= 1
     sol.num_campaigns -= 1
     
@@ -95,18 +95,12 @@ function remove(data, sol, t, p)
     else 
         sol.k[p] = 0
     end
-    
-    # update aimed
-    if sol.g[t,p] > 0
-        sol.g[t,p] -= 1
-    end
 
-    sol.L[p] = findMinIdle(data,sol.x[:,p])
     # update objective
     findObjective(data, sol)
 end
 
-function modelRepair(data, sol)
+function modelRepair!(data, sol)
     MIPdata = deepcopy(data)
     MIPdata.I = deepcopy(sol.I_cap)
     MIPdata.H = deepcopy(sol.H_cap)
@@ -114,20 +108,20 @@ function modelRepair(data, sol)
     MIPdata.F = deepcopy(data.F - transpose(sum(sol.f, dims=1))[:,1])
     MIPdata.S = deepcopy(sol.k)
     
-    MIPsol = MIPExpansion(MIPdata, 0, 2, 0)
+    MIPsol = MIP(MIPdata, 0, 2, 0)
 
     for p = 1:data.P, t = 1:data.T 
         for n = 1:MIPsol.x[t,p]
-            insert(data, sol, t, p)
+            insert!(data, sol, t, p)
         end
     end
 end
 
-function greedyRepair(data, sol)
+function greedyRepair!(data, sol)
     for p_bar in data.P_bar, n = 1:sol.k[p_bar]
         t, p = bestInsertion(data, sol, [p_bar])
         if t != 0 && p != 0
-            insert(data, sol, t, p)
+            insert!(data, sol, t, p)
             #println("Inserted ", p, " at time ", t)
         end
     end
@@ -137,7 +131,7 @@ function greedyRepair(data, sol)
         #println("Vi er i while")
         t, p = bestInsertion(data, sol, sorted_idx)
         if t != 0 && p != 0
-            insert(data, sol, t, p)
+            insert!(data, sol, t, p)
             #println("Inserted ", p, " at time ", t)
         else
             break
@@ -153,7 +147,7 @@ function bestInsertion(data, sol, sorted_idx)
     for p in sorted_idx 
         for t = data.start:data.stop
             if fits(data, sol, t, p) 
-                new_obj = delta_insert(data, sol, t, p)
+                new_obj = delta_insert(data, sol, p)
                 if new_obj < best_obj
                     best_obj = new_obj
                     best_p = p 
@@ -165,11 +159,11 @@ function bestInsertion(data, sol, sorted_idx)
     return best_t, best_p
 end
 
-function firstRepair(data, sol)
+function firstRepair!(data, sol)
     for p_bar in data.P_bar, n = 1:sol.k[p_bar]
         t, p = firstInsertion(data, sol, [p_bar])
         if t != 0 && p != 0
-            insert(data, sol, t, p)
+            insert!(data, sol, t, p)
             #println("Inserted ", p, " at time ", t)
         end
     end
@@ -179,7 +173,7 @@ function firstRepair(data, sol)
         #println("Vi er i while")
         t, p = firstInsertion(data, sol, shuffled_idx)
         if t != 0 && p != 0
-            insert(data, sol, t, p)
+            insert!(data, sol, t, p)
             #println("Inserted ", p, " at time ", t)
         else
             break
@@ -196,7 +190,7 @@ function firstInsertion(data, sol, shuffled_idx)
     for t = data.start:data.stop
         for p in shuffled_idx
             if fits(data, sol, t, p) 
-                new_obj = delta_insert(data, sol, t, p)
+                new_obj = delta_insert(data, sol, p)
                 if new_obj < best_obj
                     best_obj = new_obj
                     best_p = p 
@@ -209,40 +203,21 @@ function firstInsertion(data, sol, shuffled_idx)
     return best_t, best_p
 end
 
-function delta_insert(data, sol, t, p)
+
+function delta_insert(data, sol, p)
     if sol.k[p] > 0
-        penalty_scope = -data.penalty_S[p] 
+        return sol.obj - data.penalty_S[p] - data.reward[p]
     else
-        penalty_scope = 0
+        return sol.obj - data.reward[p]
     end
-    if sol.x[t,p] + 1 > data.aimed[p]
-        aimed_wrong = 1  #aimed wrong penalty is set to 1
-    else
-        aimed_wrong = 0
-    end
-    xp = deepcopy(sol.x[:,p])
-    xp[t] += 1
-    new_idle = findMinIdle(data,xp)
-    delta_idle = sol.L[p] - new_idle # Should be positive or zero
-    return sol.obj - data.reward[p] + penalty_scope + aimed_wrong + delta_idle
 end
 
-function delta_remove(data, sol, t, p)
+function delta_remove(data, sol, p)
     if sum(sol.x[:,p])-1 < data.S[p]
-        penalty_scope = data.penalty_S[p]
+        return sol.obj + data.penalty_S[p] + data.reward[p]
     else
-        penalty_scope = 0
+        return sol.obj + data.reward[p]
     end
-    if sol.g[t,p] > 0
-        aimed_wrong = -1  #aimed wrong penalty is set to 1
-    else
-        aimed_wrong = 0
-    end
-    xp = deepcopy(sol.x[:,p])
-    xp[t] -= 1
-    new_idle = findMinIdle(data,xp)
-    delta_idle = sol.L[p] - new_idle # Should be negative or zero
-    return sol.obj + data.reward[p] + penalty_scope + aimed_wrong + delta_idle
 end
 
 
@@ -290,10 +265,10 @@ function selectMethod(prob)
     end
 end
 
-function ALNS(data, time_limit)
+function ALNS(data, time_limit, T=1000, alpha=0.999, frac_cluster=0.1, frac_random=0.1, thres_worst=10, frac_related=0.2)
     it = 0
-    T = 1000
-    alpha = 0.999
+    #T = 1000
+    #alpha = 0.999
     sol = randomInitial(data)
     best_sol = deepcopy(sol)
     temp_sol = deepcopy(sol)
@@ -334,24 +309,24 @@ function ALNS(data, time_limit)
         # Choose destroy method
         selected_destroy = selectMethod(prob_destroy)
         if selected_destroy == 1
-            frac = 0.1
-            clusterDestroy(data,temp_sol,frac)
+            frac_cluster = 0.1
+            clusterDestroy!(data,temp_sol,frac_cluster)
         elseif selected_destroy == 2
-            frac = 0.1
-            randomDestroy(data,temp_sol,frac)
+            frac_random = 0.1
+            randomDestroy!(data,temp_sol,frac_random)
         elseif selected_destroy == 3
-            thres = 10
-            worstDestroy(data,temp_sol,thres)
+            thres_worst = 10
+            worstDestroy!(data,temp_sol,thres_worst)
         else
-            frac = 0.2
-            relatedDestroy(data, sol, frac)
+            frac_related = 0.2
+            relatedDestroy!(data, sol, frac_related)
         end
         
         # Choose repair method
         selected_repair = selectMethod(prob_repair)
         
         if selected_repair == 1
-            greedyRepair(data,temp_sol)
+            greedyRepair!(data,temp_sol)
             # Check if P_bar constraint is exceeded
             for p_bar in data.P_bar 
                 if temp_sol.k[p_bar] > 0
@@ -361,7 +336,7 @@ function ALNS(data, time_limit)
                 end
             end
         elseif selected_repair == 2
-            firstRepair(data,temp_sol)
+            firstRepair!(data,temp_sol)
 
             # Check if P_bar constraint is exceeded
             for p_bar in data.P_bar 
@@ -372,7 +347,7 @@ function ALNS(data, time_limit)
                 end
             end
         else
-            modelRepair(data,temp_sol)
+            modelRepair!(data,temp_sol)
         end
 
         if !valid

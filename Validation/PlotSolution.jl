@@ -4,6 +4,7 @@ using Colors
 using PyCall
 using XLSX
 include("ValidateSolution.jl")
+# pyimport_conda("pandas", PKG)
 
 function print_solution(sol)
     println("Objective: ", sol.obj)

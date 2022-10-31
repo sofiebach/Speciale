@@ -21,18 +21,18 @@ function randomInitial(data)
     sol = HeuristicSol(data)
     
     # Randomly insert priorities from P_bar
-    randomInsert(data, sol, data.P_bar)
+    randomInsert!(data, sol, data.P_bar)
 
     # Randomly insert according to penalty
     sorted_idx = sortperm(-data.penalty_S)
-    randomInsert(data, sol, sorted_idx)
+    randomInsert!(data, sol, sorted_idx)
 
     # Check if anything "out of scope" can be inserted
     for t = data.start:data.stop
         sorted_idx = sortperm(-data.penalty_S)
         for p in sorted_idx
             if fits(data,sol,t,p) 
-                insert(data,sol,t,p)
+                insert!(data,sol,t,p)
             end
         end
     end
@@ -40,7 +40,7 @@ function randomInitial(data)
     return sol
 end
 
-function randomInsert(data, sol, priorities)
+function randomInsert!(data, sol, priorities)
     for p in priorities
         r_times = shuffle(collect(data.start:data.stop))
         for n = 1:data.S[p], t in r_times
@@ -48,13 +48,13 @@ function randomInsert(data, sol, priorities)
                 break
             end
             if fits(data, sol, t, p)
-                insert(data, sol, t, p)
+                insert!(data, sol, t, p)
             end
         end
     end
 end
 
-function insert(data, sol, t, p)
+function insert!(data, sol, t, p)
     sol.x[t,p] += 1
     sol.num_campaigns += 1
 
@@ -91,7 +91,7 @@ function insert(data, sol, t, p)
 
     sol.L[p] = findMinIdle(data,sol.x[:,p])
 
-    findObjective(data, sol)
+    findObjective!(data, sol)
 end
 
 function findMinIdle(data, xp)
@@ -150,7 +150,7 @@ function fits(data, sol, t, p)
     return true
 end
 
-function findObjective(data, sol)
+function findObjective!(data, sol)
     num_campaigns = sum(sum(sol.x, dims=1) .* transpose(data.reward))
     scope = sum(data.penalty_S .* sol.k)
     aimed_wrong = sum(sum(sol.g))

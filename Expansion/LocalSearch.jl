@@ -1,6 +1,6 @@
-include("ConstructionHeuristics.jl")
-include("ALNS.jl")
-include("ValidateSolution.jl")
+include("ConstructionHeuristics_expanded.jl")
+include("ALNS_expanded.jl")
+include("../Validation/ValidateSolution.jl")
 
 function checkReplace(data, sol, t1, p1, p2)
     # checks if p2 can be placed at t1 INSTEAD of p1
@@ -106,22 +106,22 @@ function checkSwap(data, sol, t1, p1, t2, p2)
 
 end
 
-function swap(data, sol, t1, p1, t2, p2)
-    remove(data, sol, t1, p1)
-    remove(data, sol, t2, p2)
-    insert(data, sol, t2, p1)
-    insert(data, sol, t1, p2)
+function swap!(data, sol, t1, p1, t2, p2)
+    remove!(data, sol, t1, p1)
+    remove!(data, sol, t2, p2)
+    insert!(data, sol, t2, p1)
+    insert!(data, sol, t1, p2)
 end
 
 
-function greedyInsert(data, sol)
+function greedyInsert!(data, sol)
     # loops through all timesteps and checks if it is possible to insert another priority
     for t = data.start:data.stop
         sorted_idx = sortperm(-data.penalty_S)
         for p in sorted_idx
             if sol.k[p] > 0
                 if fits(data,sol,t,p) 
-                    insert(data,sol,t,p)
+                    insert!(data,sol,t,p)
                 end
             end
         end
@@ -146,9 +146,12 @@ function swapInsert(data, sol)
             for p1 in P1
                 for p2 in P2 
                     if checkSwap(data, temp_sol, t1, p1, t2, p2)
-                        swap(data, temp_sol, t1, p1, t2, p2)
-                        greedyInsert(data, temp_sol)
-                        if temp_sol.obj < best_sol.obj
+                        temp_obj = delta_swap(temp_sol, t1, p1, t2, p2)
+                        # println("delta: ", delta_swap(temp_sol, t1, p1, t2, p2))
+                        # swap!(data, temp_sol, t1, p1, t2, p2)
+                        # println("swap: ", temp_sol.obj)
+                        if temp_obj < best_sol.obj
+                            swap!(data, temp_sol, t1, p1, t2, p2)
                             best_sol = deepcopy(temp_sol)
                             println("new obj: ", best_sol.obj)
                             println("campaigns: ", best_sol.num_campaigns)
@@ -162,6 +165,52 @@ function swapInsert(data, sol)
     end
     return best_sol
 end
+
+function delta_swap(sol, t1, p1, t2, p2)
+    xp_1 = deepcopy(sol.x[:,p1])
+    xp_2 = deepcopy(sol.x[:,p2])
+
+    # Remove only changes the objective wrt idle time and g
+    if sol.g[t1,p1] > 0
+        aimed_wrong_p1 = -1  #aimed wrong penalty is set to 1
+    else
+        aimed_wrong_p1 = 0
+    end
+    if sol.g[t2,p2] > 0
+        aimed_wrong_p2 = -1  #aimed wrong penalty is set to 1
+    else
+        aimed_wrong_p2 = 0
+    end
+    xp_1[t1] -= 1
+    remove_idle_p1 = findMinIdle(data,xp_1)
+    delta_idle_p1 = sol.L[p1] - remove_idle_p1 # Should be negative or zero
+    xp_2[t2] -= 1
+    remove_idle_p2 = findMinIdle(data,xp_2)
+    delta_idle_p2 = sol.L[p2] - remove_idle_p2 # Should be negative or zero
+    delta_remove = aimed_wrong_p1 + aimed_wrong_p2 + delta_idle_p1 + delta_idle_p2
+
+    # Insert
+    if xp_2[t1] + 1 > data.aimed[p2]
+        aimed_wrong_p2 = 1  #aimed wrong penalty is set to 1
+    else
+        aimed_wrong_p2 = 0
+    end
+    if xp_1[t2] + 1 > data.aimed[p1]
+        aimed_wrong_p1 = 1  #aimed wrong penalty is set to 1
+    else
+        aimed_wrong_p1 = 0
+    end
+    xp_1[t2] += 1
+    new_idle_p1 = findMinIdle(data,xp_1)
+    delta_idle_p1 = remove_idle_p1 - new_idle_p1 # Should be positive or zero
+    xp_2[t1] += 1
+    new_idle_p2 = findMinIdle(data,xp_2)
+    delta_idle_p2 = remove_idle_p2 - new_idle_p2 # Should be positive or zero
+    delta_insert = aimed_wrong_p1 + aimed_wrong_p2 + delta_idle_p1 + delta_idle_p2
+
+    return sol.obj + delta_remove + delta_insert
+end
+
 
 P = 37
 data = read_DR_data(P)
