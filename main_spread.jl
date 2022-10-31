@@ -5,7 +5,7 @@ include("ValidateSolution.jl")
 P = 37
 data = read_DR_data(P)
 
-sol = MIPExpansion(data, 120, 1)
+sol = MIPExpansion(data, 120,0, 1)
 
 checkSolution(data,sol)
 

@@ -1,12 +1,15 @@
 using JuMP, Gurobi
-genv = Gurobi.Env()
+const genv = Gurobi.Env()
 function MIP(data, time_limit, solution_limit, log)
+    model = Model(optimizer_with_attributes(() -> Gurobi.Optimizer(genv)))
+    if log  == 0
+        set_silent(model)
+    end
+
     if time_limit > 0
-        model = Model(optimizer_with_attributes(() -> Gurobi.Optimizer(genv), "TimeLimit" => time_limit, "LogToConsole" => log, "OutputFlag" => log))
+        set_optimizer_attribute(model,"TimeLimit", time_limit)
     elseif solution_limit > 0
-        model = Model(optimizer_with_attributes(() -> Gurobi.Optimizer(genv), "SolutionLimit" => solution_limit, "LogToConsole" => log, "OutputFlag" => log))
-    else
-        model = Model(optimizer_with_attributes(Gurobi.Optimizer, "LogToConsole" => log, "OutputFlag" => log))
+        set_optimizer_attribute(model,"SolutionLimit", solution_limit) #, "LogToConsole" => log, "OutputFlag" => log)
     end
 
     @variable(model, x[1:data.T, 1:data.P] >= 0, Int)

@@ -106,17 +106,13 @@ function findMinIdle(data, xp)
 
     minT = Inf
     t1 = findfirst(x -> x==1, xp)
-    if xp[t1] > 0
-        for t2 = (t1+1):data.stop 
-            if xp[t2] > 0
-                if t2-t1 < minT
-                    minT = t2-t1
-                end
-                t1=t2
+    for t2 = (t1+1):data.stop 
+        if xp[t2] > 0
+            if t2-t1 < minT
+                minT = t2-t1
             end
+            t1=t2
         end 
-    else 
-        t1 += 1
     end
     return minT
 end

@@ -1,13 +1,17 @@
 using JuMP, Gurobi
 genv = Gurobi.Env()
-function MIPExpansion(data, time_limit, solution_count, logging)
-    if solution_count > 0
-        model = Model(optimizer_with_attributes(Gurobi.Optimizer, "LogToConsole" => logging, "OutputFlag" => logging, "SolutionLimit" => 1))
-    elseif time_limit > 0
-        model = Model(optimizer_with_attributes(() -> Gurobi.Optimizer(genv), "TimeLimit" => time_limit, "LogToConsole" => logging, "OutputFlag" => logging))
-    else
-        model = Model(optimizer_with_attributes(Gurobi.Optimizer, "LogToConsole" => logging, "OutputFlag" => logging))
+function MIPExpansion(data, time_limit, solution_limit, log)
+    model = Model(optimizer_with_attributes(() -> Gurobi.Optimizer(genv)))
+    if log  == 0
+        set_silent(model)
     end
+
+    if time_limit > 0
+        set_optimizer_attribute(model,"TimeLimit", time_limit)
+    elseif solution_limit > 0
+        set_optimizer_attribute(model,"SolutionLimit", solution_limit) #, "LogToConsole" => log, "OutputFlag" => log)
+    end
+
     #model = Model(optimizer_with_attributes(Gurobi.Optimizer, "LogToConsole" => logging, "OutputFlag" => logging, "SolutionLimit" => 1))
     @variable(model, x[1:data.T, p = 1:data.P, 1:data.S[p]], Bin) # We can't have more than scope of each priority for now
     @variable(model, f[1:data.T,1:data.M] >= 0) # Freelance hours

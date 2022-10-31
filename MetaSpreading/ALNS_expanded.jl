@@ -211,7 +211,7 @@ end
 
 function delta_insert(data, sol, t, p)
     if sol.k[p] > 0
-        penalty_scope = data.penalty_S[p] 
+        penalty_scope = -data.penalty_S[p] 
     else
         penalty_scope = 0
     end
@@ -223,7 +223,8 @@ function delta_insert(data, sol, t, p)
     xp = deepcopy(sol.x[:,p])
     xp[t] += 1
     new_idle = findMinIdle(data,xp)
-    return sol.obj - data.reward[p]  - penalty_scope + aimed_wrong + sol.L[p] - new_idle
+    delta_idle = sol.L[p] - new_idle # Should be positive or zero
+    return sol.obj - data.reward[p] + penalty_scope + aimed_wrong + delta_idle
 end
 
 function delta_remove(data, sol, t, p)
@@ -233,14 +234,15 @@ function delta_remove(data, sol, t, p)
         penalty_scope = 0
     end
     if sol.g[t,p] > 0
-        aimed_wrong = 1  #aimed wrong penalty is set to 1
+        aimed_wrong = -1  #aimed wrong penalty is set to 1
     else
         aimed_wrong = 0
     end
     xp = deepcopy(sol.x[:,p])
     xp[t] -= 1
     new_idle = findMinIdle(data,xp)
-    return sol.obj + penalty_scope + data.reward[p] - aimed_wrong + sol.L[p] - new_idle
+    delta_idle = sol.L[p] - new_idle # Should be negative or zero
+    return sol.obj + data.reward[p] + penalty_scope + aimed_wrong + delta_idle
 end
 
 

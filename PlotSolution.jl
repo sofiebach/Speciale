@@ -330,6 +330,7 @@ function drawHeatmap(inventory_used, staff_used, data, sol, filename)
     import matplotlib.pyplot as plt
     import seaborn as sns
     from matplotlib import ticker
+    cmap = matplotlib.cm.get_cmap('Blues')
     
     def heatmap(used_inv, used_prod, channels, media, filename):
         timesteps = np.arange(1,63)
@@ -346,10 +347,7 @@ function drawHeatmap(inventory_used, staff_used, data, sol, filename)
         #xticks = ticker.MaxNLocator(nbins=M, integer=True)
         #print(xticks())
         
-
-
-        
-        p1 = sns.heatmap(df1, linewidths=.5, ax = ax1, vmin=0, vmax=max_total, cbar_ax = cbar_ax, cmap = 'inferno')
+        p1 = sns.heatmap(df1, linewidths=.5, ax = ax1, vmin=0, vmax=max_total, cbar_ax = cbar_ax, cmap = 'viridis')
         ax1.xaxis.set_ticks(np.arange(0,62,5))
         ax1.xaxis.set_major_formatter(ticker.FormatStrFormatter('%d'))
         ax1.tick_params(axis = 'x', labelsize=12, rotation=0)
@@ -357,8 +355,10 @@ function drawHeatmap(inventory_used, staff_used, data, sol, filename)
         ax1.set_xlabel("Time (weeks)")
         ax1.title.set_text('Production hours')
         ax1.set_xlim([0, 62])
-    
-        p2 = sns.heatmap(df2, linewidths=.5, ax = ax2, vmin=0, vmax=max_total, cbar_ax = cbar_ax, cmap = 'inferno') 
+        
+        
+
+        p2 = sns.heatmap(df2, linewidths=.5, ax = ax2, vmin=0, vmax=max_total, cbar_ax = cbar_ax, cmap = 'viridis') 
         ax2.xaxis.set_ticks(np.arange(0,62,5))
         ax2.xaxis.set_major_formatter(ticker.FormatStrFormatter('%d'))
         ax2.tick_params(axis = 'x', labelsize=12, rotation=0)
