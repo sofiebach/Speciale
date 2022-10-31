@@ -3,8 +3,8 @@
 function tuneAcceptanceCriteria(data, temperatures, alphas)
     filename = "tuning/T_alpha"
     outFile = open(filename, "w")
-    time_limit = 30
-    num_iter = 2
+    time_limit = 60
+    num_iter = 5
 
     best_obj = Inf
     best_T = 0
@@ -34,7 +34,7 @@ function tuneAcceptanceCriteria(data, temperatures, alphas)
     return best_T, best_alpha
 end
 
-function tuneDestroy(data, cluster, random, worst, related)
+function tuneDestroy(data, cluster, random, worst, related, filename)
     time_limit = 10
     num_iter = 5
     T = 1000
@@ -46,7 +46,6 @@ function tuneDestroy(data, cluster, random, worst, related)
     best_worst = 0
     best_related = 0
 
-    filename = "tuning/destroy_fracs"
     outFile = open(filename, "w")
     for frac_cluster in cluster, frac_random in random, thres_worst in worst, frac_related in related
         println("cluster: ", frac_cluster)
