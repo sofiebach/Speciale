@@ -19,25 +19,6 @@ function selectMethod(prob)
     end
 end
 
-function diversify!(data, sol)
-    max_swaps = 5
-    num_swaps = 0
-    
-    while num_swaps < max_swaps
-        r1 = rand(data.start:data.stop)
-        r2 = rand(data.start:data.stop)
-        p1 = rand(1:data.P)
-        p2 = rand(1:data.P)
-        t1 = min(r1, r2)
-        t2 = max(r1, r2)
-        # check if swap if valid
-        if (checkSwap(data, sol, t1, p1, t2, p2) && p1 != p2 && t1 != t2)
-            swap!(data, sol, t1, p1, t2, p2)
-            num_swaps += 1
-        end
-    end
-end
-
 function ALNS(data, time_limit, T=1000, alpha=0.999, frac_cluster=0.1, frac_random=0.1, thres_worst=10, frac_related=0.2)    
     it = 0
     sol = randomInitial(data)

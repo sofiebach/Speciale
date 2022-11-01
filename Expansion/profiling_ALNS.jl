@@ -1,6 +1,9 @@
 include("ALNS_expanded.jl")
 include("../tuning/tuning.jl")
 include("../ReadWrite.jl")
+include("LocalSearch.jl")
+include("../Validation/ValidateSolution.jl")
+include("../Validation/PlotSolution.jl")
 
 # Read best T and best alpha
 params1, objs1 = readTuneAcceptance()
@@ -47,4 +50,9 @@ avg_time_repair2 = params2.time_repair ./ params2.num_repair
 println("Average repair times: ", avg_time_repair2)
 
 
+sol = ILS(data, 60)
+
+used_inv, used_prod = checkSolution(data, sol)
+
+drawHeatmap(used_inv, used_prod, data, sol, "sof_test")
 

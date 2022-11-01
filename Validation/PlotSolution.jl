@@ -1,10 +1,17 @@
 using Luxor
+using XLSX
 using PlotlyJS
 using Colors
+# import Pkg
+# ENV["PYTHON"] = "/Users/sofiebach/opt/anaconda3/envs/skole/bin/python3"
+# Pkg.build("PyCall")
 using PyCall
-using XLSX
+# @pyimport pandas as pd
+# @pyimport numpy as np
+# @pyimport matplotlib.pyplot as plt
+# @pyimport seaborn as sns
+
 include("ValidateSolution.jl")
-# pyimport_conda("pandas", PKG)
 
 function print_solution(sol)
     println("Objective: ", sol.obj)
@@ -379,11 +386,11 @@ end
 
 function chosenDestroyRepair(params)
     py"""
-    import pandas as pd
-    import numpy as np
-    import matplotlib.pyplot as plt
-    import seaborn as sns
-    from matplotlib import ticker
+    # import pandas as pd
+    # import numpy as np
+    # import matplotlib.pyplot as plt
+    # import seaborn as sns
+    # from matplotlib import ticker
     
     def destroyRapairHist(params):
         plt.hist(params.destroys)

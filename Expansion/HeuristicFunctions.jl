@@ -225,6 +225,25 @@ function swap!(data, sol, t1, p1, t2, p2)
     insert!(data, sol, t1, p2)
 end
 
+function diversify!(data, sol)
+    max_swaps = 5
+    num_swaps = 0
+    
+    while num_swaps < max_swaps
+        r1 = rand(data.start:data.stop)
+        r2 = rand(data.start:data.stop)
+        p1 = rand(1:data.P)
+        p2 = rand(1:data.P)
+        t1 = min(r1, r2)
+        t2 = max(r1, r2)
+        # check if swap if valid
+        if (checkSwap(data, sol, t1, p1, t2, p2) && p1 != p2 && t1 != t2)
+            swap!(data, sol, t1, p1, t2, p2)
+            num_swaps += 1
+        end
+    end
+end
+
 function greedyInsert!(data, sol)
     # loops through all timesteps and checks if it is possible to insert another priority
     for t = data.start:data.stop
