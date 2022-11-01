@@ -331,7 +331,6 @@ function drawHeatmap(inventory_used, staff_used, data, sol, filename)
     import matplotlib.pyplot as plt
     import seaborn as sns
     from matplotlib import ticker
-    cmap = matplotlib.cm.get_cmap('Blues')
     
     def heatmap(used_inv, used_prod, channels, media, filename):
         timesteps = np.arange(1,63)
@@ -377,6 +376,24 @@ function drawHeatmap(inventory_used, staff_used, data, sol, filename)
     py"heatmap"(used_cap_inv, used_cap_prod, channels, media, filename)
 
 end
+
+function chosenDestroyRepair(params)
+    py"""
+    import pandas as pd
+    import numpy as np
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+    from matplotlib import ticker
+    
+    def destroyRapairHist(params):
+        plt.hist(params.destroys)
+
+        
+        plt.show()
+    """
+    py"destroyRapairHist"(params)
+end
+
 
 
 function plotScope(data, sol, filename)
