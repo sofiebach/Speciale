@@ -1,8 +1,8 @@
-include("ReadWrite.jl")
+include("../ReadWrite.jl")
 
 include("MIPModelSpreading.jl")
-include("MetaSpreading/ALNS_expanded.jl")
-include("MetaSpreading/ConstructionHeuristics_expanded.jl")
+include("ALNS_expanded.jl")
+include("ConstructionHeuristics_expanded.jl")
 using Dates
 P = 37
 data = read_DR_data(P)
