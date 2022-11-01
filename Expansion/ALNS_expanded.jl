@@ -1,3 +1,6 @@
+include("ConstructionHeuristics_expanded.jl")
+include("MIPModelSpreading.jl")
+
 using Statistics
 
 function randomDestroy!(data, sol, frac)
@@ -343,10 +346,8 @@ function selectMethod(prob)
     end
 end
 
-function ALNS(data, time_limit)
+function ALNS(data, time_limit, T=1000, alpha=0.999, frac_cluster=0.1, frac_random=0.1, thres_worst=10, frac_related=0.2)
     it = 0
-    T = 1000
-    alpha = 0.999
     sol = randomInitial(data)
     best_sol = deepcopy(sol)
     temp_sol = deepcopy(sol)
@@ -387,17 +388,13 @@ function ALNS(data, time_limit)
         # Choose destroy method
         selected_destroy = selectMethod(prob_destroy)
         if selected_destroy == 1
-            frac = 0.1
-            clusterDestroy!(data,temp_sol,frac)
+            clusterDestroy!(data,temp_sol,frac_cluster)
         elseif selected_destroy == 2
-            frac = 0.1
-            randomDestroy!(data,temp_sol,frac)
+            randomDestroy!(data,temp_sol,frac_random)
         elseif selected_destroy == 3
-            thres = 10
-            worstDestroy!(data,temp_sol,thres)
+            worstDestroy!(data,temp_sol,thres_worst)
         else
-            frac = 0.2
-            relatedDestroy!(data, sol, frac)
+            relatedDestroy!(data, sol, frac_related)
         end
         
         # Choose repair method

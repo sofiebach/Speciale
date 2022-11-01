@@ -1,5 +1,4 @@
 
-
 function tuneAcceptanceCriteria(data, temperatures, alphas)
     filename = "tuning/T_alpha"
     outFile = open(filename, "w")
@@ -71,8 +70,7 @@ function tuneDestroy(data, cluster, random, worst, related, filename)
     return best_cluster, best_random, best_worst, best_related
 end
 
-function readTuneDestroy()
-    filename = "tuning/destroy_fracs"
+function readTuneDestroy(filename)
     file = open(filename)
 
     params = []
