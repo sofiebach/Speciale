@@ -1,338 +1,11 @@
+include("HeuristicFunctions.jl")
 include("ConstructionHeuristics_expanded.jl")
-include("MIPModelSpreading.jl")
-
-using Statistics
-
-function randomDestroy!(data, sol, frac)
-    n_destroy = round(sol.num_campaigns*frac)
-    while n_destroy > 0 
-        p = rand(1:data.P)
-        if sum(sol.x[:,p]) == 0
-            continue
-        end
-        r_times = findall(x -> x > 0, sol.x[:,p])
-
-        t = r_times[rand(1:length(r_times))]
-        remove!(data, sol, t, p)
-        n_destroy -= 1
-    end
-    #println(sol.obj)
-end
-
-function clusterDestroy!(data, sol, frac)
-    t_destroy = Int(round((data.stop - data.start)*frac))
-    rand_t = rand(data.start:(data.stop-t_destroy))
-    for t = rand_t:(rand_t+t_destroy), p = 1:data.P
-        while sol.x[t,p] > 0
-            remove!(data,sol,t,p)
-        end
-    end   
-end
-
-function worstDestroy!(data, sol, thres)
-    for t = data.start:data.stop, m = 1:data.M
-        while sol.f[t,m] > thres
-            t_hat = rand((t-data.Q_upper):(t-data.Q_lower))
-            p_worst = findall(x -> x > 0, sol.x[t_hat,:].*data.w[:,m])
-            if length(p_worst) > 0
-                remove!(data,sol,t_hat,rand(p_worst))
-            end
-        end
-    end
-end
-
-function relatedDestroy!(data, sol, frac)
-    n_destroy = round(sol.num_campaigns*frac)
-    sim = findSimilarity(data)
-    tabu = []
-    while n_destroy > 0
-        idx = filter!(x -> x ∉ tabu, collect(1:data.P))
-        max_k, p_idx = findmax(sol.k[idx])
-        p = idx[p_idx]
-        push!(tabu, p)
-        p_related = sortperm(-sim[p,:])
-        for p_r in p_related 
-            if sim[p,p_r] > 0 && sum(sol.x[:,p_r]) > 0
-                n_remove = ceil(sum(sol.x[:,p_r]) / 2)
-                while n_remove > 0
-                    r_times = findall(x -> x > 0, sol.x[:,p_r])
-                    t = r_times[rand(1:length(r_times))]
-                    remove!(data, sol, t, p_r)
-                    n_remove -= 1
-                    n_destroy -= 1
-                end
-                break
-            end
-        end
-    end
-end
-
-function remove!(data, sol, t, p)
-    sol.x[t,p] -= 1
-    sol.num_campaigns -= 1
-    
-    # update inventory
-    l_idx = 1
-    for t_hat = (t+data.L_lower):(t+data.L_upper)
-        for c = 1:data.C
-            sol.I_cap[t_hat, c] += data.u[l_idx,p,c]
-        end
-        l_idx += 1
-    end
-    
-    # update production
-    for t_hat = (t+data.Q_lower):(t+data.Q_upper) 
-        for m = 1:data.M
-            sol.H_cap[t_hat, m] += data.w[p, m]
-            if sol.H_cap[t_hat, m] < 0
-                sol.f[t_hat, m] = -sol.H_cap[t_hat, m]
-            else
-                sol.f[t_hat,m] = 0
-            end
-        end
-    end
-
-    # update scope
-    if sum(sol.x[:,p]) < data.S[p]
-        sol.k[p] += 1
-    else 
-        sol.k[p] = 0
-    end
-    
-    # update aimed
-    if sol.g[t,p] > 0
-        sol.g[t,p] -= 1
-    end
-
-    sol.L[p] = findMinIdle(data,sol.x[:,p])
-    # update objective
-    findObjective!(data, sol)
-end
-
-function modelRepair!(data, sol)
-    MIPdata = deepcopy(data)
-    MIPdata.I = deepcopy(sol.I_cap)
-    MIPdata.H = deepcopy(sol.H_cap)
-    MIPdata.H[MIPdata.H .< 0.0] .= 0.0
-    MIPdata.F = deepcopy(data.F - transpose(sum(sol.f, dims=1))[:,1])
-    MIPdata.S = deepcopy(sol.k)
-    
-    MIPsol = MIPExpansion(MIPdata, 0, 2, 0)
-
-    for p = 1:data.P, t = 1:data.T 
-        for n = 1:MIPsol.x[t,p]
-            insert!(data, sol, t, p)
-        end
-    end
-end
-
-function greedyRepair!(data, sol)
-    for p_bar in data.P_bar, n = 1:sol.k[p_bar]
-        t, p = bestInsertion(data, sol, [p_bar])
-        if t != 0 && p != 0
-            insert!(data, sol, t, p)
-            #println("Inserted ", p, " at time ", t)
-        end
-    end
-
-    sorted_idx = sortperm(-data.penalty_S)
-    while true
-        #println("Vi er i while")
-        t, p = bestInsertion(data, sol, sorted_idx)
-        if t != 0 && p != 0
-            insert!(data, sol, t, p)
-            #println("Inserted ", p, " at time ", t)
-        else
-            break
-        end
-    end
-end
-
-function bestInsertion(data, sol, sorted_idx)
-    best_obj = sol.obj
-    best_p = 0
-    best_t = 0
-    
-    for p in sorted_idx 
-        for t = data.start:data.stop
-            if fits(data, sol, t, p) 
-                new_obj = delta_insert(data, sol, t, p)
-                if new_obj < best_obj
-                    best_obj = new_obj
-                    best_p = p 
-                    best_t = t 
-                end
-            end
-        end
-    end
-    return best_t, best_p
-end
-
-function firstRepair!(data, sol)
-    for p_bar in data.P_bar, n = 1:sol.k[p_bar]
-        t, p = firstInsertion(data, sol, [p_bar])
-        if t != 0 && p != 0
-            insert!(data, sol, t, p)
-            #println("Inserted ", p, " at time ", t)
-        end
-    end
-
-    shuffled_idx = shuffle(1:data.P)
-    while true
-        #println("Vi er i while")
-        t, p = firstInsertion(data, sol, shuffled_idx)
-        if t != 0 && p != 0
-            insert!(data, sol, t, p)
-            #println("Inserted ", p, " at time ", t)
-        else
-            break
-        end
-    end
-end
-
-
-function firstInsertion(data, sol, shuffled_idx)
-    best_obj = sol.obj
-    best_p = 0
-    best_t = 0
-    
-    for t = data.start:data.stop
-        for p in shuffled_idx
-            if fits(data, sol, t, p) 
-                new_obj = delta_insert(data, sol, t, p)
-                if new_obj < best_obj
-                    best_obj = new_obj
-                    best_p = p 
-                    best_t = t
-                    break
-                end 
-            end
-        end
-    end
-    return best_t, best_p
-end
-
-function regretRepair!(data, sol)
-    for p_bar in data.P_bar, n = 1:sol.k[p_bar]
-        t, p = regretInsertion(data, sol, [p_bar])
-        if t != 0 && p != 0
-            insert!(data, sol, t, p)
-        end
-    end
-
-    shuffled_idx = shuffle(1:data.P)
-    while true
-        t, p = regretInsertion(data, sol, shuffled_idx)
-        if t != 0 && p != 0
-            insert!(data, sol, t, p)
-        else
-            break
-        end
-    end
-end
-
-function regretInsertion(data, sol, priorities)
-    obj_best = ones(Float64, data.P)*Inf
-    obj_second = ones(Float64, data.P)*Inf
-    t_best = zeros(Int64, data.P)
-    
-    idx = 1
-    for p in priorities
-        for t = data.start:data.stop
-            if fits(data, sol, t, p) 
-                new_obj = delta_insert(data, sol, t, p)
-                if new_obj < obj_best[idx] && new_obj < sol.obj
-                    obj_second[idx] = obj_best[idx]
-                    obj_best[idx] = new_obj
-                    t_best[idx] = t 
-                elseif new_obj < obj_second[idx]
-                    obj_second[idx] = new_obj
-                end
-            end
-        end
-        idx += 1
-    end
-    loss = obj_second - obj_best
-    replace!(loss, NaN=>-1)
-    loss, idx = findmax(loss)
-    best_p = priorities[idx]
-    if loss >= 0
-        best_t = t_best[idx]
-    else 
-        best_p = 0
-        best_t = 0
-    end
-    return best_t, best_p
-end
-
-function delta_insert(data, sol, t, p)
-    if sol.k[p] > 0
-        penalty_scope = -data.penalty_S[p] 
-    else
-        penalty_scope = 0
-    end
-    if sol.x[t,p] + 1 > data.aimed[p]
-        aimed_wrong = 1  #aimed wrong penalty is set to 1
-    else
-        aimed_wrong = 0
-    end
-    xp = deepcopy(sol.x[:,p])
-    xp[t] += 1
-    new_idle = findMinIdle(data,xp)
-    delta_idle = sol.L[p] - new_idle # Should be positive or zero
-    return sol.obj - data.reward[p] + penalty_scope + aimed_wrong + delta_idle
-end
-
-function delta_remove(data, sol, t, p)
-    if sum(sol.x[:,p])-1 < data.S[p]
-        penalty_scope = data.penalty_S[p]
-    else
-        penalty_scope = 0
-    end
-    if sol.g[t,p] > 0
-        aimed_wrong = -1  #aimed wrong penalty is set to 1
-    else
-        aimed_wrong = 0
-    end
-    xp = deepcopy(sol.x[:,p])
-    xp[t] -= 1
-    new_idle = findMinIdle(data,xp)
-    delta_idle = sol.L[p] - new_idle # Should be negative or zero
-    return sol.obj + data.reward[p] + penalty_scope + aimed_wrong + delta_idle
-end
-
-
-function elapsed_time(start_time)
-    return round((time_ns()-start_time)/1e9, digits = 3)
-end
 
 function setProb(rho, prob)
     for i = 1:length(prob)
         prob[i] = rho[i]/sum(rho[:])
     end
     return prob
-end
-
-function findSimilarity(data)
-    sim = zeros(data.P, data.P)
-    for p1 = 1:(data.P-1)
-        for p2 = (p1+1):data.P
-            sim_u = PearsonSimilarity(data.u[:,p1,:], data.u[:,p2,:])
-            sim_w = PearsonSimilarity(data.w[p1,:], data.w[p2,:])
-
-            sim[p1,p2] = mean([sim_u, sim_w])
-            sim[p2,p1] = mean([sim_u, sim_w])
-        end 
-    end
-    return sim
-end
-
-function PearsonSimilarity(a, b)
-    mu_a =  mean(a)
-    mu_b = mean(b)
-    t = (sum((a.-mu_a).*(b.-mu_b)))
-    n = sqrt(sum((a.-mu_a).^2))*sqrt(sum((b.-mu_b).^2))
-    return t/n
 end
 
 function selectMethod(prob)
@@ -342,6 +15,25 @@ function selectMethod(prob)
         next_prob += prob[i]
         if chosen <= next_prob
             return i
+        end
+    end
+end
+
+function diversify!(data, sol)
+    max_swaps = 5
+    num_swaps = 0
+    
+    while num_swaps < max_swaps
+        r1 = rand(data.start:data.stop)
+        r2 = rand(data.start:data.stop)
+        p1 = rand(1:data.P)
+        p2 = rand(1:data.P)
+        t1 = min(r1, r2)
+        t2 = max(r1, r2)
+        # check if swap if valid
+        if (checkSwap(data, sol, t1, p1, t2, p2) && p1 != p2 && t1 != t2)
+            swap!(data, sol, t1, p1, t2, p2)
+            num_swaps += 1
         end
     end
 end
@@ -498,10 +190,10 @@ function ALNS(data, time_limit, T=1000, alpha=0.999, frac_cluster=0.1, frac_rand
     current_best=current_best, status=status, time_repair=time_repair, time_destroy=time_destroy, num_repair=num_repair, num_destroy=num_destroy)
 end
 
-
-
 function ALNS_uden_modelrepair(data, time_limit, T=1000, alpha=0.999, frac_cluster=0.1, frac_random=0.1, thres_worst=10, frac_related=0.2)    
     it = 0
+    best_it = 1
+    long_term_update = 1000
     sol = randomInitial(data)
     best_sol = deepcopy(sol)
     temp_sol = deepcopy(sol)
@@ -535,8 +227,15 @@ function ALNS_uden_modelrepair(data, time_limit, T=1000, alpha=0.999, frac_clust
 
     while elapsed_time(start_time) < time_limit
     #while it < 100
+        # diversification
+        if best_it > long_term_update
+            diversify!(data, sol)
+            best_it = 1
+            println("Diversified!")
+        end
+
         valid = true
-        it += 1
+
         # update probabilities
         if (it % 10 == 0)
             prob_destroy = setProb(rho_destroy, prob_destroy)
@@ -607,6 +306,9 @@ function ALNS_uden_modelrepair(data, time_limit, T=1000, alpha=0.999, frac_clust
         if !valid
             continue
         end
+
+        it += 1
+        best_it += 1
 
         # Update repair time
         time_repair[selected_repair] += elapsed_repair
