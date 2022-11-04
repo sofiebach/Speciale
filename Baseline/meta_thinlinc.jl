@@ -1,13 +1,12 @@
 include("../ReadWrite.jl")
 include("ALNS.jl")
 using Dates
+
 P = 37
 data = read_DR_data(P)
-timelimit = 120
-
-
-sol = randomInitial(data)
-sol, params = ALNS(data, timelimit)
+timelimit = 30
+modelRepair = true
+sol, params = ALNSBaseline(data, timelimit, modelRepair)
 
 
 

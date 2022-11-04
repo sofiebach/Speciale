@@ -73,13 +73,16 @@ function modelRepair!(data, sol)
     MIPdata.S = deepcopy(sol.k)
     
     MIPsol = MIPExpansion(MIPdata, 0, 2, 0)
-
-    for p = 1:data.P, t = 1:data.T 
-        for n = 1:MIPsol.x[t,p]
-            insert!(data, sol, t, p)
+    if MIPsol == 0
+        return
+    else
+        for p = 1:data.P, t = 1:data.T 
+            for n = 1:MIPsol.x[t,p]
+                insert!(data, sol, t, p)
+            end
         end
     end
-end
+end 
 
 function firstRepair!(data, sol)
     for p_bar in data.P_bar, n = 1:sol.k[p_bar]

@@ -13,10 +13,9 @@ function tuneAcceptanceCriteria(data, temperatures, alphas, gammas)
     best_alpha = 0
     best_gamma = 0
     for T in temperatures, alpha in alphas, gamma in gammas
-        println("T: ", T, " alpha: ", alpha, "gamma: ", gamma)
         objs = 0
         for k = 1:num_iter
-            sol, _ = ALNS_uden_modelRepair(data,time_limit,T,alpha,gamma)
+            sol, _ = ALNSBaseline(data,time_limit,false,T,alpha,gamma)
             objs += sol.obj
         end
         write(outFile, "T, alpha, gamma, avg objective\n")
@@ -49,13 +48,9 @@ function tuneDestroy(data, cluster, random, worst, related, filename)
 
     outFile = open(filename, "w")
     for frac_cluster in cluster, frac_random in random, thres_worst in worst, frac_related in related
-        println("cluster: ", frac_cluster)
-        println("random: ", frac_random)
-        println("worst: ", thres_worst)
-        println("related: ", frac_related)
         objs = 0
         for k = 1:num_iter
-            sol, _ = ALNS_uden_modelRepair(data, time_limit, T, alpha, gamma, frac_cluster, frac_random, thres_worst, frac_related)
+            sol, _ = ALNSBaseline(data, time_limit, false, T, alpha, gamma, frac_cluster, frac_random, thres_worst, frac_related)
             objs += sol.obj
         end
         write(outFile, "cluster, random, worst, related, avg objective\n")

@@ -1,20 +1,13 @@
 include("../ReadWrite.jl")
-include("MIPModelSpreading.jl")
 include("../Validation/ValidateSolution.jl")
-include("ConstructionHeuristics_expanded.jl")
 include("ALNS_expanded.jl")
 
 P = 37
 data = read_DR_data(P)
 
-# sol = randomInitial(data)
-# println(sol.obj)
-# clusterDestroy(data,sol,0.2)
-# println(sol.obj)
-# regretRepair(data,sol)
-# println(sol.obj)
-
-sol, params = ALNS(data, 60)
+time_limit = 180
+modelRepair = false
+sol, params = ALNSExpanded(data, time_limit, modelRepair)
 
 checkSolution(data, sol)
 

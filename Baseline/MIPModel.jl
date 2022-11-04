@@ -1,5 +1,5 @@
 using JuMP, Gurobi
-const genv = Gurobi.Env()
+genv = Gurobi.Env()
 function MIP(data, time_limit, solution_limit, log)
     model = Model(optimizer_with_attributes(() -> Gurobi.Optimizer(genv)))
     if log  == 0
@@ -40,6 +40,9 @@ function MIP(data, time_limit, solution_limit, log)
 
     JuMP.optimize!(model)
 
+    if primal_status(model) != FEASIBLE_POINT
+        return 0
+    end
     # Create solution object
     sol = Sol(data.T,data.P,data.M)
     sol.obj = objective_value(model)
