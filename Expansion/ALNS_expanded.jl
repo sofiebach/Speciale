@@ -30,11 +30,14 @@ function ALNS(data, time_limit, T=1000, alpha=0.999, frac_cluster=0.1, frac_rand
     time_destroy = zeros(4)
     prob_destroy = zeros(4)
     num_destroy = zeros(4)
+    destroy_names = Array{String}(undef,4)
 
     rho_repair = ones(4)
     prob_repair = zeros(4)
     time_repair = zeros(4)
     num_repair = zeros(4)
+    repair_names = Array{String}(undef,4)
+    
 
     prob_destroy = setProb(rho_destroy, prob_destroy)
     prob_repair = setProb(rho_repair, prob_repair)
@@ -51,6 +54,8 @@ function ALNS(data, time_limit, T=1000, alpha=0.999, frac_cluster=0.1, frac_rand
     current_obj = []
     current_best = []
     status = []
+    prob_destroy_t = []
+    prob_repair_t = []
 
     while elapsed_time(start_time) < time_limit
     #while it < 100
@@ -65,15 +70,19 @@ function ALNS(data, time_limit, T=1000, alpha=0.999, frac_cluster=0.1, frac_rand
         # Choose destroy method
         selected_destroy = selectMethod(prob_destroy)
         if selected_destroy == 1
+            destroy_names[1] = "Cluster destroy"
             destroy_time = time_ns()
             clusterDestroy!(data,temp_sol,frac_cluster)
         elseif selected_destroy == 2
+            destroy_names[2] = "Random destroy"
             destroy_time = time_ns()
             randomDestroy!(data,temp_sol,frac_random)
         elseif selected_destroy == 3
+            destroy_names[3] = "Worst destroy"
             destroy_time = time_ns()
             worstDestroy!(data,temp_sol,thres_worst)
         else
+            destroy_names[4] = "Related destroy"
             destroy_time = time_ns()
             relatedDestroy!(data, sol, frac_related)
         end
@@ -86,6 +95,7 @@ function ALNS(data, time_limit, T=1000, alpha=0.999, frac_cluster=0.1, frac_rand
         selected_repair = selectMethod(prob_repair)
         
         if selected_repair == 1
+            repair_names[1] = "Greedy repair"
             repair_time = time_ns()
             greedyRepair!(data,temp_sol)
             elapsed_repair = elapsed_time(repair_time)
@@ -98,6 +108,7 @@ function ALNS(data, time_limit, T=1000, alpha=0.999, frac_cluster=0.1, frac_rand
                 end
             end
         elseif selected_repair == 2
+            repair_names[2] = "First repair"
             repair_time = time_ns()
             firstRepair!(data,temp_sol)
             elapsed_repair = elapsed_time(repair_time)
@@ -109,7 +120,8 @@ function ALNS(data, time_limit, T=1000, alpha=0.999, frac_cluster=0.1, frac_rand
                     break
                 end
             end
-        elseif selected_repair == 3 
+        elseif selected_repair == 3
+            repair_names[3] = "Regret repair" 
             repair_time = time_ns()
             regretRepair!(data,temp_sol)
             elapsed_repair = elapsed_time(repair_time)
@@ -122,6 +134,7 @@ function ALNS(data, time_limit, T=1000, alpha=0.999, frac_cluster=0.1, frac_rand
                 end
             end
         else
+            repair_names[4] = "Model repair"
             repair_time = time_ns()
             modelRepair!(data,temp_sol)
             elapsed_repair = elapsed_time(repair_time)
@@ -161,14 +174,19 @@ function ALNS(data, time_limit, T=1000, alpha=0.999, frac_cluster=0.1, frac_rand
         end
         append!(status, w)
         append!(current_best, best_sol.obj)
+        append!(prob_destroy_t, prob_destroy)
+        append!(prob_repair_t, prob_repair)
 
         rho_destroy[selected_destroy] = gamma*rho_destroy[selected_destroy] + (1-gamma)*w
         rho_repair[selected_repair] = gamma*rho_repair[selected_repair] + (1-gamma)*w
         T = alpha * T
      
     end
-    return best_sol, (prob_destroy=prob_destroy, prob_repair=prob_repair, destroys=destroys, repairs=repairs, current_obj=current_obj,
-    current_best=current_best, status=status, time_repair=time_repair, time_destroy=time_destroy, num_repair=num_repair, num_destroy=num_destroy)
+    prob_destroy_t = reshape(prob_destroy_t, length(num_destroy),:)
+    prob_repair_t = reshape(prob_repair_t, length(num_repair),:)
+    return best_sol, (prob_destroy=prob_destroy, prob_repair=prob_repair, prob_destroy_t = prob_destroy_t, prob_repair_t = prob_repair_t, 
+    destroys=destroys, repairs=repairs, current_obj=current_obj, current_best=current_best, status=status, time_repair=time_repair, 
+    time_destroy=time_destroy, num_repair=num_repair, num_destroy=num_destroy, destroy_names = destroy_names, repair_names = repair_names)
 end
 
 function ALNS_uden_modelrepair(data, time_limit, T=1000, alpha=0.999, frac_cluster=0.1, frac_random=0.1, thres_worst=10, frac_related=0.2)    
@@ -185,11 +203,13 @@ function ALNS_uden_modelrepair(data, time_limit, T=1000, alpha=0.999, frac_clust
     time_destroy = zeros(4)
     prob_destroy = zeros(4)
     num_destroy = zeros(4)
+    destroy_names = Array{String}(undef,4)
 
     rho_repair = ones(3)
     prob_repair = zeros(3)
     time_repair = zeros(3)
     num_repair = zeros(3)
+    repair_names = Array{String}(undef,3)
 
     prob_destroy = setProb(rho_destroy, prob_destroy)
     prob_repair = setProb(rho_repair, prob_repair)
@@ -206,6 +226,8 @@ function ALNS_uden_modelrepair(data, time_limit, T=1000, alpha=0.999, frac_clust
     current_obj = []
     current_best = []
     status = []
+    prob_destroy_t = [] 
+    prob_repair_t = []
 
     while elapsed_time(start_time) < time_limit
         valid = true
@@ -228,15 +250,19 @@ function ALNS_uden_modelrepair(data, time_limit, T=1000, alpha=0.999, frac_clust
         # Choose destroy method
         selected_destroy = selectMethod(prob_destroy)
         if selected_destroy == 1
+            destroy_names[1] = "Cluster destroy"
             destroy_time = time_ns()
             clusterDestroy!(data,temp_sol,frac_cluster)
         elseif selected_destroy == 2
+            destroy_names[2] = "Random destroy"
             destroy_time = time_ns()
             randomDestroy!(data,temp_sol,frac_random)
         elseif selected_destroy == 3
+            destroy_names[3] = "Worst destroy"
             destroy_time = time_ns()
             worstDestroy!(data,temp_sol,thres_worst)
         else
+            destroy_names[4] = "Related destroy"
             destroy_time = time_ns()
             relatedDestroy!(data, sol, frac_related)
         end
@@ -249,6 +275,7 @@ function ALNS_uden_modelrepair(data, time_limit, T=1000, alpha=0.999, frac_clust
         selected_repair = selectMethod(prob_repair)
         
         if selected_repair == 1
+            repair_names[1] = "Greedy repair"
             repair_time = time_ns()
             greedyRepair!(data,temp_sol)
             elapsed_repair = elapsed_time(repair_time)
@@ -261,6 +288,7 @@ function ALNS_uden_modelrepair(data, time_limit, T=1000, alpha=0.999, frac_clust
                 end
             end
         elseif selected_repair == 2
+            repair_names[2] = "First repair"
             repair_time = time_ns()
             firstRepair!(data,temp_sol)
             elapsed_repair = elapsed_time(repair_time)
@@ -273,6 +301,7 @@ function ALNS_uden_modelrepair(data, time_limit, T=1000, alpha=0.999, frac_clust
                 end
             end
         else
+            repair_names[3] = "Regret repair"
             repair_time = time_ns()
             regretRepair!(data,temp_sol)
             elapsed_repair = elapsed_time(repair_time)
@@ -323,12 +352,17 @@ function ALNS_uden_modelrepair(data, time_limit, T=1000, alpha=0.999, frac_clust
         end
         append!(status, w)
         append!(current_best, best_sol.obj)
+        append!(prob_destroy_t, prob_destroy)
+        append!(prob_repair_t, prob_repair)
 
         rho_destroy[selected_destroy] = gamma*rho_destroy[selected_destroy] + (1-gamma)*w
         rho_repair[selected_repair] = gamma*rho_repair[selected_repair] + (1-gamma)*w
         T = alpha * T
      
     end
-    return best_sol, (prob_destroy=prob_destroy, prob_repair=prob_repair, destroys=destroys, repairs=repairs, current_obj=current_obj, 
-    current_best=current_best, status=status, time_repair=time_repair, time_destroy=time_destroy, num_repair=num_repair, num_destroy=num_destroy)
+    prob_destroy_t = reshape(prob_destroy_t, length(num_destroy),:)
+    prob_repair_t = reshape(prob_repair_t, length(num_repair),:)
+    return best_sol, (prob_destroy=prob_destroy, prob_repair=prob_repair, destroys=destroys,  prob_destroy_t = prob_destroy_t,
+    prob_repair_t = prob_repair_t, repairs=repairs, current_obj=current_obj, current_best=current_best, status=status, 
+    time_repair=time_repair, time_destroy=time_destroy, num_repair=num_repair, num_destroy=num_destroy, destroy_names = destroy_names, repair_names = repair_names)
 end

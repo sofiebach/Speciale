@@ -316,8 +316,6 @@ function drawRadioSchedule(data, sol, filename)
     preview()
 end
 
-
-
 function drawHeatmap(inventory_used, staff_used, data, sol, filename)       
     channels = XLSX.readdata("data/data_inventory_consumption.xlsx", "Mapping", "B2:B13")[1:data.C]
     media = XLSX.readdata("data/data_staffing_constraint.xlsx", "Bemanding", "A2:A5")[1:data.M]
@@ -340,8 +338,7 @@ function drawHeatmap(inventory_used, staff_used, data, sol, filename)
     from matplotlib import ticker
     
     def heatmap(used_inv, used_prod, channels, media, filename):
-        timesteps = np.arange(1,63)
-        
+        timesteps = np.arange(1,(len(used_inv)+1))
         df1 = pd.DataFrame(np.transpose(used_prod), index = media)#,  columns = timesteps)
         df2 = pd.DataFrame(np.transpose(used_inv), index = channels)#,  columns = timesteps)
 
@@ -355,18 +352,18 @@ function drawHeatmap(inventory_used, staff_used, data, sol, filename)
         #print(xticks())
         
         p1 = sns.heatmap(df1, linewidths=.5, ax = ax1, vmin=0, vmax=max_total, cbar_ax = cbar_ax, cmap = 'viridis')
-        ax1.xaxis.set_ticks(np.arange(0,62,5))
+        ax1.xaxis.set_ticks(np.arange(0,len(used_inv),5))
         ax1.xaxis.set_major_formatter(ticker.FormatStrFormatter('%d'))
         ax1.tick_params(axis = 'x', labelsize=12, rotation=0)
         ax1.tick_params(axis = 'y', labelsize=12)
         ax1.set_xlabel("Time (weeks)")
         ax1.title.set_text('Production hours')
-        ax1.set_xlim([0, 62])
+        ax1.set_xlim([0, len(used_inv)])
         
         
 
         p2 = sns.heatmap(df2, linewidths=.5, ax = ax2, vmin=0, vmax=max_total, cbar_ax = cbar_ax, cmap = 'viridis') 
-        ax2.xaxis.set_ticks(np.arange(0,62,5))
+        ax2.xaxis.set_ticks(np.arange(0,len(used_inv),5))
         ax2.xaxis.set_major_formatter(ticker.FormatStrFormatter('%d'))
         ax2.tick_params(axis = 'x', labelsize=12, rotation=0)
         ax2.tick_params(axis = 'y', labelsize=12)
@@ -384,21 +381,57 @@ function drawHeatmap(inventory_used, staff_used, data, sol, filename)
 
 end
 
-function chosenDestroyRepair(params)
-    py"""
-    # import pandas as pd
-    # import numpy as np
-    # import matplotlib.pyplot as plt
-    # import seaborn as sns
-    # from matplotlib import ticker
-    
-    def destroyRapairHist(params):
-        plt.hist(params.destroys)
+function solutionTracking(params, filename)
 
+    rejected = findall(x -> x <= 1, params.status)
+    accepted = findall(x -> x == 5, params.status)
+    better = findall(x -> x == 10, params.status)
+    
+    py"""
+    import pandas as pd
+    import numpy as np
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+    from matplotlib import ticker
+    
+    def solutionPlot(params, rejected, accepted, better, filename):
         
+        plt.plot(rejected[::10], np.array(params.current_obj)[rejected.astype(int)-1][::10], 'bo', markersize = 4)
+        plt.plot(accepted[::10], np.array(params.current_obj)[accepted.astype(int)-1][::10], 'yo', markersize = 4)
+        plt.plot(better, np.array(params.current_obj)[better.astype(int)-1], 'ro', markersize = 4)
+        plt.legend(["Rejected", "Accepted", "New best"])
+        plt.savefig("output/" + filename + ".png")
         plt.show()
     """
-    py"destroyRapairHist"(params)
+    py"solutionPlot"(params,rejected, accepted, better, filename)
+end
+
+
+function probabilityTracking(params, filename)
+   
+    py"""
+    import pandas as pd
+    import numpy as np
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+    from matplotlib import ticker
+
+    def progDR(params, filename):
+        f,(ax1,ax2) = plt.subplots(2,1, figsize = (12,8))
+        i = 0
+        while i < len(params.num_destroy):
+            ax1.plot(params.prob_destroy_t[i])
+            ax1.legend(params.destroy_names)
+            i += 1
+        i = 0
+        while i < len(params.num_repair):
+            ax2.plot(params.prob_repair_t[i])
+            ax2.legend(params.repair_names)
+            i += 1
+        plt.savefig("output/" + filename + ".png")
+        plt.show()
+    """
+    py"progDR"(params, filename)
 end
 
 
