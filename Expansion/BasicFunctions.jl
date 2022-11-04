@@ -1,4 +1,5 @@
 using Random
+using Statistics
 
 function insert!(data, sol, t, p)
     sol.x[t,p] += 1

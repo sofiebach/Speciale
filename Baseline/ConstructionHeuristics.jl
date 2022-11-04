@@ -1,4 +1,4 @@
-using Random
+include("BasicFunctions.jl")
 
 # Struct for holding the instance
 mutable struct HeuristicSol
@@ -37,92 +37,4 @@ function randomInitial(data)
     
     return sol
 end
-
-function randomInsert!(data, sol, priorities)
-    for p in priorities
-        r_times = shuffle(collect(data.start:data.stop))
-        for n = 1:data.S[p], t in r_times
-            if sol.k[p] == 0
-                break
-            end
-            if fits(data, sol, t, p)
-                insert!(data, sol, t, p)
-            end
-        end
-    end
-end
-
-function insert!(data, sol, t, p)
-    sol.x[t,p] += 1
-    sol.num_campaigns += 1
-
-    # update inventory
-    l_idx = 1
-    for t_hat = (t+data.L_lower):(t+data.L_upper)
-        for c = 1:data.C
-            sol.I_cap[t_hat, c] -= data.u[l_idx,p,c]
-        end
-        l_idx += 1
-    end
-
-    # update production
-    for m = 1:data.M
-        for t_hat = (t+data.Q_lower):(t+data.Q_upper)
-            sol.H_cap[t_hat, m] -= data.w[p, m]
-            if sol.H_cap[t_hat, m] < 0
-                sol.f[t_hat, m] = -sol.H_cap[t_hat, m]
-            end
-        end
-    end
-
-    # update scope
-    if sol.k[p] > 0
-        sol.k[p] -= 1
-    end
-
-    findObjective!(data, sol)
-end
-
-
-function fits(data, sol, t, p)
-    if t < data.start || t > data.stop
-        println("Select t between start and stop.")
-        return false
-    end
-
-    l_idx = 1
-    for t_hat = (t+data.L_lower):(t+data.L_upper)
-        for c = 1:data.C
-            grp = data.u[l_idx,p,c]
-            if sol.I_cap[t_hat, c] - grp < 0
-                return false
-            end
-        end
-        l_idx += 1
-    end
-
-    for m = 1:data.M
-        freelancers_needed = 0
-        for t_hat = (t+data.Q_lower):(t+data.Q_upper) 
-            if sol.H_cap[t_hat, m] - data.w[p, m] < 0
-                freelancers_needed += -(sol.H_cap[t_hat, m] - data.w[p, m])
-                if sum(sol.f[:,m]) + freelancers_needed > data.F[m] 
-                    return false
-                end
-            end
-        end
-    end    
-    
-    return true
-end
-
-function findObjective!(data, sol)
-    num_campaigns = sum(sum(sol.x, dims=1) .* transpose(data.reward))
-    scope = sum(data.penalty_S .* sol.k)
-    # freelance = sum(sum(sol.f, dims=1) .* data.penalty_f)
-    sol.obj =  scope - num_campaigns
-end
-
-
-
 

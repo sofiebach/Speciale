@@ -1,43 +1,45 @@
+include("../Baseline/ALNS.jl")
+include("../Baseline/ConstructionHeuristics.jl")
 
-function tuneAcceptanceCriteria(data, temperatures, alphas)
-    filename = "tuning/T_alpha"
+function tuneAcceptanceCriteria(data, temperatures, alphas, gammas)
+    filename = "results/acceptanceCriteria"
     outFile = open(filename, "w")
     time_limit = 60
     num_iter = 5
+    println("Will run for ", length(temperatures)*length(alphas)*length(gammas)*time_limit*num_iter/60/60, " hours.")
 
     best_obj = Inf
     best_T = 0
     best_alpha = 0
-    T_idx = 1
-    for T in temperatures
-        a_idx = 1
-        for alpha in alphas
-            println("T: ", T, " alpha: ", alpha)
-            objs = 0
-            for k = 1:num_iter
-                sol, _ = ALNS(data, time_limit, T, alpha)
-                objs += sol.obj
-            end
-            write(outFile, "T, alpha, avg objective\n")
-            write(outFile, join([T, alpha, objs/num_iter]," ")*"\n")
-            if objs / num_iter < best_obj 
-                best_obj = objs / num_iter
-                best_T = T
-                best_alpha = alpha
-            end
-            a_idx += 1
+    best_gamma = 0
+    for T in temperatures, alpha in alphas, gamma in gammas
+        println("T: ", T, " alpha: ", alpha, "gamma: ", gamma)
+        objs = 0
+        for k = 1:num_iter
+            sol, _ = ALNS_uden_modelRepair(data,time_limit,T,alpha,gamma)
+            objs += sol.obj
         end
-        T_idx += 1
+        write(outFile, "T, alpha, gamma, avg objective\n")
+        write(outFile, join([T, alpha, gamma, objs/num_iter]," ")*"\n")
+        if objs / num_iter < best_obj 
+            best_obj = objs / num_iter
+            best_T = T
+            best_alpha = alpha
+            best_gamma = gamma
+        end
     end
     close(outFile)
-    return best_T, best_alpha
+    return best_T, best_alpha, best_gamma
 end
 
 function tuneDestroy(data, cluster, random, worst, related, filename)
-    time_limit = 10
+    time_limit = 60
     num_iter = 5
+    println("Will run for ", length(cluster)*length(random)*length(worst)*length(related)*time_limit*num_iter/60/60, " hours.")
+
     T = 1000
-    alpha = 0.99
+    alpha = 0.9
+    gamma = 0.9
     
     best_obj = Inf
     best_cluster = 0
@@ -53,7 +55,7 @@ function tuneDestroy(data, cluster, random, worst, related, filename)
         println("related: ", frac_related)
         objs = 0
         for k = 1:num_iter
-            sol, _ = ALNS(data, time_limit, T, alpha, frac_cluster, frac_random, thres_worst, frac_related)
+            sol, _ = ALNS_uden_modelRepair(data, time_limit, T, alpha, gamma, frac_cluster, frac_random, thres_worst, frac_related)
             objs += sol.obj
         end
         write(outFile, "cluster, random, worst, related, avg objective\n")
@@ -91,7 +93,7 @@ function readTuneDestroy(filename)
 end
 
 function readTuneAcceptance()
-    filename = "tuning/T_alpha"
+    filename = "results/acceptanceCriteria"
     file = open(filename)
 
     params = []
@@ -100,8 +102,8 @@ function readTuneAcceptance()
     comment = 1
     for line in eachline(file)
         if comment % 2 == 0
-            T, alpha, obj = parse.(Float64, split(line))
-            push!(params, [T, alpha])
+            T, alpha, gamma, obj = parse.(Float64, split(line))
+            push!(params, [T, alpha, gamma])
             push!(objectives, obj)
         end
         comment += 1

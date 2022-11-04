@@ -172,9 +172,10 @@ function ALNS(data, time_limit, T=1000, alpha=0.999, frac_cluster=0.1, frac_rand
 end
 
 function ALNS_uden_modelrepair(data, time_limit, T=1000, alpha=0.999, frac_cluster=0.1, frac_random=0.1, thres_worst=10, frac_related=0.2)    
-    it = 0
+    it = 1
     best_it = 1
     long_term_update = 1000
+
     sol = randomInitial(data)
     best_sol = deepcopy(sol)
     temp_sol = deepcopy(sol)
@@ -207,15 +208,16 @@ function ALNS_uden_modelrepair(data, time_limit, T=1000, alpha=0.999, frac_clust
     status = []
 
     while elapsed_time(start_time) < time_limit
-    #while it < 100
-        # diversification
-        if best_it > long_term_update
-            diversify!(data, sol)
-            best_it = 1
-            println("Diversified!")
-        end
-
         valid = true
+
+        # intensification and diversification
+        if best_it > long_term_update
+            sol = deepcopy(best_sol)
+            println("Intensified!")
+            diversify!(data, sol)
+            println("Diversified!")
+            best_it = 1
+        end
 
         # update probabilities
         if (it % 10 == 0)
@@ -298,9 +300,9 @@ function ALNS_uden_modelrepair(data, time_limit, T=1000, alpha=0.999, frac_clust
         append!(repairs, selected_repair)
         append!(destroys, selected_destroy)
         append!(current_obj, temp_sol.obj)
-        w = w4
 
         # Check acceptance criteria
+        w = w4
         if temp_sol.obj < sol.obj
             sol = deepcopy(temp_sol)
             w = w2
