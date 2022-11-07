@@ -417,16 +417,23 @@ function probabilityTracking(params, filename)
     from matplotlib import ticker
 
     def progDR(params, filename):
-        f,(ax1,ax2) = plt.subplots(2,1, figsize = (12,8))
+        f,(ax1,ax2) = plt.subplots(2,1, figsize = (10,10))
         i = 0
+        iter = range(1,len(params.prob_destroy_t[0]),10)
         while i < len(params.num_destroy):
-            ax1.plot(params.prob_destroy_t[i])
+            ax1.plot(iter, params.prob_destroy_t[i][::10])
             ax1.legend(params.destroy_names)
+            ax1.set_xlabel("Iterations")
+            ax1.title.set_text('Probability')
+            ax1.title.set_text('Destroy')
             i += 1
         i = 0
         while i < len(params.num_repair):
-            ax2.plot(params.prob_repair_t[i])
+            ax2.plot(iter, params.prob_repair_t[i][::10])
             ax2.legend(params.repair_names)
+            ax2.set_xlabel("Iterations")
+            ax2.title.set_text('Probability')
+            ax2.title.set_text('Repair')
             i += 1
         plt.savefig("output/" + filename + ".png")
         plt.show()
