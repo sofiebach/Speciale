@@ -1,19 +1,5 @@
 include("BasicFunctions.jl")
-
-# Struct for holding the instance
-mutable struct BaselineSol
-    obj::Float64
-    num_campaigns::Int64
-    x::Array{Int64,2}
-    f::Array{Float64,2}
-    k::Array{Int64,1}
-    P::Int64
-    T::Int64
-    M::Int64
-    I_cap::Array{Float64,2}
-    H_cap::Array{Float64,2}
-    BaselineSol(data) = new(0.0, 0, zeros(Int64,data.T,data.P), zeros(Float64,data.T,data.M), deepcopy(data.S), data.P, data.T, data.M, deepcopy(data.I), deepcopy(data.H))
-end
+include("../Structures.jl")
 
 function randomInitial(data)
     sol = BaselineSol(data)
