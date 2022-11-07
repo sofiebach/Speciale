@@ -46,7 +46,7 @@ function ALNSBaseline(data,time_limit,modelRepair=false,T=1000,alpha=0.99,gamma=
     rho_destroy = ones(num)
     prob_destroy = zeros(num)
     time_destroy = zeros(num)
-    num_destroy = zeros(num)
+    num_destroy = zeros(Int64,num)
     destroy_names = Array{String}(undef,num)
 
     if modelRepair
@@ -57,7 +57,7 @@ function ALNSBaseline(data,time_limit,modelRepair=false,T=1000,alpha=0.99,gamma=
     rho_repair = ones(num)
     prob_repair = zeros(num)
     time_repair = zeros(num)
-    num_repair = zeros(num)
+    num_repair = zeros(Int64, num)
     repair_names = Array{String}(undef,num)
 
     prob_destroy = setProb(rho_destroy, prob_destroy)
@@ -93,19 +93,19 @@ function ALNSBaseline(data,time_limit,modelRepair=false,T=1000,alpha=0.99,gamma=
         # Choose destroy method
         selected_destroy = selectMethod(prob_destroy)
         if selected_destroy == 1
-            destroy_names[selected_destroy] = "Cluster destroy"
+            destroy_names[selected_destroy] = "Cluster-destroy"
             destroy_time = time_ns()
             clusterDestroy!(data,temp_sol,frac_cluster)
         elseif selected_destroy == 2
-            destroy_names[selected_destroy] = "Random destroy"
+            destroy_names[selected_destroy] = "Random-destroy"
             destroy_time = time_ns()
             randomDestroy!(data,temp_sol,frac_random)
         elseif selected_destroy == 3
-            destroy_names[selected_destroy] = "Worst destroy"
+            destroy_names[selected_destroy] = "Worst-destroy"
             destroy_time = time_ns()
             worstDestroy!(data,temp_sol,thres_worst)
         else
-            destroy_names[selected_destroy] = "Related destroy"
+            destroy_names[selected_destroy] = "Related-destroy"
             destroy_time = time_ns()
             relatedDestroy!(data, sol, frac_related)
         end
@@ -117,19 +117,19 @@ function ALNSBaseline(data,time_limit,modelRepair=false,T=1000,alpha=0.99,gamma=
         # Choose repair method
         selected_repair = selectMethod(prob_repair)
         if selected_repair == 1
-            repair_names[selected_repair] = "Greedy repair"
+            repair_names[selected_repair] = "Greedy-repair"
             repair_time = time_ns()
             greedyRepair!(data,temp_sol)
             elapsed_repair = elapsed_time(repair_time)
             valid = isValid(data, temp_sol, sol)
         elseif selected_repair == 2
-            repair_names[selected_repair] = "First repair"
+            repair_names[selected_repair] = "First-repair"
             repair_time = time_ns()
             firstRepair!(data,temp_sol)
             elapsed_repair = elapsed_time(repair_time)
             valid = isValid(data, temp_sol, sol)
         else
-            repair_names[selected_repair] = "Model repair"
+            repair_names[selected_repair] = "Model-repair"
             repair_time = time_ns()
             modelRepair!(data,temp_sol)
             elapsed_repair = elapsed_time(repair_time)

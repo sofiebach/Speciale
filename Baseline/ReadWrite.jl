@@ -142,72 +142,6 @@ function read_DR_data(P)
     return data
 end
 
-
-#Read data instance
-#function readInstance(filename)
-#    f = open(filename)
-#    readline(f) # comment
-#    P, C, M, timeperiod = parse.(Int,split(readline(f)))
-#    readline(f) # blank
-#    readline(f) # comment
-#    L_lower, L_upper, L_zero = parse.(Int,split(readline(f)))
-#    readline(f) # blank
-#    readline(f) # comment
-#    L = parse.(Int,split(readline(f)))
-#    readline(f) # blank
-#    readline(f) # comment
-#    Q_lower, Q_upper = parse.(Int,split(readline(f)))
-#    readline(f) # blank
-#    readline(f) # comment
-#    Q = parse.(Int,split(readline(f)))
-#    readline(f) # blank
-#    readline(f) # comment
-#    start, stop, T = parse.(Int,split(readline(f)))
-#    readline(f) # blank
-#    readline(f) # comment
-#    S = parse.(Float64,split(readline(f)))
-#    readline(f) # blank
-#    readline(f) # comment
-#    w = parse.(Float64,split(readline(f)))
-#    readline(f) # blank
-#    readline(f) # comment
-#    H = zeros(Float64, T, M)
-#    for m = 1:M
-#        H[:,m] = parse.(Float64,split(readline(f)))
-#    end
-#    #H = parse.(Int,split(readline(f)))
-#    readline(f) # blank
-#    readline(f) # comment
-#    I = zeros(Float64, T, C)
-#    for c in 1:C
-#        I[:,c] = parse.(Float64,split(readline(f)))
-#    end
-#    readline(f) # blank
-#    readline(f) # comment
-#    L = collect(L_lower:L_upper)
-#    u = zeros(Float64, length(L), P, C)
-#    for c = 1:C
-#        line = parse.(Float64,split(readline(f)))
-#        u[:,:,c] = reshape(line, (length(L), P))
-#    end
-#
-#    GRP_matrix = zeros(Float64, T, T, P, C)
-#    for t_col = start:stop
-#        row_start = t_col + L_lower
-#        row_stop = min(T, row_start + length(L) - 1)
-#        for t_row = row_start:row_stop
-#            for c = 1:C
-#                for p = 1:P
-#                    l = L_zero + t_row-t_col
-#                    GRP_matrix[t_row, t_col, p, c] = u[l,p,c]
-#                end
-#            end
-#        end
-#    end
-#    data = Instance(P,C,M,timeperiod,L_lower,L_upper,L,L_zero,Q_lower,Q_upper,Q,start,stop,T,S,w,H,I,u,GRP_matrix)
-#    return data
-#end
-
 # Write solution
 function writeSolution(filename, data, sol)
     outFile = open(filename, "w")
@@ -280,6 +214,30 @@ function writeParameters(filename, params)
 
     write(outFile, "status\n")
     write(outFile, join(params.status," ")*"\n\n")
+
+    write(outFile, "prob destroy iter\n")
+    write(outFile, join(params.prob_destroy_t," ")*"\n\n")
+
+    write(outFile, "prob repair iter\n")
+    write(outFile, join(params.prob_repair_t," ")*"\n\n")
+
+    write(outFile, "time destroy\n")
+    write(outFile, join(params.time_destroy," ")*"\n\n")
+
+    write(outFile, "time repair\n")
+    write(outFile, join(params.time_repair," ")*"\n\n")
+
+    write(outFile, "num destroy\n")
+    write(outFile, join(params.num_destroy," ")*"\n\n")
+
+    write(outFile, "num repair\n")
+    write(outFile, join(params.num_repair," ")*"\n\n")
+
+    write(outFile, "destroy names\n")
+    write(outFile, join(params.destroy_names," ")*"\n\n")
+
+    write(outFile, "repair names\n")
+    write(outFile, join(params.repair_names," ")*"\n\n")
     close(outFile)
 end
 
@@ -292,10 +250,10 @@ function readParameters(filename)
     prob_repair = parse.(Float64,split(readline(f)))
     readline(f) # blank
     readline(f) # destroys
-    destroys = parse.(Int,split(readline(f)))
+    destroys = parse.(Int64,split(readline(f)))
     readline(f) # blank
     readline(f) # repairs
-    repairs = parse.(Int,split(readline(f)))
+    repairs = parse.(Int64,split(readline(f)))
     readline(f) # blank
     readline(f) # current objective
     current_obj = parse.(Float64,split(readline(f)))
@@ -304,124 +262,35 @@ function readParameters(filename)
     current_best = parse.(Float64,split(readline(f)))
     readline(f) # blank
     readline(f) # status
-    status = parse.(Int,split(readline(f)))
-
-    return  (prob_destroy=prob_destroy, prob_repair=prob_repair, destroys=destroys, repairs=repairs, current_obj=current_obj, current_best=current_best, status=status)
+    status = parse.(Int64,split(readline(f)))
+    readline(f) # blank
+    readline(f) # prob destroy iter
+    prob_destroy_t = parse.(Float64,split(readline(f)))
+    readline(f) # blank
+    readline(f) # prob repair iter
+    prob_repair_t = parse.(Float64,split(readline(f)))
+    readline(f) # blank
+    readline(f) # time destroy
+    time_destroy = parse.(Float64,split(readline(f)))
+    readline(f) # blank
+    readline(f) # time repair
+    time_repair = parse.(Float64,split(readline(f)))
+    readline(f) # blank
+    readline(f) # num destroy
+    num_destroy = parse.(Int64,split(readline(f)))
+    readline(f) # blank
+    readline(f) # num repair
+    num_repair = parse.(Int64,split(readline(f)))
+    readline(f) # blank
+    readline(f) # destroy names
+    destroy_names = split(readline(f), " ")
+    readline(f) # blank
+    readline(f) # repair names
+    repair_names = split(readline(f), " ")
+    
+    return (prob_destroy=prob_destroy, prob_repair=prob_repair, destroys=destroys,  prob_destroy_t = prob_destroy_t,
+    prob_repair_t = prob_repair_t, repairs=repairs, current_obj=current_obj, current_best=current_best, status=status, 
+    time_repair=time_repair, time_destroy=time_destroy, num_repair=num_repair, num_destroy=num_destroy, 
+    destroy_names=destroy_names, repair_names=repair_names)
 end
 
-function OLDwriteSolution(filename, data, sol)
-    outFile = open(filename, "w")
-    write(outFile, "P, C, M, T, timeperiod" * "\n")
-    write(outFile, join([data.P, data.C, data.M, data.T, data.timeperiod]," ")*"\n\n")
-
-    write(outFile, "L_lower, L_upper" * "\n")
-    write(outFile, join([data.L_lower, data.L_upper]," ")*"\n\n")
-
-    write(outFile, "Q_lower, Q_upper" * "\n")
-    write(outFile, join([data.Q_lower, data.Q_upper]," ")*"\n\n")
-
-    write(outFile, "CONSUMPTION" * "\n")
-    for c = 1:data.C
-        write(outFile, join(data.u[:,:,c], " ") * "\n")
-    end
-    write(outFile, "\n")
-
-    write(outFile, "INVENTORY" * "\n")
-    for c = 1:data.C
-        write(outFile, join(data.I[:,c], " ") * "\n")
-    end
-    write(outFile, "\n")
-
-    write(outFile, "STAFFING" * "\n")
-    for m = 1:data.M
-        write(outFile, join(data.H[:,m], " ") * "\n")
-    end
-    write(outFile, "\n")
-
-    write(outFile, "PRODUCTION HOURS" * "\n")
-    for m = 1:data.M
-        write(outFile, join(data.w[:,m], " ") * "\n")
-    end
-    write(outFile, "\n")
-
-    write(outFile, "SCOPE" * "\n")
-    write(outFile, join(data.S, " ") * "\n\n")
-
-    write(outFile, "Objective value \n")
-    write(outFile, join(sol.obj," ")*"\n\n")
-    write(outFile, "Solution \n")
-    for p = 1:sol.P
-        write(outFile,join(sol.x[:,p]," ") * "\n")
-    end
-    write(outFile, "\n")
-
-    write(outFile, "Penalty for undone jobs" * "\n")
-    write(outFile,join(sol.k," ")*"\n")
-    write(outFile, "\n")
-
-    write(outFile, "Freelancers hired" * "\n")
-    for m = 1:sol.M
-        write(outFile,join(sol.f[:,m]," ")*"\n")
-    end
-    close(outFile)
-end
-
-
-# Read solution
-function OLDreadSolution(filename)
-    f = open(filename)
-    readline(f) # comment
-    P, C, M, T, timeperiod = parse.(Int,split(readline(f)))
-    readline(f) # blank
-    readline(f) # comment
-    L_lower, L_upper = parse.(Int,split(readline(f)))
-    readline(f) # blank
-    readline(f) # comment
-    Q_lower, Q_upper = parse.(Int,split(readline(f)))
-    readline(f) # blank
-    readline(f) # comment
-    data = Instance(P,C,M,timeperiod,L_lower,L_upper,Q_lower,Q_upper,T)
-    for c = 1:C
-        line = parse.(Float64,split(readline(f)))
-        data.u[:,:,c] = reshape(line, (data.L_upper-data.L_lower+1, data.P))
-    end
-    readline(f) # blank
-    readline(f) # comment
-    for c in 1:data.C
-        data.I[:,c] = parse.(Float64,split(readline(f)))
-    end
-    readline(f) # blank
-    readline(f) # comment
-    for m = 1:data.M
-        data.H[:,m] = parse.(Float64,split(readline(f)))
-    end
-    readline(f) # blank
-    readline(f) # comment
-    for m = 1:data.M
-        data.w[:,m] = parse.(Float64,split(readline(f)))
-    end
-    readline(f) # blank
-    readline(f) # comment
-    data.S = parse.(Float64,split(readline(f)))
-    readline(f) # blank
-    readline(f) # comment
-    sol = Sol(data.T,data.P,data.M)
-    sol.obj = parse.(Float64, readline(f))
-    readline(f) # blank
-    readline(f) # comment
-    #x = zeros(Int, T, P)
-    for p in 1:data.P
-        sol.x[:,p] = parse.(Int,split(readline(f)))
-    end
-    readline(f) # blank
-    readline(f) # comment
-    sol.k = parse.(Int,split(readline(f)))
-    readline(f) # blank
-    readline(f) # comment
-    for m = 1:M
-        sol.f[:,m] = parse.(Int,split(readline(f)))
-    end
-    readline(f) # blank
-    readline(f) # comment
-    return data, sol
-end

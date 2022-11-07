@@ -1,0 +1,300 @@
+cluster, random, worst, related, avg objective
+0.1 0.1 5.0 0.1 18845.713800439982
+cluster, random, worst, related, avg objective
+0.1 0.1 5.0 0.15 19035.13376911744
+cluster, random, worst, related, avg objective
+0.1 0.1 5.0 0.2 19205.738208785846
+cluster, random, worst, related, avg objective
+0.1 0.1 5.0 0.25 18972.077244988493
+cluster, random, worst, related, avg objective
+0.1 0.1 5.0 0.3 19007.352999448252
+cluster, random, worst, related, avg objective
+0.1 0.1 6.0 0.1 19135.65612859968
+cluster, random, worst, related, avg objective
+0.1 0.1 6.0 0.15 18830.721737591477
+cluster, random, worst, related, avg objective
+0.1 0.1 6.0 0.2 18939.981503606126
+cluster, random, worst, related, avg objective
+0.1 0.1 6.0 0.25 18908.81567841135
+cluster, random, worst, related, avg objective
+0.1 0.1 6.0 0.3 18851.327806869675
+cluster, random, worst, related, avg objective
+0.1 0.1 7.0 0.1 18907.352538034735
+cluster, random, worst, related, avg objective
+0.1 0.1 7.0 0.15 18907.588822516816
+cluster, random, worst, related, avg objective
+0.1 0.1 7.0 0.2 18875.855653340575
+cluster, random, worst, related, avg objective
+0.1 0.1 7.0 0.25 19001.990143743868
+cluster, random, worst, related, avg objective
+0.1 0.1 7.0 0.3 18879.421980768806
+cluster, random, worst, related, avg objective
+0.1 0.1 8.0 0.1 19014.547860173825
+cluster, random, worst, related, avg objective
+0.1 0.1 8.0 0.15 18885.04851467659
+cluster, random, worst, related, avg objective
+0.1 0.1 8.0 0.2 18995.957993570628
+cluster, random, worst, related, avg objective
+0.1 0.1 8.0 0.25 18996.275899324344
+cluster, random, worst, related, avg objective
+0.1 0.1 8.0 0.3 19111.532703542827
+cluster, random, worst, related, avg objective
+0.1 0.1 9.0 0.1 18987.994077669766
+cluster, random, worst, related, avg objective
+0.1 0.1 9.0 0.15 18875.451135781117
+cluster, random, worst, related, avg objective
+0.1 0.1 9.0 0.2 18995.878233156942
+cluster, random, worst, related, avg objective
+0.1 0.1 9.0 0.25 18808.69559351023
+cluster, random, worst, related, avg objective
+0.1 0.1 9.0 0.3 19006.855873381923
+cluster, random, worst, related, avg objective
+0.1 0.1 10.0 0.1 19056.425039517482
+cluster, random, worst, related, avg objective
+0.1 0.1 10.0 0.15 18926.604806369967
+cluster, random, worst, related, avg objective
+0.1 0.1 10.0 0.2 18904.449263355884
+cluster, random, worst, related, avg objective
+0.1 0.1 10.0 0.25 18912.502854216327
+cluster, random, worst, related, avg objective
+0.1 0.1 10.0 0.3 18985.963726468803
+cluster, random, worst, related, avg objective
+0.1 0.15 5.0 0.1 18978.122734599292
+cluster, random, worst, related, avg objective
+0.1 0.15 5.0 0.15 19161.545837095957
+cluster, random, worst, related, avg objective
+0.1 0.15 5.0 0.2 19025.995945942406
+cluster, random, worst, related, avg objective
+0.1 0.15 5.0 0.25 19097.60562355129
+cluster, random, worst, related, avg objective
+0.1 0.15 5.0 0.3 19182.720980108665
+cluster, random, worst, related, avg objective
+0.1 0.15 6.0 0.1 19218.61291762405
+cluster, random, worst, related, avg objective
+0.1 0.15 6.0 0.15 19024.81425194944
+cluster, random, worst, related, avg objective
+0.1 0.15 6.0 0.2 19010.16890898984
+cluster, random, worst, related, avg objective
+0.1 0.15 6.0 0.25 19036.069894290296
+cluster, random, worst, related, avg objective
+0.1 0.15 6.0 0.3 19036.34847758445
+cluster, random, worst, related, avg objective
+0.1 0.15 7.0 0.1 19073.390591824907
+cluster, random, worst, related, avg objective
+0.1 0.15 7.0 0.15 19171.26730791854
+cluster, random, worst, related, avg objective
+0.1 0.15 7.0 0.2 19161.862297940443
+cluster, random, worst, related, avg objective
+0.1 0.15 7.0 0.25 19271.005364667468
+cluster, random, worst, related, avg objective
+0.1 0.15 7.0 0.3 18993.927734034765
+cluster, random, worst, related, avg objective
+0.1 0.15 8.0 0.1 19201.108428321593
+cluster, random, worst, related, avg objective
+0.1 0.15 8.0 0.15 19082.981418812273
+cluster, random, worst, related, avg objective
+0.1 0.15 8.0 0.2 19030.849492277062
+cluster, random, worst, related, avg objective
+0.1 0.15 8.0 0.25 19216.979179507172
+cluster, random, worst, related, avg objective
+0.1 0.15 8.0 0.3 19154.398117088713
+cluster, random, worst, related, avg objective
+0.1 0.15 9.0 0.1 19149.257931823908
+cluster, random, worst, related, avg objective
+0.1 0.15 9.0 0.15 19185.115979568414
+cluster, random, worst, related, avg objective
+0.1 0.15 9.0 0.2 18986.034281204702
+cluster, random, worst, related, avg objective
+0.1 0.15 9.0 0.25 19164.70697689612
+cluster, random, worst, related, avg objective
+0.1 0.15 9.0 0.3 19125.655899494952
+cluster, random, worst, related, avg objective
+0.1 0.15 10.0 0.1 19005.01584215055
+cluster, random, worst, related, avg objective
+0.1 0.15 10.0 0.15 19179.273888416727
+cluster, random, worst, related, avg objective
+0.1 0.15 10.0 0.2 19235.271481953656
+cluster, random, worst, related, avg objective
+0.1 0.15 10.0 0.25 18989.8523040605
+cluster, random, worst, related, avg objective
+0.1 0.15 10.0 0.3 19024.126696518128
+cluster, random, worst, related, avg objective
+0.1 0.2 5.0 0.1 18987.29481317307
+cluster, random, worst, related, avg objective
+0.1 0.2 5.0 0.15 19236.273725323936
+cluster, random, worst, related, avg objective
+0.1 0.2 5.0 0.2 19058.22360580458
+cluster, random, worst, related, avg objective
+0.1 0.2 5.0 0.25 19308.030364890798
+cluster, random, worst, related, avg objective
+0.1 0.2 5.0 0.3 19233.587530841167
+cluster, random, worst, related, avg objective
+0.1 0.2 6.0 0.1 19199.523483475237
+cluster, random, worst, related, avg objective
+0.1 0.2 6.0 0.15 19120.83605177409
+cluster, random, worst, related, avg objective
+0.1 0.2 6.0 0.2 19289.189217276737
+cluster, random, worst, related, avg objective
+0.1 0.2 6.0 0.25 19197.16840315767
+cluster, random, worst, related, avg objective
+0.1 0.2 6.0 0.3 19190.254683351715
+cluster, random, worst, related, avg objective
+0.1 0.2 7.0 0.1 19220.087219318568
+cluster, random, worst, related, avg objective
+0.1 0.2 7.0 0.15 19315.552780434995
+cluster, random, worst, related, avg objective
+0.1 0.2 7.0 0.2 19170.153380400774
+cluster, random, worst, related, avg objective
+0.1 0.2 7.0 0.25 19351.634754263418
+cluster, random, worst, related, avg objective
+0.1 0.2 7.0 0.3 19205.511864004693
+cluster, random, worst, related, avg objective
+0.1 0.2 8.0 0.1 19057.90826918816
+cluster, random, worst, related, avg objective
+0.1 0.2 8.0 0.15 19285.179402721384
+cluster, random, worst, related, avg objective
+0.1 0.2 8.0 0.2 19146.76923986047
+cluster, random, worst, related, avg objective
+0.1 0.2 8.0 0.25 19318.150064401136
+cluster, random, worst, related, avg objective
+0.1 0.2 8.0 0.3 19247.110627006303
+cluster, random, worst, related, avg objective
+0.1 0.2 9.0 0.1 19363.262714410794
+cluster, random, worst, related, avg objective
+0.1 0.2 9.0 0.15 19278.1650746018
+cluster, random, worst, related, avg objective
+0.1 0.2 9.0 0.2 19090.28521031787
+cluster, random, worst, related, avg objective
+0.1 0.2 9.0 0.25 19163.585315032404
+cluster, random, worst, related, avg objective
+0.1 0.2 9.0 0.3 19226.934834010663
+cluster, random, worst, related, avg objective
+0.1 0.2 10.0 0.1 19265.801913197654
+cluster, random, worst, related, avg objective
+0.1 0.2 10.0 0.15 19284.357021470856
+cluster, random, worst, related, avg objective
+0.1 0.2 10.0 0.2 19197.18614240949
+cluster, random, worst, related, avg objective
+0.1 0.2 10.0 0.25 19361.038767860806
+cluster, random, worst, related, avg objective
+0.1 0.2 10.0 0.3 19403.049314362495
+cluster, random, worst, related, avg objective
+0.1 0.25 5.0 0.1 19199.916210539304
+cluster, random, worst, related, avg objective
+0.1 0.25 5.0 0.15 19275.923138653812
+cluster, random, worst, related, avg objective
+0.1 0.25 5.0 0.2 19210.303901196126
+cluster, random, worst, related, avg objective
+0.1 0.25 5.0 0.25 19313.924770917125
+cluster, random, worst, related, avg objective
+0.1 0.25 5.0 0.3 19243.1166466391
+cluster, random, worst, related, avg objective
+0.1 0.25 6.0 0.1 19258.066018672485
+cluster, random, worst, related, avg objective
+0.1 0.25 6.0 0.15 19033.82271682213
+cluster, random, worst, related, avg objective
+0.1 0.25 6.0 0.2 19184.271763444332
+cluster, random, worst, related, avg objective
+0.1 0.25 6.0 0.25 19290.74800895108
+cluster, random, worst, related, avg objective
+0.1 0.25 6.0 0.3 19266.393325477467
+cluster, random, worst, related, avg objective
+0.1 0.25 7.0 0.1 19352.828505657064
+cluster, random, worst, related, avg objective
+0.1 0.25 7.0 0.15 19237.47789742101
+cluster, random, worst, related, avg objective
+0.1 0.25 7.0 0.2 19213.965629949806
+cluster, random, worst, related, avg objective
+0.1 0.25 7.0 0.25 19204.059523128723
+cluster, random, worst, related, avg objective
+0.1 0.25 7.0 0.3 19264.37851240574
+cluster, random, worst, related, avg objective
+0.1 0.25 8.0 0.1 19339.58116650403
+cluster, random, worst, related, avg objective
+0.1 0.25 8.0 0.15 19311.308080626586
+cluster, random, worst, related, avg objective
+0.1 0.25 8.0 0.2 19294.3151260838
+cluster, random, worst, related, avg objective
+0.1 0.25 8.0 0.25 19370.01192287925
+cluster, random, worst, related, avg objective
+0.1 0.25 8.0 0.3 19106.62468896199
+cluster, random, worst, related, avg objective
+0.1 0.25 9.0 0.1 19232.212561175205
+cluster, random, worst, related, avg objective
+0.1 0.25 9.0 0.15 19250.126734253037
+cluster, random, worst, related, avg objective
+0.1 0.25 9.0 0.2 19385.016994792903
+cluster, random, worst, related, avg objective
+0.1 0.25 9.0 0.25 19395.984071060997
+cluster, random, worst, related, avg objective
+0.1 0.25 9.0 0.3 19358.151442216553
+cluster, random, worst, related, avg objective
+0.1 0.25 10.0 0.1 19206.45712570527
+cluster, random, worst, related, avg objective
+0.1 0.25 10.0 0.15 19254.65403135315
+cluster, random, worst, related, avg objective
+0.1 0.25 10.0 0.2 19365.22488414766
+cluster, random, worst, related, avg objective
+0.1 0.25 10.0 0.25 19369.582854276967
+cluster, random, worst, related, avg objective
+0.1 0.25 10.0 0.3 19292.248149867635
+cluster, random, worst, related, avg objective
+0.1 0.3 5.0 0.1 19376.259665894002
+cluster, random, worst, related, avg objective
+0.1 0.3 5.0 0.15 19238.71660402418
+cluster, random, worst, related, avg objective
+0.1 0.3 5.0 0.2 19059.53571774278
+cluster, random, worst, related, avg objective
+0.1 0.3 5.0 0.25 19202.669276346187
+cluster, random, worst, related, avg objective
+0.1 0.3 5.0 0.3 19233.625434397865
+cluster, random, worst, related, avg objective
+0.1 0.3 6.0 0.1 19111.22098746323
+cluster, random, worst, related, avg objective
+0.1 0.3 6.0 0.15 19250.866994055854
+cluster, random, worst, related, avg objective
+0.1 0.3 6.0 0.2 19258.616782244524
+cluster, random, worst, related, avg objective
+0.1 0.3 6.0 0.25 19408.98065631313
+cluster, random, worst, related, avg objective
+0.1 0.3 6.0 0.3 19201.30044300282
+cluster, random, worst, related, avg objective
+0.1 0.3 7.0 0.1 19330.012661287423
+cluster, random, worst, related, avg objective
+0.1 0.3 7.0 0.15 18977.719327551913
+cluster, random, worst, related, avg objective
+0.1 0.3 7.0 0.2 19246.083721760333
+cluster, random, worst, related, avg objective
+0.1 0.3 7.0 0.25 19167.06091885785
+cluster, random, worst, related, avg objective
+0.1 0.3 7.0 0.3 19413.665959801037
+cluster, random, worst, related, avg objective
+0.1 0.3 8.0 0.1 19271.202717960834
+cluster, random, worst, related, avg objective
+0.1 0.3 8.0 0.15 19309.532293644537
+cluster, random, worst, related, avg objective
+0.1 0.3 8.0 0.2 19235.434916174432
+cluster, random, worst, related, avg objective
+0.1 0.3 8.0 0.25 19405.44319444453
+cluster, random, worst, related, avg objective
+0.1 0.3 8.0 0.3 19327.435175019793
+cluster, random, worst, related, avg objective
+0.1 0.3 9.0 0.1 19245.860226782348
+cluster, random, worst, related, avg objective
+0.1 0.3 9.0 0.15 19433.880004852334
+cluster, random, worst, related, avg objective
+0.1 0.3 9.0 0.2 19497.872648390203
+cluster, random, worst, related, avg objective
+0.1 0.3 9.0 0.25 19364.894720399
+cluster, random, worst, related, avg objective
+0.1 0.3 9.0 0.3 19340.071964413662
+cluster, random, worst, related, avg objective
+0.1 0.3 10.0 0.1 19342.28096474863
+cluster, random, worst, related, avg objective
+0.1 0.3 10.0 0.15 19341.2859377256
+cluster, random, worst, related, avg objective
+0.1 0.3 10.0 0.2 19521.593077287496
+cluster, random, worst, related, avg objective
+0.1 0.3 10.0 0.25 19192.36607132946
+cluster, random, worst, related, avg objective
+0.1 0.3 10.0 0.3 19254.48206738168

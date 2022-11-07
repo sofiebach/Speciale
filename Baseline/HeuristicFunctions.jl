@@ -72,7 +72,7 @@ function modelRepair!(data, sol)
     MIPdata.F = deepcopy(data.F - transpose(sum(sol.f, dims=1))[:,1])
     MIPdata.S = deepcopy(sol.k)
     
-    MIPsol = MIP(MIPdata, 0, 2, 0)
+    MIPsol = MIPBaseline(MIPdata, 0, 2, 0)
 
     if MIPsol == 0
        return

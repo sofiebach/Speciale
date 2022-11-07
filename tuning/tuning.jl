@@ -87,8 +87,7 @@ function readTuneDestroy(filename)
     return params, objectives
 end
 
-function readTuneAcceptance()
-    filename = "results/acceptanceCriteria"
+function readTuneAcceptance(filename)
     file = open(filename)
 
     params = []

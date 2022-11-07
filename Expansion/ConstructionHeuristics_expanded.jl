@@ -1,7 +1,7 @@
 include("BasicFunctions.jl")
 
 # Struct for holding the instance
-mutable struct HeuristicSol
+mutable struct ExpandedSol
     obj::Float64
     num_campaigns::Int64
     x::Array{Int64,2}
@@ -14,11 +14,11 @@ mutable struct HeuristicSol
     M::Int64
     I_cap::Array{Float64,2}
     H_cap::Array{Float64,2}
-    HeuristicSol(data) = new(0.0, 0, zeros(Int64,data.T,data.P), zeros(Float64,data.T,data.M), deepcopy(data.S), zeros(Int64, data.P), zeros(Int64, data.T, data.P), data.P, data.T, data.M, deepcopy(data.I), deepcopy(data.H))
+    ExpandedSol(data) = new(0.0, 0, zeros(Int64,data.T,data.P), zeros(Float64,data.T,data.M), deepcopy(data.S), zeros(Int64, data.P), zeros(Int64, data.T, data.P), data.P, data.T, data.M, deepcopy(data.I), deepcopy(data.H))
 end
 
 function randomInitial(data)
-    sol = HeuristicSol(data)
+    sol = ExpandedSol(data)
     
     # Randomly insert priorities from P_bar
     randomInsert!(data, sol, data.P_bar)
