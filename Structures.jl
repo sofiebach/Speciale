@@ -54,7 +54,7 @@ mutable struct Sol
     P::Int64
     T::Int64
     M::Int64
-    Sol(T,P,M) = new(0.0, 0, zeros(Int64,T,P), zeros(Float64,T,M), zeros(Int64,P), zeros(Int64, data.P), zeros(Int64, data.T, data.P), P, T, M)
+    Sol(T,P,M) = new(0.0, 0, zeros(Int64,T,P), zeros(Float64,T,M), zeros(Int64,P), zeros(Int64,P), zeros(Int64, T, P), P, T, M)
 end
 
 mutable struct BaselineSol
