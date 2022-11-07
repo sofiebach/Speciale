@@ -3,17 +3,15 @@ include("ConstructionHeuristics.jl")
 
 using Statistics
 
-function setProb(rho, prob)
-    for i = 1:length(prob)
-        prob[i] = rho[i]/sum(rho[:])
-    end
-    return prob
+function setProb(rho)
+    return rho./sum(rho)
 end
 
 function selectMethod(prob)
+    n = length(prob)
     chosen = rand()
     next_prob = 0
-    for i=1:length(prob)
+    for i=1:n
         next_prob += prob[i]
         if chosen <= next_prob
             return i
@@ -44,7 +42,6 @@ function ALNSBaseline(data,time_limit,modelRepair=false,T=1000,alpha=0.99,gamma=
 
     num = 4
     rho_destroy = ones(num)
-    prob_destroy = zeros(num)
     time_destroy = zeros(num)
     num_destroy = zeros(Int64,num)
     destroy_names = Array{String}(undef,num)
@@ -55,13 +52,12 @@ function ALNSBaseline(data,time_limit,modelRepair=false,T=1000,alpha=0.99,gamma=
         num = 2
     end
     rho_repair = ones(num)
-    prob_repair = zeros(num)
     time_repair = zeros(num)
     num_repair = zeros(Int64, num)
     repair_names = Array{String}(undef,num)
 
-    prob_destroy = setProb(rho_destroy, prob_destroy)
-    prob_repair = setProb(rho_repair, prob_repair)
+    prob_destroy = setProb(rho_destroy)
+    prob_repair = setProb(rho_repair)
 
     w1 = 10
     w2 = 5
@@ -86,8 +82,8 @@ function ALNSBaseline(data,time_limit,modelRepair=false,T=1000,alpha=0.99,gamma=
 
         # update probabilities
         if (it % 10 == 0)
-            prob_destroy = setProb(rho_destroy, prob_destroy)
-            prob_repair = setProb(rho_repair, prob_repair)
+            prob_destroy = setProb(rho_destroy)
+            prob_repair = setProb(rho_repair)
         end
 
         # Choose destroy method

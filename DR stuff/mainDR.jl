@@ -1,6 +1,6 @@
 include("DR_output.jl")
-include("ReadWrite.jl")
-include("PlotSolution.jl")
+include("../Baseline/ReadWrite.jl")
+include("../Validation/PlotSolution.jl")
 
 inventory_check, number_priorities, consumption_check, dr_sol = DR_plan()
 

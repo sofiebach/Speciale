@@ -1,11 +1,13 @@
 include("ALNS.jl")
 include("../tuning/tuning.jl")
-include("../ReadWrite.jl")
+include("../Baseline/ReadWrite.jl")
 include("../Validation/ValidateSolution.jl")
 include("../Validation/PlotSolution.jl")
 
 # Read best T and best alpha
-params1, objs1 = readTuneAcceptance()
+prefix = "results/"
+filename = prefix * "acceptanceCriteria"
+params1, objs1 = readTuneAcceptance(filename)
 _, idx1 = findmin(objs1)
 T, alpha = params1[idx1]
 
