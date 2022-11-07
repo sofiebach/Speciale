@@ -15,11 +15,15 @@ data = read_DR_data(P)
 
 sol, params = ALNS_uden_modelrepair(data, 120)
 
-inv, prod = checkSolution(data, sol)
 
-drawHeatmap(inv, prod, data, sol, "hej")
+inventory, production = checkSolution(data, sol)
 
-simulatedAnnealingPlot(params)
+drawHeatmap(inventory, production, data, sol, "hej")
+
+solutionTracking(params, "test")
+
+include("PlotSolution.jl")
+probabilityTracking(params, "hej")
 
 include("PlotSolution.jl")
 progressDestroyRepair(params)
