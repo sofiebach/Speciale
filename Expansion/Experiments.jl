@@ -28,3 +28,22 @@ sum(solMIP.x)
 
 length(paramsALNS_w.status)
 length(paramsALNS_wo.status)
+
+println("--- ALNS with model repair ---")
+println(paramsALNS_w.repair_names)
+println("Repair times: ", paramsALNS_w.time_repair)
+avg_time_repair1 = paramsALNS_w.time_repair ./ paramsALNS_w.num_repair
+println("Average repair times: ", avg_time_repair1)
+println(paramsALNS_w.destroy_names)
+avg_time_destroy1 = paramsALNS_w.time_destroy ./ paramsALNS_w.num_destroy
+println("Average destroy times: ", avg_time_destroy1)
+
+
+println("--- ALNS with model repair ---")
+println(paramsALNS_wo.repair_names)
+println("Repair times: ", paramsALNS_wo.time_repair)
+avg_time_repair1 = paramsALNS_wo.time_repair ./ paramsALNS_wo.num_repair
+println("Average repair times: ", avg_time_repair1)
+println(paramsALNS_wo.destroy_names)
+avg_time_destroy1 = paramsALNS_wo.time_destroy ./ paramsALNS_wo.num_destroy
+println("Average destroy times: ", avg_time_destroy1)

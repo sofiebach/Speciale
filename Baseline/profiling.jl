@@ -1,8 +1,6 @@
 include("ALNS.jl")
 include("../tuning/tuning.jl")
 include("../Baseline/ReadWrite.jl")
-include("../Validation/ValidateSolution.jl")
-include("../Validation/PlotSolution.jl")
 
 # Read best T and best alpha
 prefix = "results/"
@@ -12,11 +10,11 @@ _, idx1 = findmin(objs1)
 T, alpha = params1[idx1]
 
 # Read best fractions and thresholds
-fracs_10, objs_10 = readTuneDestroy("tuning/destroy_cluster_10")
-fracs_15, objs_15 = readTuneDestroy("tuning/destroy_cluster_15")
-fracs_20, objs_20 = readTuneDestroy("tuning/destroy_cluster_20")
-fracs_25, objs_25 = readTuneDestroy("tuning/destroy_cluster_25")
-fracs_30, objs_30 = readTuneDestroy("tuning/destroy_cluster_30")
+fracs_10, objs_10 = readTuneDestroy(prefix * "destroy_10")
+fracs_15, objs_15 = readTuneDestroy(prefix * "destroy_15")
+fracs_20, objs_20 = readTuneDestroy(prefix * "destroy_20")
+fracs_25, objs_25 = readTuneDestroy(prefix * "destroy_25")
+fracs_30, objs_30 = readTuneDestroy(prefix * "destroy_30")
 objs2 = vcat(objs_10, objs_15, objs_20, objs_25, objs_30)
 params2 = vcat(fracs_10, fracs_15, fracs_20, fracs_25, fracs_30)
 
@@ -29,8 +27,8 @@ data = read_DR_data(P)
 
 # Run ALNS with tuned parameters
 time_limit = 120
-sol1, params1 = ALNS(data, time_limit, T, alpha, frac_cluster, frac_random, thres_worst, frac_related)
-sol2, params2 = ALNS_uden_modelrepair(data, time_limit, T, alpha, frac_cluster, frac_random, thres_worst, frac_related)
+sol1, params1 = ALNSBaseline(data, time_limit, true, T, alpha, frac_cluster, frac_random, thres_worst, frac_related)
+sol2, params2 = ALNS_uden_modelrepair(data, time_limit, false, T, alpha, frac_cluster, frac_random, thres_worst, frac_related)
 
 println("--- ALNS with model repair ---")
 num_iter1 = length(params1.current_obj)
@@ -49,5 +47,7 @@ avg_time_destroy2 = params2.time_destroy ./ params2.num_destroy
 println("Average destroy times: ", avg_time_destroy2)
 avg_time_repair2 = params2.time_repair ./ params2.num_repair
 println("Average repair times: ", avg_time_repair2)
+
+
 
 
