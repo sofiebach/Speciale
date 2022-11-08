@@ -419,7 +419,7 @@ function probabilityTracking(params, filename)
     def progDR(params, filename):
         f,(ax1,ax2) = plt.subplots(2,1, figsize = (10,10))
         i = 0
-        iter = range(1,len(params.prob_destroy_t[0]),10)
+        iter = range(1,len(params.prob_destroy_t[0]) + 1,10)
         while i < len(params.num_destroy):
             ax1.plot(iter, params.prob_destroy_t[i][::10])
             ax1.legend(params.destroy_names)
@@ -440,8 +440,6 @@ function probabilityTracking(params, filename)
     """
     py"progDR"(params, filename)
 end
-
-
 
 function plotScope(data, sol, filename)
     total = sum(sol.x, dims=1)
