@@ -104,7 +104,7 @@ function ALNSExpanded(data, time_limit, modelRepair=false, T=1000, alpha=0.9, ga
         else
             destroy_names[selected_destroy] = "Related-destroy"
             destroy_time = time_ns()
-            relatedDestroy!(data, sol, frac_related)
+            relatedDestroy!(data, temp_sol, frac_related)
         end
 
         # Update destroy time
@@ -151,9 +151,7 @@ function ALNSExpanded(data, time_limit, modelRepair=false, T=1000, alpha=0.9, ga
         time_repair[selected_repair] += elapsed_repair
         num_repair[selected_repair] += 1
 
-        append!(repairs, selected_repair)
-        append!(destroys, selected_destroy)
-        append!(current_obj, temp_sol.obj)
+        
 
         # Check acceptance criteria
         w = w4
@@ -175,6 +173,9 @@ function ALNSExpanded(data, time_limit, modelRepair=false, T=1000, alpha=0.9, ga
             println("New best")
             println(best_sol.obj)
         end
+        append!(repairs, selected_repair)
+        append!(destroys, selected_destroy)
+        append!(current_obj, temp_sol.obj)
         append!(status, w)
         append!(current_best, best_sol.obj)
         append!(prob_destroy_t, prob_destroy)
@@ -187,8 +188,10 @@ function ALNSExpanded(data, time_limit, modelRepair=false, T=1000, alpha=0.9, ga
     end
     prob_destroy_t = reshape(prob_destroy_t, length(num_destroy),:)
     prob_repair_t = reshape(prob_repair_t, length(num_repair),:)
+    println("T: ", T)
 
     return best_sol, (prob_destroy=prob_destroy, prob_repair=prob_repair, destroys=destroys,  prob_destroy_t = prob_destroy_t,
     prob_repair_t = prob_repair_t, repairs=repairs, current_obj=current_obj, current_best=current_best, status=status, 
-    time_repair=time_repair, time_destroy=time_destroy, num_repair=num_repair, num_destroy=num_destroy, destroy_names = destroy_names, repair_names = repair_names)
+    time_repair=time_repair, time_destroy=time_destroy, num_repair=num_repair, num_destroy=num_destroy, destroy_names = destroy_names,
+    repair_names = repair_names, iter = it)
 end

@@ -103,7 +103,7 @@ function ALNSBaseline(data,time_limit,modelRepair=false,T=1000,alpha=0.99,gamma=
         else
             destroy_names[selected_destroy] = "Related-destroy"
             destroy_time = time_ns()
-            relatedDestroy!(data, sol, frac_related)
+            relatedDestroy!(data, temp_sol, frac_related)
         end
         
         # Update destroy time
