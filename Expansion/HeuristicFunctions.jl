@@ -2,7 +2,7 @@ include("BasicFunctions.jl")
 include("MIPModelSpreading.jl")
 
 function randomDestroy!(data, sol, frac)
-    n_destroy = round(sol.num_campaigns*frac)
+    n_destroy = ceil(sol.num_campaigns*frac)
     while n_destroy > 0 
         p = rand(1:data.P)
         if sum(sol.x[:,p]) == 0
@@ -17,7 +17,7 @@ function randomDestroy!(data, sol, frac)
 end
 
 function clusterDestroy!(data, sol, frac)
-    t_destroy = Int(round((data.stop - data.start)*frac))
+    t_destroy = Int(ceil((data.stop - data.start)*frac))
     rand_t = rand(data.start:(data.stop-t_destroy))
     for t = rand_t:(rand_t+t_destroy), p = 1:data.P
         while sol.x[t,p] > 0
