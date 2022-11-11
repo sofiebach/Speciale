@@ -14,3 +14,8 @@ sol2.exp_obj
 
 sol2.objective
 sol2.objective.k_penalty - sol2.objective.x_reward + sol2.objective.g_penalty - sol2.objective.L_reward
+
+x = MIPExpansion(data,"HiGHS")
+
+
+

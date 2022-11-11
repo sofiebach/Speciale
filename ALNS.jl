@@ -115,24 +115,6 @@ function ALNS(data,time_limit,type="baseline",modelRepair=false,T=1000,alpha=0.9
         time_destroy[selected_destroy] += elapsed_destroy
         num_destroy[selected_destroy] += 1
 
-        # if selected_destroy == 1
-        #     destroy_names[selected_destroy] = "Cluster-destroy"
-        #     destroy_time = time_ns()
-        #     clusterDestroy!(data,temp_sol,frac_cluster)
-        # elseif selected_destroy == 2
-        #     destroy_names[selected_destroy] = "Random-destroy"
-        #     destroy_time = time_ns()
-        #     randomDestroy!(data,temp_sol,frac_random)
-        # elseif selected_destroy == 3
-        #     destroy_names[selected_destroy] = "Worst-destroy"
-        #     destroy_time = time_ns()
-        #     worstDestroy!(data,temp_sol,thres_worst)
-        # else
-        #     destroy_names[selected_destroy] = "Related-destroy"
-        #     destroy_time = time_ns()
-        #     relatedDestroy!(data, temp_sol, frac_related)
-        # end
-
         # Choose repair method
         selected_repair = selectMethod(prob_repair)
         repair_time = time_ns()
@@ -150,32 +132,6 @@ function ALNS(data,time_limit,type="baseline",modelRepair=false,T=1000,alpha=0.9
         # Update repair time
         time_repair[selected_repair] += elapsed_repair
         num_repair[selected_repair] += 1
-
-        # if selected_repair == 1
-        #     repair_names[selected_repair] = "Greedy-repair"
-        #     repair_time = time_ns()
-        #     greedyRepair!(data,temp_sol,type)
-        #     elapsed_repair = elapsed_time(repair_time)
-        #     valid = isValid(data, temp_sol, sol)
-        # elseif selected_repair == 2
-        #     repair_names[selected_repair] = "First-repair"
-        #     repair_time = time_ns()
-        #     firstRepair!(data,temp_sol,type)
-        #     elapsed_repair = elapsed_time(repair_time)
-        #     valid = isValid(data, temp_sol, sol)
-        # elseif selected_repair == 3
-        #     repair_names[selected_repair] = "Regret-repair"
-        #     repair_time = time_ns()
-        #     regretRepair!(data,temp_sol,type)
-        #     elapsed_repair = elapsed_time(repair_time)
-        #     valid = isValid(data, temp_sol, sol)
-        # else
-        #     repair_names[selected_repair] = "Model-repair"
-        #     repair_time = time_ns()
-        #     modelRepair!(data,temp_sol,type)
-        #     elapsed_repair = elapsed_time(repair_time)
-        #     valid = true
-        # end
 
         # Check acceptance criteria
         if type == "baseline"

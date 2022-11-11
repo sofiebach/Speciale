@@ -73,9 +73,11 @@ function modelRepair!(data, sol, type)
 
     sol_limit = 2
     if type == "expanded"
-        MIPx = MIPExpansion(MIPdata, 0, sol_limit, 0)
+        time_limit = 10
+        MIPx = MIPExpansion(MIPdata, "HiGHS", 0, time_limit, 0)
     elseif type == "baseline" 
-        MIPx = MIPBaseline(MIPdata, 0, sol_limit, 0)
+        time_limit = 10
+        MIPx = MIPBaseline(MIPdata, "HiGHS", 0, time_limit, 0)
     else
         println("Enter valid model type")
         return

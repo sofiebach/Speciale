@@ -1,15 +1,28 @@
 using JuMP, Gurobi
+import HiGHS
 
 genv = Gurobi.Env()
 
-function MIPBaseline(data, time_limit, solution_limit, log)
-    model = Model(optimizer_with_attributes(() -> Gurobi.Optimizer(genv)))
+function MIPBaseline(data, solver, log=1, time_limit=60, solution_limit=0)
+    if solver == "Gurobi"
+        model = Model(optimizer_with_attributes(() -> Gurobi.Optimizer(genv)))
+    elseif solver == "HiGHS"
+        model = Model(optimizer_with_attributes(() -> HiGHS.Optimizer()))
+    else
+        println("Input valid solver")
+        return
+    end
+    
     if log  == 0
         set_silent(model)
     end
 
     if time_limit > 0
-        set_optimizer_attribute(model,"TimeLimit", time_limit)
+        if solver == "Gurobi"
+            set_optimizer_attribute(model, "TimeLimit", time_limit)
+        else
+            set_optimizer_attribute(model, "time_limit", time_limit*1.0)
+        end
     elseif solution_limit > 0
         set_optimizer_attribute(model,"SolutionLimit", solution_limit)
     end
@@ -55,14 +68,26 @@ function MIPBaseline(data, time_limit, solution_limit, log)
 end
 
 
-function MIPExpansion(data, time_limit, solution_limit, log)
-    model = Model(optimizer_with_attributes(() -> Gurobi.Optimizer(genv)))
+function MIPExpansion(data, solver, log=1, time_limit=60, solution_limit=0)
+    if solver == "Gurobi"
+        model = Model(optimizer_with_attributes(() -> Gurobi.Optimizer(genv)))
+    elseif solver == "HiGHS"
+        model = Model(optimizer_with_attributes(() -> HiGHS.Optimizer()))
+    else
+        println("Input valid solver")
+        return
+    end
+    
     if log  == 0
         set_silent(model)
     end
 
     if time_limit > 0
-        set_optimizer_attribute(model,"TimeLimit", time_limit)
+        if solver == "Gurobi"
+            set_optimizer_attribute(model, "TimeLimit", time_limit)
+        else
+            set_optimizer_attribute(model, "time_limit", time_limit*1.0)
+        end
     elseif solution_limit > 0
         set_optimizer_attribute(model,"SolutionLimit", solution_limit)
     end
