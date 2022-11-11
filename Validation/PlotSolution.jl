@@ -1,5 +1,4 @@
 using Luxor
-using XLSX
 using PlotlyJS
 using Colors
 # import Pkg
@@ -10,8 +9,6 @@ using PyCall
 # @pyimport numpy as np
 # @pyimport matplotlib.pyplot as plt
 # @pyimport seaborn as sns
-
-include("ValidateSolution.jl")
 
 function print_solution(sol)
     println("Objective: ", sol.obj)
@@ -37,22 +34,22 @@ function print_solution(sol)
 end
 
 function drawTVSchedule(data, sol, filename)
-    TV_campaigns = 29
-    mapping = XLSX.readdata("data/data_staffing_constraint.xlsx", "Mapping", "B2:C30")[1:TV_campaigns,:]
-    BC_names = unique(mapping[:,1])
+    p_tv = findall(x -> x == "TV", data.campaign_type)
+    unique_BC_names = unique(data.BC_names[p_tv])
+
     BC = []
-    for bc in BC_names
+    for bc in unique_BC_names
         priorities = []
-        for i = 1:TV_campaigns
-            if mapping[i,1] == bc
+        for i in p_tv
+            if data.BC_names[i] == bc
                 push!(priorities, i)
             end
         end
         push!(BC, priorities)
     end
 
-    P_names = unique(mapping[:,2])
-    num_P_names = length(P_names)
+    unique_P_names = unique(data.P_names)
+    num_P_names = length(unique_P_names)
     
     #col = ["blue","red","green","yellow","orange","purple","cyan","magenta","lime","gray","pink"]
     w = data.L_upper - data.L_lower + 1
@@ -65,7 +62,7 @@ function drawTVSchedule(data, sol, filename)
         for t = 1:data.T
             for p in BC[bc]
                 if sol.x[t,p] != 0
-                    priority = mapping[p,2]
+                    priority = data.P_names
                     for n = 1:sol.x[t,p]
                         isPlaced = false
                         len_ends = length(ends)
@@ -92,7 +89,7 @@ function drawTVSchedule(data, sol, filename)
 
     scalar = 100
     h = 0.8
-    col = distinguishable_colors(length(P_names)+1)[2:(length(P_names)+1)]
+    col = distinguishable_colors(length(unique_P_names)+1)[2:(length(unique_P_names)+1)]
 
     Drawing((data.T+w)*scalar, height*scalar, "output/schedule_" * filename * ".png")
     background("white") # color of background
@@ -120,19 +117,19 @@ function drawTVSchedule(data, sol, filename)
         sethue("black")
         setopacity(1)
         Luxor.rect(0,(c-0.5)*scalar,(data.T+w)*scalar,5, :fill)
-        text(string(BC_names[bc]), Point((0.5)*scalar,(c+0.5) * scalar), halign=:left)
+        text(string(unique_BC_names[bc]), Point((0.5)*scalar,(c+0.5) * scalar), halign=:left)
         ends = ones(1)
         for t = 1:data.T
             for p in BC[bc]
                 if sol.x[t,p] != 0
-                    priority = mapping[p,2]
+                    priority = data.P_names[p]
                     for n = 1:sol.x[t,p]
                         isPlaced = false
                         len_ends = length(ends)
                         for e = 1:len_ends
                             if (t+data.L_lower) >= ends[e]
                                 for prio = 1:num_P_names
-                                    if mapping[p,2] == P_names[prio]
+                                    if data.P_names[p] == unique_P_names[prio]
                                         setcolor(col[prio])
                                     end
                                 end
@@ -151,7 +148,7 @@ function drawTVSchedule(data, sol, filename)
                         if isPlaced == false
                             c += 1
                             for prio = 1:num_P_names
-                                if mapping[p,2] == P_names[prio]
+                                if data.P_names[p] == unique_P_names[prio]
                                     setcolor(col[prio])
                                 end
                             end
@@ -177,22 +174,22 @@ function drawTVSchedule(data, sol, filename)
 end
 
 function drawRadioSchedule(data, sol, filename)
-    radio_campaigns = 8
-    mapping = XLSX.readdata("data/data_staffing_constraint.xlsx", "Mapping", "B31:C38")[1:radio_campaigns,:]
-    BC_names = unique(mapping[:,1])
+    p_radio = findall(x -> x == "RADIO", data.campaign_type)
+    unique_BC_names = unique(data.BC_names[p_radio])
+
     BC = []
-    for bc in BC_names
+    for bc in unique_BC_names
         priorities = []
-        for i = 1:radio_campaigns
-            if mapping[i,1] == bc
+        for i in p_radio
+            if data.BC_names[i] == bc
                 push!(priorities, i)
             end
         end
         push!(BC, priorities)
     end
 
-    P_names = reverse!(unique(mapping[:,2]))
-    num_P_names = length(P_names)
+    unique_P_names = unique(data.P_names)
+    num_P_names = length(unique_P_names)
     
     #col = ["blue","red","green","yellow","orange","purple","cyan","magenta","lime","gray","pink"]
     w = data.L_upper - data.L_lower + 1
@@ -205,7 +202,7 @@ function drawRadioSchedule(data, sol, filename)
         for t = 1:data.T
             for p in BC[bc]
                 if sol.x[t,p] != 0
-                    priority = mapping[p,2]
+                    priority = data.P_names
                     for n = 1:sol.x[t,p]
                         isPlaced = false
                         len_ends = length(ends)
@@ -232,7 +229,7 @@ function drawRadioSchedule(data, sol, filename)
 
     scalar = 100
     h = 0.8
-    col = distinguishable_colors(length(P_names)+1)[2:(length(P_names)+1)]
+    col = distinguishable_colors(length(unique_P_names)+1)[2:(length(unique_P_names)+1)]
 
     Drawing((data.T+w)*scalar, height*scalar, "output/schedule_" * filename * ".png")
     background("white") # color of background
@@ -260,19 +257,19 @@ function drawRadioSchedule(data, sol, filename)
         sethue("black")
         setopacity(1)
         Luxor.rect(0,(c-0.5)*scalar,(data.T+w)*scalar,5, :fill)
-        text(string(BC_names[bc]), Point((0.5)*scalar,(c+0.5) * scalar), halign=:left)
+        text(string(unique_BC_names[bc]), Point((0.5)*scalar,(c+0.5) * scalar), halign=:left)
         ends = ones(1)
         for t = 1:data.T
             for p in BC[bc]
                 if sol.x[t,p] != 0
-                    priority = mapping[p,2]
+                    priority = data.P_names[p]
                     for n = 1:sol.x[t,p]
                         isPlaced = false
                         len_ends = length(ends)
                         for e = 1:len_ends
                             if (t+data.L_lower) >= ends[e]
                                 for prio = 1:num_P_names
-                                    if mapping[p,2] == P_names[prio]
+                                    if data.P_names[p] == unique_P_names[prio]
                                         setcolor(col[prio])
                                     end
                                 end
@@ -291,7 +288,7 @@ function drawRadioSchedule(data, sol, filename)
                         if isPlaced == false
                             c += 1
                             for prio = 1:num_P_names
-                                if mapping[p,2] == P_names[prio]
+                                if data.P_names[p] == unique_P_names[prio]
                                     setcolor(col[prio])
                                 end
                             end
@@ -317,9 +314,7 @@ function drawRadioSchedule(data, sol, filename)
 end
 
 function drawHeatmap(inventory_used, staff_used, data, sol, filename)       
-    channels = XLSX.readdata("data/data_inventory_consumption.xlsx", "Mapping", "B2:B13")[1:data.C]
-    media = XLSX.readdata("data/data_staffing_constraint.xlsx", "Bemanding", "A2:A5")[1:data.M]
-    
+      
     staff_incl_freelancer = data.H + sol.f 
     used_cap_inv = inventory_used ./data.I
     used_cap_prod = staff_used ./staff_incl_freelancer
@@ -377,7 +372,7 @@ function drawHeatmap(inventory_used, staff_used, data, sol, filename)
         plt.show()
     """
 
-    py"heatmap"(used_cap_inv, used_cap_prod, channels, media, filename)
+    py"heatmap"(used_cap_inv, used_cap_prod, data.C_names, data.M_names, filename)
 
 end
 
@@ -490,16 +485,15 @@ end
 
 function plotScope(data, sol, filename)
     total = sum(sol.x, dims=1)
-    mapping = XLSX.readdata("data/data_staffing_constraint.xlsx", "Mapping", "B2:C38")[1:data.P,:]
-    BC_names = unique(mapping[:,1])
+    BC_names = unique(data.BC_names)
     num_BC = length(BC_names)
-    campaign_names = unique(mapping[:,2])
+    campaign_names = unique(data.P_names)
     num_campaigns = length(campaign_names)
     output = zeros(Float64, length(BC_names), length(campaign_names))*NaN
     for p = 1:data.P
         for bc = 1:num_BC
             for campaign = 1:num_campaigns
-                if mapping[p,1] == BC_names[bc] && mapping[p,2] == campaign_names[campaign]
+                if data.BC_names[p] == BC_names[bc] && data.P_names[p] == campaign_names[campaign]
                     output[bc, campaign] = total[p] - data.S[p]
                 end
             end

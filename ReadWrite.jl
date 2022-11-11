@@ -81,11 +81,12 @@ function read_DR_data(P)
 
     data.aimed = ceil.(data.S/data.T)
 
-    mapping = XLSX.readdata("data/data_staffing_constraint.xlsx", "Mapping", "B2:C38")[1:data.P,:]
+    mapping = XLSX.readdata("data/data_staffing_constraint.xlsx", "Mapping", "B2:D38")[1:data.P,:]
     data.P_names = mapping[:,2]
     data.C_names = XLSX.readdata("data/data_inventory_consumption.xlsx", "Mapping", "B2:B13")[1:data.C]
     data.M_names = XLSX.readdata("data/data_staffing_constraint.xlsx", "Bemanding", "A2:A5")[1:data.M]
     data.BC_names = mapping[:,1]
+    data.campaign_type = mapping[:,3]
 
     return data
 end
@@ -154,7 +155,7 @@ function writeInstance(filename, data)
     write(outFile, "aimed\n")
     write(outFile,join(data.aimed," ")*"\n\n")
 
-    write(outFile, "P_names\n") #skal fikses
+    write(outFile, "P_names\n") 
     write(outFile,join(replace.(data.P_names, " " => "£")," ")*"\n\n")
 
     write(outFile, "C_names\n")
@@ -163,8 +164,11 @@ function writeInstance(filename, data)
     write(outFile, "M_names\n")
     write(outFile,join(data.M_names," ")*"\n\n")
 
-    write(outFile, "BC_names\n") #skal fikses
+    write(outFile, "BC_names\n") 
     write(outFile,join(replace.(data.BC_names, " " => "£")," ")*"\n\n")
+
+    write(outFile, "campaign_type\n") #skal fikses
+    write(outFile,join(replace.(data.campaign_type, " " => "£")," ")*"\n\n")
 
     close(outFile)
 end
@@ -263,10 +267,12 @@ function readInstance(filename)
     readline(f) # BC_names
     data.BC_names = replace.(split(readline(f)), "£" => " ")
     readline(f) # blank
+
+    readline(f) # campaign_type
+    data.campaign_type = split(readline(f))
+    readline(f) # blank
     return data
 end
-
-
 
 # Write solution
 function writeSolution(filename, data, sol)

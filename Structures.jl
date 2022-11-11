@@ -28,6 +28,7 @@ mutable struct Instance
     C_names::Array{String,1}
     M_names::Array{String,1}
     BC_names::Array{String,1}
+    campaign_type::Array{String,1}
     Instance(P,C,M,timeperiod,L_lower,L_upper,Q_lower,Q_upper,T) = new(P,[1,8],C,M,timeperiod,
         L_lower,L_upper,indexin(0,collect(L_lower:L_upper))[],
         Q_lower,Q_upper,
@@ -46,6 +47,7 @@ mutable struct Instance
         zeros(Int64,P),
         Vector(undef,C),
         Vector(undef,M),
+        Vector(undef,P),
         Vector(undef,P))
 end
 
