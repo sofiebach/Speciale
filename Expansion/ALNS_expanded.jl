@@ -33,6 +33,8 @@ function ALNSExpanded(data, time_limit, modelRepair=false, T=1000, alpha=0.9, ga
     it = 1
     best_it = 1
     long_term_update = 1000
+    T_start = T
+    T_threshold = 5 #Minimum T before we want to intensify
 
     sol = randomInitial(data)
     best_sol = deepcopy(sol)
@@ -68,16 +70,17 @@ function ALNSExpanded(data, time_limit, modelRepair=false, T=1000, alpha=0.9, ga
     current_obj = []
     current_best = []
     status = []
-    prob_destroy_t = [] 
-    prob_repair_t = []
+    prob_destroy_it = [] 
+    prob_repair_it = []
+    T_it = []
 
     while elapsed_time(start_time) < time_limit
         # intensification and diversification
-        if best_it > long_term_update
+        if T < T_threshold
             sol = deepcopy(best_sol)
+            temp_sol = deepcopy(sol)
             println("Intensified!")
-            diversify!(data, sol)
-            println("Diversified!")
+            T = T_start
             best_it = 1
         end
 
@@ -151,47 +154,45 @@ function ALNSExpanded(data, time_limit, modelRepair=false, T=1000, alpha=0.9, ga
         time_repair[selected_repair] += elapsed_repair
         num_repair[selected_repair] += 1
 
-        
-
         # Check acceptance criteria
-        w = w4
-        if temp_sol.obj < sol.obj
-            sol = deepcopy(temp_sol)
-            w = w2
-            #println("Better than sol")
-        else
-            if rand() < exp(-(temp_sol.obj-sol.obj)/T)
-                sol = deepcopy(temp_sol)
-                w = w3
-                #println("Annealing")
-            end
-        end
-
         if temp_sol.obj < best_sol.obj
             best_sol = deepcopy(temp_sol)
             w = w1
+            best_it = 1
             println("New best")
             println(best_sol.obj)
+        elseif temp_sol.obj < sol.obj
+            sol = deepcopy(temp_sol)
+            w = w2
+            #println("Better than sol")
+        elseif rand() < exp(-(temp_sol.obj-sol.obj)/T)
+                sol = deepcopy(temp_sol)
+                w = w3
+                #println("Annealing")
+        else
+            w = w4
         end
+
         append!(repairs, selected_repair)
         append!(destroys, selected_destroy)
         append!(current_obj, temp_sol.obj)
         append!(status, w)
         append!(current_best, best_sol.obj)
-        append!(prob_destroy_t, prob_destroy)
-        append!(prob_repair_t, prob_repair)
+        append!(prob_destroy_it, prob_destroy)
+        append!(prob_repair_it, prob_repair)
+        append!(T_it, T)
 
         rho_destroy[selected_destroy] = gamma*rho_destroy[selected_destroy] + (1-gamma)*w
         rho_repair[selected_repair] = gamma*rho_repair[selected_repair] + (1-gamma)*w
         T = alpha * T
      
     end
-    prob_destroy_t = reshape(prob_destroy_t, length(num_destroy),:)
-    prob_repair_t = reshape(prob_repair_t, length(num_repair),:)
+    prob_destroy_t = reshape(prob_destroy_it, length(num_destroy),:)
+    prob_repair_t = reshape(prob_repair_it, length(num_repair),:)
     println("T: ", T)
 
-    return best_sol, (prob_destroy=prob_destroy, prob_repair=prob_repair, destroys=destroys,  prob_destroy_t = prob_destroy_t,
-    prob_repair_t = prob_repair_t, repairs=repairs, current_obj=current_obj, current_best=current_best, status=status, 
+    return best_sol, (prob_destroy=prob_destroy, prob_repair=prob_repair, destroys=destroys,  prob_destroy_it = prob_destroy_it,
+    prob_repair_it = prob_repair_it, repairs=repairs, current_obj=current_obj, current_best=current_best, status=status, 
     time_repair=time_repair, time_destroy=time_destroy, num_repair=num_repair, num_destroy=num_destroy, destroy_names = destroy_names,
-    repair_names = repair_names, iter = it)
+    repair_names = repair_names, iter = it, T_it = T_it)
 end

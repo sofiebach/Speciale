@@ -399,6 +399,7 @@ function solutionTracking(params, filename)
         plt.plot(rejected[::10], np.array(params.current_obj)[rejected.astype(int)-1][::10], 'bo', markersize = 4)
         plt.plot(accepted[::10], np.array(params.current_obj)[accepted.astype(int)-1][::10], 'yo', markersize = 4)
         plt.plot(better, np.array(params.current_obj)[better.astype(int)-1], 'ro', markersize = 4)
+        plt.plot(params.current_best 'k-' , markersize = 4)
         plt.legend(["Rejected", "Accepted", "New best"])
         plt.savefig("output/" + filename + ".png")
         plt.show()
@@ -406,6 +407,52 @@ function solutionTracking(params, filename)
     py"solutionPlot"(params,rejected, accepted, better, filename)
 end
 
+function solutionTracking_all(params, filename)
+
+    rejected = findall(x -> x <= 1, params.status)
+    accepted = findall(x -> x == 5, params.status)
+    better = findall(x -> x == 10, params.status)
+    
+    py"""
+    import pandas as pd
+    import numpy as np
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+    from matplotlib import ticker
+    
+    def solutionPlot(params, rejected, accepted, better, filename):
+        
+        plt.plot(rejected, np.array(params.current_obj)[rejected.astype(int)-1], 'bo', markersize = 4)
+        plt.plot(accepted, np.array(params.current_obj)[accepted.astype(int)-1], 'yo', markersize = 4)
+        plt.plot(better, np.array(params.current_obj)[better.astype(int)-1], 'ro', markersize = 4)
+        plt.plot(params.current_best, 'k-' , markersize = 4)
+        plt.legend(["Rejected", "Accepted", "New best"])
+        plt.savefig("output/" + filename + ".png")
+        plt.show()
+    """
+    py"solutionPlot"(params,rejected, accepted, better, filename)
+end
+
+
+
+function temperatureTracking(params, filename)
+
+   
+    py"""
+    import pandas as pd
+    import numpy as np
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+    from matplotlib import ticker
+    
+    def tempPlot(params, filename):
+        
+        plt.plot(params.T_it)
+        plt.savefig("output/" + filename + ".png")
+        plt.show()
+    """
+    py"tempPlot"(params, filename)
+end
 
 function probabilityTracking(params, filename)
    
