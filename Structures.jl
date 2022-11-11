@@ -1,4 +1,3 @@
-
 mutable struct Instance
     P::Int64
     P_bar::Array{Int64, 1}
@@ -25,6 +24,11 @@ mutable struct Instance
     penalty_f::Array{Float64, 1}
     F::Array{Float64, 1}
     aimed::Array{Int64,1}
+    P_names::Array{String,1}
+    C_names::Array{String,1}
+    M_names::Array{String,1}
+    BC_names::Array{String,1}
+    campaign_type::Array{String,1}
     Instance(P,C,M,timeperiod,L_lower,L_upper,Q_lower,Q_upper,T) = new(P,[1,8],C,M,timeperiod,
         L_lower,L_upper,indexin(0,collect(L_lower:L_upper))[],
         Q_lower,Q_upper,
@@ -40,7 +44,11 @@ mutable struct Instance
         zeros(Float64, P),
         zeros(Float64, M),
         zeros(Int64, M),
-        zeros(Int64,P))
+        zeros(Int64,P),
+        Vector(undef,C),
+        Vector(undef,M),
+        Vector(undef,P),
+        Vector(undef,P))
 end
 
 # mutable struct Sol

@@ -80,6 +80,197 @@ function read_DR_data(P)
     data.reward = (data.penalty_S.-minimum(data.penalty_S).+1)./(maximum(data.penalty_S)-minimum(data.penalty_S))
 
     data.aimed = ceil.(data.S/data.T)
+
+    mapping = XLSX.readdata("data/data_staffing_constraint.xlsx", "Mapping", "B2:D38")[1:data.P,:]
+    data.P_names = mapping[:,2]
+    data.C_names = XLSX.readdata("data/data_inventory_consumption.xlsx", "Mapping", "B2:B13")[1:data.C]
+    data.M_names = XLSX.readdata("data/data_staffing_constraint.xlsx", "Bemanding", "A2:A5")[1:data.M]
+    data.BC_names = mapping[:,1]
+    data.campaign_type = mapping[:,3]
+
+    return data
+end
+
+function writeInstance(filename, data)
+    outFile = open(filename, "w")
+    write(outFile, "timeperiod P M C T\n")
+    write(outFile, join([data.timeperiod, data.P, data.M, data.C, data.T]," ")*"\n\n")
+
+    write(outFile, "L_lower L_upper L_zero Q_lower Q_upper\n")
+    write(outFile, join([data.L_lower, data.L_upper, data.L_zero, data.Q_lower, data.Q_upper]," ")*"\n\n")
+    
+    write(outFile, "start stop\n")
+    write(outFile, join([data.start, data.stop]," ")*"\n\n")
+    
+    write(outFile, "P_bar\n")
+    write(outFile,join(data.P_bar," ")*"\n\n")
+
+    write(outFile, "S \n")
+    write(outFile,join(data.S," ")*"\n\n")
+    
+    write(outFile, "w\n")
+    for m = 1:data.M
+        write(outFile,join(data.w[:,m]," ")*"\n")
+    end
+    write(outFile, "\n")
+
+    write(outFile, "H\n")
+    for m = 1:data.M
+        write(outFile,join(data.H[:,m]," ")*"\n")
+    end
+    write(outFile, "\n")
+
+    write(outFile, "I\n")
+    for c = 1:data.C
+        write(outFile,join(data.I[:,c]," ")*"\n")
+    end
+    write(outFile, "\n")
+
+    write(outFile, "u\n")
+    for c = 1:data.C
+        for p=1:data.P
+            write(outFile,join(data.u[:,p,c]," ")*"\n")
+        end
+    end
+    write(outFile, "\n")
+
+    write(outFile, "L_l\n")
+    write(outFile,join(data.L_l," ")*"\n\n")
+
+    write(outFile, "L_u\n")
+    write(outFile,join(data.L_u," ")*"\n\n")
+
+    write(outFile, "penalty_S\n")
+    write(outFile,join(data.penalty_S," ")*"\n\n")
+
+    write(outFile, "reward\n")
+    write(outFile,join(data.reward," ")*"\n\n")
+
+    write(outFile, "penalty_f\n")
+    write(outFile,join(data.penalty_f," ")*"\n\n")
+
+    write(outFile, "F\n")
+    write(outFile,join(data.F," ")*"\n\n")
+
+    write(outFile, "aimed\n")
+    write(outFile,join(data.aimed," ")*"\n\n")
+
+    write(outFile, "P_names\n") 
+    write(outFile,join(replace.(data.P_names, " " => "£")," ")*"\n\n")
+
+    write(outFile, "C_names\n")
+    write(outFile,join(data.C_names," ")*"\n\n")
+
+    write(outFile, "M_names\n")
+    write(outFile,join(data.M_names," ")*"\n\n")
+
+    write(outFile, "BC_names\n") 
+    write(outFile,join(replace.(data.BC_names, " " => "£")," ")*"\n\n")
+
+    write(outFile, "campaign_type\n") #skal fikses
+    write(outFile,join(replace.(data.campaign_type, " " => "£")," ")*"\n\n")
+
+    close(outFile)
+end
+
+
+function readInstance(filename)
+    f = open(filename)
+    readline(f) # timeperiod P M C T
+    timeperiod, P, M, C, T = parse.(Int,split(readline(f)))
+    readline(f) # blank
+
+    readline(f) # L_lower L_upper L_zero Q_lower Q_upper
+    L_lower,L_upper, L_zero, Q_lower, Q_upper = parse.(Int,split(readline(f)))
+    readline(f) # blank
+
+    data = Instance(P,C,M,timeperiod,L_lower,L_upper,Q_lower,Q_upper,T) 
+    
+    readline(f) # start, stop
+    data.start, data.stop = parse.(Int,split(readline(f)))
+    readline(f) # blank
+
+    readline(f) # P_bar
+    data.P_bar = parse.(Int,split(readline(f)))
+    readline(f) # blank
+
+    readline(f) # S
+    data.S = parse.(Int,split(readline(f)))
+    readline(f) # blank
+
+    readline(f) # w
+    for m = 1:M
+        data.w[:,m] = parse.(Float64,split(readline(f)))
+    end
+    readline(f) # blank
+
+    readline(f) # H
+    for m = 1:M
+        data.H[:,m] = parse.(Float64,split(readline(f)))
+    end
+    readline(f) # blank
+
+    readline(f) # I
+    for c = 1:C
+        data.I[:,c] = parse.(Float64,split(readline(f)))
+    end
+    readline(f) # blank
+
+    readline(f) # u
+    for c = 1:C
+        for p = 1:P
+            data.u[:,p,c] = parse.(Float64,split(readline(f)))
+        end
+    end
+    readline(f) # blank
+
+    readline(f) # L_l
+    data.L_l = parse.(Int,split(readline(f)))
+    readline(f) # blank
+
+    readline(f) # L_u
+    data.L_u = parse.(Int,split(readline(f)))
+    readline(f) # blank
+
+    readline(f) # penalty_S
+    data.penalty_S = parse.(Float64,split(readline(f)))
+    readline(f) # blank
+
+    readline(f) # reward
+    data.reward = parse.(Float64,split(readline(f)))
+    readline(f) # blank
+
+    readline(f) # penalty_f
+    data.penalty_f = parse.(Float64,split(readline(f)))
+    readline(f) # blank
+
+    readline(f) # F
+    data.F = parse.(Float64,split(readline(f)))
+    readline(f) # blank
+
+    readline(f) # aimed
+    data.aimed = parse.(Int,split(readline(f)))
+    readline(f) # blank
+
+    readline(f) # P_names
+    data.P_names = replace.(split(readline(f)), "£" => " ")
+    readline(f) # blank
+
+    readline(f) # C_names
+    data.C_names = split(readline(f))
+    readline(f) # blank
+
+    readline(f) # M_names
+    data.M_names = split(readline(f))
+    readline(f) # blank
+
+    readline(f) # BC_names
+    data.BC_names = replace.(split(readline(f)), "£" => " ")
+    readline(f) # blank
+
+    readline(f) # campaign_type
+    data.campaign_type = split(readline(f))
+    readline(f) # blank
     return data
 end
 
