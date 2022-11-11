@@ -43,24 +43,30 @@ function MIPBaseline(data, time_limit, solution_limit, log)
     if primal_status(model) != FEASIBLE_POINT
         return 0
     end
-    # Create solution object
-    sol = Sol(data.T,data.P,data.M)
-    sol.obj = objective_value(model)
-    for p = 1:sol.P
-        if JuMP.value(k[p]) > 0.5
-            sol.k[p] = Int64(round(JuMP.value(k[p])))
-        end
-        for t = 1:sol.T
-            if JuMP.value(x[t,p]) > 0.5
-                sol.x[t,p] = Int64(round(JuMP.value(x[t,p])))
-            end  
+
+    x1 = zeros(Int64, data.T, data.P)
+    for t = 1:data.T, p = 1:data.P
+        if JuMP.value(x[t,p]) > 0.5
+            x1[t,p] = Int64(round(JuMP.value(x[t,p])))
         end
     end
-    sol.num_campaigns = sum(sol.x)
-    for t = 1:sol.T
-        for m = 1:sol.M
-            sol.f[t,m] = JuMP.value(f[t,m])
-        end
-    end
-    return sol
+    # # Create solution object
+    # sol = ExpandedSol(data)
+    # sol.obj = objective_value(model)
+    # for p = 1:sol.P
+    #     sol.k[p] = Int64(round(JuMP.value(k[p])))
+    #     for t = 1:sol.T
+    #         if JuMP.value(x[t,p]) > 0.5
+    #             sol.x[t,p] = Int64(round(JuMP.value(x[t,p])))
+    #         end  
+    #     end
+    # end
+    # sol.num_campaigns = sum(sol.x)
+    # for t = 1:sol.T
+    #     for m = 1:sol.M
+    #         sol.f[t,m] = JuMP.value(f[t,m])
+    #     end
+    # end
+
+    return x1
 end

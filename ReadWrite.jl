@@ -1,7 +1,7 @@
 using XLSX
 using Dates
 using Statistics
-include("../Structures.jl")
+include("Structures.jl")
 
 function read_DR_data(P)
     population = 5800000
@@ -89,8 +89,11 @@ function writeSolution(filename, data, sol)
     write(outFile, "T P M\n")
     write(outFile, join([data.T, data.P, data.M]," ")*"\n\n")
 
-    write(outFile, "obj\n")
-    write(outFile, join(sol.obj," ")*"\n\n")
+    write(outFile, "base obj\n")
+    write(outFile, join(sol.base_obj," ")*"\n\n")
+
+    write(outFile, "exp obj\n")
+    write(outFile, join(sol.exp_obj," ")*"\n\n")
 
     write(outFile, "x\n")
     for p = 1:sol.P
@@ -123,9 +126,11 @@ function readSolution(filename)
     T, P, M = parse.(Int,split(readline(f)))
     readline(f) # blank
 
-    sol = Sol(T,P,M)
-    readline(f) # obj
-    sol.obj = parse.(Float64, readline(f))
+    sol = ExpandedSol(data)
+    readline(f) # baseobj
+    sol.base_obj = parse.(Float64, readline(f))
+    readline(f) # exp obj
+    sol.exp_obj = parse.(Float64, readline(f))
     readline(f) # blank
     readline(f) # x
     for p in 1:P
@@ -174,10 +179,16 @@ function writeParameters(filename, params)
     write(outFile, join(params.status," ")*"\n\n")
 
     write(outFile, "prob destroy iter\n")
-    write(outFile, join(params.prob_destroy_t," ")*"\n\n")
+    for i = 1:length(params.num_destroy)
+        write(outFile, join(params.prob_destroy_t[i,:]," ")*"\n")
+    end
+    write(outFile, "\n")
 
     write(outFile, "prob repair iter\n")
-    write(outFile, join(params.prob_repair_t," ")*"\n\n")
+    for i = 1:length(params.num_repair)
+        write(outFile, join(params.prob_repair_t[i,:]," ")*"\n")
+    end
+    write(outFile, "\n")
 
     write(outFile, "time destroy\n")
     write(outFile, join(params.time_destroy," ")*"\n\n")
@@ -223,10 +234,16 @@ function readParameters(filename)
     status = parse.(Int64,split(readline(f)))
     readline(f) # blank
     readline(f) # prob destroy iter
-    prob_destroy_t = parse.(Float64,split(readline(f)))
+    prob_destroy_t = zeros(Float64, length(num_destroy), length(status))
+    for i = 1:length(num_destroy)
+        prob_destroy_t[i,:] = parse.(Float64,split(readline(f)))
+    end
     readline(f) # blank
     readline(f) # prob repair iter
-    prob_repair_t = parse.(Float64,split(readline(f)))
+    prob_repair_t = zeros(Float64, length(num_repair), length(status))
+    for i = 1:length(num_repair)
+        prob_repair_t[i,:] = parse.(Float64,split(readline(f)))
+    end
     readline(f) # blank
     readline(f) # time destroy
     time_destroy = parse.(Float64,split(readline(f)))

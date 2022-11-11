@@ -17,7 +17,7 @@ function DR_plan()
     P = size(mapping)[1]
 
     data = read_DR_data(P)
-    dr_sol = Sol(data.T,data.P,data.M)
+    dr_sol = ExpandedSol(data)
 
     inventory_check = zeros(Float64, T, C)
     number_priorities = zeros(Int64, P)

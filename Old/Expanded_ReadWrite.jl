@@ -105,6 +105,15 @@ function writeSolution(filename, data, sol)
     for m = 1:sol.M
         write(outFile,join(sol.f[:,m]," ")*"\n")
     end
+    write(outFile, "\n")
+
+    write(outFile, "L\n")
+    write(outFile, join(sol.L," ")*"\n\n")
+
+    write(outFile, "g\n")
+    for p = 1:sol.P
+        write(outFile,join(sol.g[:,p]," ")*"\n")
+    end
     close(outFile)
 end
 
@@ -114,7 +123,7 @@ function readSolution(filename)
     T, P, M = parse.(Int,split(readline(f)))
     readline(f) # blank
 
-    sol = Sol(T,P,M)
+    sol = ExpandedSol(data)
     readline(f) # obj
     sol.obj = parse.(Float64, readline(f))
     readline(f) # blank
@@ -129,6 +138,14 @@ function readSolution(filename)
     readline(f) # f
     for m = 1:M
         sol.f[:,m] = parse.(Float64,split(readline(f)))
+    end
+    readline(f) # blank
+    readline(f) # L 
+    sol.L = parse.(Int,split(readline(f)))
+    readline(f) # blank
+    readline(f) # g 
+    for p = 1:P
+        sol.g[:,p] = parse.(Int,split(readline(f)))
     end
     return sol
 end
@@ -157,10 +174,16 @@ function writeParameters(filename, params)
     write(outFile, join(params.status," ")*"\n\n")
 
     write(outFile, "prob destroy iter\n")
-    write(outFile, join(params.prob_destroy_t," ")*"\n\n")
+    for i = 1:length(params.num_destroy)
+        write(outFile, join(params.prob_destroy_t[i,:]," ")*"\n")
+    end
+    write(outFile, "\n")
 
     write(outFile, "prob repair iter\n")
-    write(outFile, join(params.prob_repair_t," ")*"\n\n")
+    for i = 1:length(params.num_repair)
+        write(outFile, join(params.prob_repair_t[i,:]," ")*"\n")
+    end
+    write(outFile, "\n")
 
     write(outFile, "time destroy\n")
     write(outFile, join(params.time_destroy," ")*"\n\n")
@@ -206,10 +229,16 @@ function readParameters(filename)
     status = parse.(Int64,split(readline(f)))
     readline(f) # blank
     readline(f) # prob destroy iter
-    prob_destroy_t = parse.(Float64,split(readline(f)))
+    prob_destroy_t = zeros(Float64, length(num_destroy), length(status))
+    for i = 1:length(num_destroy)
+        prob_destroy_t[i,:] = parse.(Float64,split(readline(f)))
+    end
     readline(f) # blank
     readline(f) # prob repair iter
-    prob_repair_t = parse.(Float64,split(readline(f)))
+    prob_repair_t = zeros(Float64, length(num_repair), length(status))
+    for i = 1:length(num_repair)
+        prob_repair_t[i,:] = parse.(Float64,split(readline(f)))
+    end
     readline(f) # blank
     readline(f) # time destroy
     time_destroy = parse.(Float64,split(readline(f)))
@@ -224,14 +253,13 @@ function readParameters(filename)
     num_repair = parse.(Int64,split(readline(f)))
     readline(f) # blank
     readline(f) # destroy names
-    destroy_names = split(readline(f), " ")
+    destroy_names =  split(readline(f), " ")
     readline(f) # blank
     readline(f) # repair names
-    repair_names = split(readline(f), " ")
+    repair_names =  split(readline(f), " ")
     
     return (prob_destroy=prob_destroy, prob_repair=prob_repair, destroys=destroys,  prob_destroy_t = prob_destroy_t,
     prob_repair_t = prob_repair_t, repairs=repairs, current_obj=current_obj, current_best=current_best, status=status, 
     time_repair=time_repair, time_destroy=time_destroy, num_repair=num_repair, num_destroy=num_destroy, 
     destroy_names=destroy_names, repair_names=repair_names)
 end
-

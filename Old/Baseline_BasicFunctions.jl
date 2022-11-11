@@ -1,5 +1,6 @@
 using Random
 using Statistics
+include("MIPModel.jl")
 
 function insert!(data, sol, t, p)
     sol.x[t,p] += 1
@@ -30,6 +31,16 @@ function insert!(data, sol, t, p)
     end
 
     findObjective!(data, sol)
+end
+
+function MIPtoSol(data, x)
+    sol = ExpandedSol(data)
+    for t = 1:data.T, p = 1:data.P
+        for n = 1:x[t,p]
+            insert!(data, sol, t, p)
+        end
+    end
+    return sol
 end
 
 function remove!(data, sol, t, p)

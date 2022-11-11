@@ -138,6 +138,16 @@ function fits(data, sol, t, p)
     return true
 end
 
+function MIPtoSol(data, x)
+    sol = ExpandedSol(data)
+    for t = 1:data.T, p = 1:data.P
+        for n = 1:x[t,p]
+            insert!(data, sol, t, p)
+        end
+    end
+    return sol
+end
+
 function findObjective!(data, sol)
     num_campaigns = sum(sum(sol.x, dims=1) .* transpose(data.reward))
     scope = sum(data.penalty_S .* sol.k)
