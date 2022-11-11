@@ -149,13 +149,18 @@ function MIPtoSol(data, x)
 end
 
 function findObjective!(data, sol)
-    num_campaigns = sum(sum(sol.x, dims=1) .* transpose(data.reward))
-    scope = sum(data.penalty_S .* sol.k)
-    aimed_wrong = sum(sum(sol.g))
-    idle_times = sum(sol.L)
+    # x_reward = sum(sum(sol.x, dims=1) .* transpose(data.reward))
+    # k_penalty = sum(data.penalty_S .* sol.k)
+    # g_penalty = sum(sum(sol.g))
+    # L_reward = sum(sol.L)
     # freelance = sum(sum(sol.f, dims=1) .* data.penalty_f)
-    sol.base_obj = scope - num_campaigns
-    sol.exp_obj =  scope - num_campaigns + aimed_wrong - idle_times
+    sol.objective.x_reward = sum(sum(sol.x, dims=1) .* transpose(data.reward))
+    sol.objective.k_penalty = sum(data.penalty_S .* sol.k)
+    sol.objective.g_penalty = sum(sum(sol.g))
+    sol.objective.L_reward = sum(sol.L)
+
+    sol.base_obj = sol.objective.k_penalty - sol.objective.x_reward
+    sol.exp_obj =  sol.objective.k_penalty - sol.objective.x_reward + sol.objective.g_penalty - sol.objective.L_reward
 end
 
 function randomInsert!(data, sol, priorities)
@@ -188,12 +193,12 @@ function deltaInsert(data, sol, t, p)
     xp[t] += 1
     new_idle = findMinIdle(data,xp)
     delta_idle = sol.L[p] - new_idle # Should be positive or zero
-    delta_exp = sol.obj - data.reward[p] + penalty_scope + aimed_wrong + delta_idle
+    delta_exp = sol.exp_obj - data.reward[p] + penalty_scope + aimed_wrong + delta_idle
 
     if sol.k[p] > 0
-        delta_base =  sol.obj - data.penalty_S[p] - data.reward[p]
+        delta_base =  sol.base_obj - data.penalty_S[p] - data.reward[p]
     else
-        delta_base = sol.obj - data.reward[p]
+        delta_base = sol.base_obj - data.reward[p]
     end
 
     return (delta_base=delta_base, delta_exp=delta_exp)
@@ -214,12 +219,12 @@ function deltaRemove(data, sol, t, p)
     xp[t] -= 1
     new_idle = findMinIdle(data,xp)
     delta_idle = sol.L[p] - new_idle # Should be negative or zero
-    delta_exp = sol.obj + data.reward[p] + penalty_scope + aimed_wrong + delta_idle
+    delta_exp = sol.exp_obj + data.reward[p] + penalty_scope + aimed_wrong + delta_idle
 
     if sum(sol.x[:,p])-1 < data.S[p]
-        delta_base = sol.obj + data.penalty_S[p] + data.reward[p]
+        delta_base = sol.base_obj + data.penalty_S[p] + data.reward[p]
     else
-        delta_base = sol.obj + data.reward[p]
+        delta_base = sol.base_obj + data.reward[p]
     end
 
     return (delta_base=delta_base, delta_exp=delta_exp)    
@@ -278,8 +283,8 @@ function findSimilarity(data)
     sim = zeros(data.P, data.P)
     for p1 = 1:(data.P-1)
         for p2 = (p1+1):data.P
-            sim_u = PearsonSimilarity(data.u[:,p1,:], data.u[:,p2,:])
-            sim_w = PearsonSimilarity(data.w[p1,:], data.w[p2,:])
+            sim_u = pearsonSimilarity(data.u[:,p1,:], data.u[:,p2,:])
+            sim_w = pearsonSimilarity(data.w[p1,:], data.w[p2,:])
 
             sim[p1,p2] = mean([sim_u, sim_w])
             sim[p2,p1] = mean([sim_u, sim_w])

@@ -73,19 +73,19 @@ function modelRepair!(data, sol, type)
 
     sol_limit = 2
     if type == "expanded"
-        MIPsol = MIPExpansion(MIPdata, 0, sol_limit, 0)
+        MIPx = MIPExpansion(MIPdata, 0, sol_limit, 0)
     elseif type == "baseline" 
-        MIPsol = MIPBaseline(MIPdata, 0, sol_limit, 0)
+        MIPx = MIPBaseline(MIPdata, 0, sol_limit, 0)
     else
         println("Enter valid model type")
         return
     end
 
-    if MIPsol == 0
+    if MIPx == 0
         return
     else
         for p = 1:data.P, t = 1:data.T 
-            for n = 1:MIPsol.x[t,p]
+            for n = 1:MIPx[t,p]
                 insert!(data, sol, t, p)
             end
         end
@@ -132,7 +132,14 @@ function greedyRepair!(data, sol, type)
 end
 
 function bestInsertion(data, sol, sorted_idx, type)
-    best_obj = sol.obj
+    if type == "baseline"
+        best_obj = sol.base_obj
+    elseif type == "expanded"
+        best_obj = sol.exp_obj
+    else
+        println("Enter valid model type")
+        return
+    end
     best_p = 0
     best_t = 0
     
@@ -162,7 +169,14 @@ end
 
 
 function firstInsertion(data, sol, shuffled_idx, type)
-    best_obj = sol.obj
+    if type == "baseline"
+        best_obj = sol.base_obj
+    elseif type == "expanded"
+        best_obj = sol.exp_obj
+    else
+        println("Enter valid model type")
+        return
+    end
     best_p = 0
     best_t = 0
     
@@ -222,14 +236,16 @@ function regretInsertion(data, sol, priorities, type)
                 delta_obj = deltaInsert(data, sol, t, p)
                 if type == "expanded"
                     new_obj = delta_obj.delta_exp
+                    sol_obj = sol.exp_obj
                 elseif type == "baseline"
                     new_obj = delta_obj.delta_base
+                    sol_obj = sol.base_obj
                 else
                     println("Enter valid model type")
                     return
                 end
 
-                if new_obj < obj_best[idx] && new_obj < sol.obj
+                if new_obj < obj_best[idx] && new_obj < sol_obj
                     obj_second[idx] = obj_best[idx]
                     obj_best[idx] = new_obj
                     t_best[idx] = t 

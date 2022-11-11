@@ -11,14 +11,13 @@ function MIPBaseline(data, time_limit, solution_limit, log)
     if time_limit > 0
         set_optimizer_attribute(model,"TimeLimit", time_limit)
     elseif solution_limit > 0
-        set_optimizer_attribute(model,"SolutionLimit", solution_limit) #, "LogToConsole" => log, "OutputFlag" => log)
+        set_optimizer_attribute(model,"SolutionLimit", solution_limit)
     end
 
     @variable(model, x[1:data.T, 1:data.P] >= 0, Int)
     @variable(model, f[1:data.T,1:data.M] >= 0) # freelance hours
     @variable(model, k[1:data.P] >= 0, Int)
     
-
     @objective(model, Min, -sum(data.reward[p]*x[t,p] for t = data.start:data.stop for p = 1:data.P) + sum(k[p]*data.penalty_S[p] for p = 1:data.P) + sum(f[t,m]*data.penalty_f[m] for t = 1:data.T for m = 1:data.M))
 
     #It is not possible to slack on Flagskib DR1 and DR2 (p=1 and p=8)
@@ -65,10 +64,9 @@ function MIPExpansion(data, time_limit, solution_limit, log)
     if time_limit > 0
         set_optimizer_attribute(model,"TimeLimit", time_limit)
     elseif solution_limit > 0
-        set_optimizer_attribute(model,"SolutionLimit", solution_limit) #, "LogToConsole" => log, "OutputFlag" => log)
+        set_optimizer_attribute(model,"SolutionLimit", solution_limit)
     end
 
-    #model = Model(optimizer_with_attributes(Gurobi.Optimizer, "LogToConsole" => logging, "OutputFlag" => logging, "SolutionLimit" => 1))
     @variable(model, x[1:data.T, p = 1:data.P, 1:data.S[p]], Bin) # We can't have more than scope of each priority for now
     @variable(model, f[1:data.T,1:data.M] >= 0) # Freelance hours
     @variable(model, k[1:data.P] >= 0, Int) # Slack for scope
