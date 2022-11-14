@@ -1,30 +1,34 @@
 include("PlotSolution.jl")
-include("../Expansion/ReadWrite.jl")
-include("../Expansion/ConstructionHeuristics_expanded.jl")
-include("../Expansion/ALNS_expanded.jl")
-include("../Expansion/MIPModelSpreading.jl")
-include("../Expansion/LocalSearch.jl")
+include("../ReadWrite.jl")
+include("../ConstructionHeuristics.jl")
+include("ValidateSolution.jl")
+
+include("../ALNS.jl")
+include("../MIPModels.jl")
+
 
 
 P = 37
 data = read_DR_data(P)
 
-#sol = randomInitial(data)
+sol = randomInitial(data)
 
-sol, params = ALNSExpanded(data, 30, false)
+sol, params = ALNS(data, 120, "expanded", false, 10000, 0.995)
 
 
 inventory, production = checkSolution(data, sol)
 
 drawHeatmap(inventory, production, data, sol, "hej")
 
-solutionTracking(params, "test")
+include("PlotSolution.jl")
+solutionTracking_all(params, "test3")
+
+temperatureTracking(params, "temp_check")
+
 
 include("PlotSolution.jl")
+
 probabilityTracking(params, "hej")
-
-include("PlotSolution.jl")
-progressDestroyRepair(params)
 
 sol1 = deepcopy(sol)
 

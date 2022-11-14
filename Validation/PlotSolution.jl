@@ -461,9 +461,9 @@ function probabilityTracking(params, filename)
     def progDR(params, filename):
         f,(ax1,ax2) = plt.subplots(2,1, figsize = (10,10))
         i = 0
-        iter = range(1,len(params.prob_destroy_t[0]) + 1,10)
+        iter = range(1,len(params.prob_destroy_it[0]) + 1,10)
         while i < len(params.num_destroy):
-            ax1.plot(iter, params.prob_destroy_t[i][::10])
+            ax1.plot(iter, params.prob_destroy_it[i][::10])
             ax1.legend(params.destroy_names)
             ax1.set_xlabel("Iterations")
             ax1.title.set_text('Probability')
@@ -471,7 +471,7 @@ function probabilityTracking(params, filename)
             i += 1
         i = 0
         while i < len(params.num_repair):
-            ax2.plot(iter, params.prob_repair_t[i][::10])
+            ax2.plot(iter, params.prob_repair_it[i][::10])
             ax2.legend(params.repair_names)
             ax2.set_xlabel("Iterations")
             ax2.title.set_text('Probability')
