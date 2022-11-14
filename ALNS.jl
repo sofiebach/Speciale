@@ -175,7 +175,7 @@ function ALNS(data,time_limit,type="baseline",modelRepair=false,T=10000,alpha=0.
             append!(current_best, best_sol.base_obj)
         elseif type == "expanded"
             append!(current_obj, temp_sol.exp_obj)
-        append!(current_best, best_sol.exp_obj)
+            append!(current_best, best_sol.exp_obj)
         else
             println("Enter valid model type")
         end

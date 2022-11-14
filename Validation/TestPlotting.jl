@@ -8,21 +8,11 @@ model = "ALNS"
 type = "baseline"
 modelrepair = "false"
 filename = "results/"*model*"_"*type*"_"*modelrepair
-sol = readSolution(filename)
+sol = readSolution(filename, data)
 params = readParameters(filename*"_parameters")
 
-solutionTracking_all(params, "test3")
+solutionTracking_all(params, filename*"_sol_tracking")
 
-temperatureTracking(params, "temp_check")
-
-
-include("PlotSolution.jl")
-
-probabilityTracking(params, "hej")
-
-sol1 = deepcopy(sol)
-
-swapInsert(data,sol1)
-
-
-drawTVSchedule(data,sol,"hallo")
+probabilityTracking(params, filename*"_prob_tracking")
+   
+temperatureTracking(params, filename*"temp_tracking")
