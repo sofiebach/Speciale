@@ -369,15 +369,21 @@ function writeParameters(filename, params)
     write(outFile, "status\n")
     write(outFile, join(params.status," ")*"\n\n")
 
+    write(outFile, "num destroy\n")
+    write(outFile, join(params.num_destroy," ")*"\n\n")
+
+    write(outFile, "num repair\n")
+    write(outFile, join(params.num_repair," ")*"\n\n")
+
     write(outFile, "prob destroy iter\n")
     for i = 1:length(params.num_destroy)
-        write(outFile, join(params.prob_destroy_t[i,:]," ")*"\n")
+        write(outFile, join(params.prob_destroy_it[i,:]," ")*"\n")
     end
     write(outFile, "\n")
 
     write(outFile, "prob repair iter\n")
     for i = 1:length(params.num_repair)
-        write(outFile, join(params.prob_repair_t[i,:]," ")*"\n")
+        write(outFile, join(params.prob_repair_it[i,:]," ")*"\n")
     end
     write(outFile, "\n")
 
@@ -387,17 +393,17 @@ function writeParameters(filename, params)
     write(outFile, "time repair\n")
     write(outFile, join(params.time_repair," ")*"\n\n")
 
-    write(outFile, "num destroy\n")
-    write(outFile, join(params.num_destroy," ")*"\n\n")
-
-    write(outFile, "num repair\n")
-    write(outFile, join(params.num_repair," ")*"\n\n")
-
     write(outFile, "destroy names\n")
     write(outFile, join(params.destroy_names," ")*"\n\n")
 
     write(outFile, "repair names\n")
     write(outFile, join(params.repair_names," ")*"\n\n")
+
+    write(outFile, "iterations\n")
+    write(outFile, join(params.iter," ")*"\n\n")
+
+    write(outFile, "Temperature\n")
+    write(outFile, join(params.T_it," ")*"\n\n")
     close(outFile)
 end
 
@@ -424,16 +430,22 @@ function readParameters(filename)
     readline(f) # status
     status = parse.(Int64,split(readline(f)))
     readline(f) # blank
+    readline(f) # num destroy
+    num_destroy = parse.(Int64,split(readline(f)))
+    readline(f) # blank
+    readline(f) # num repair
+    num_repair = parse.(Int64,split(readline(f)))
+    readline(f) # blank
     readline(f) # prob destroy iter
-    prob_destroy_t = zeros(Float64, length(num_destroy), length(status))
+    prob_destroy_it = zeros(Float64, length(num_destroy), length(status))
     for i = 1:length(num_destroy)
-        prob_destroy_t[i,:] = parse.(Float64,split(readline(f)))
+        prob_destroy_it[i,:] = parse.(Float64,split(readline(f)))
     end
     readline(f) # blank
     readline(f) # prob repair iter
-    prob_repair_t = zeros(Float64, length(num_repair), length(status))
+    prob_repair_it = zeros(Float64, length(num_repair), length(status))
     for i = 1:length(num_repair)
-        prob_repair_t[i,:] = parse.(Float64,split(readline(f)))
+        prob_repair_it[i,:] = parse.(Float64,split(readline(f)))
     end
     readline(f) # blank
     readline(f) # time destroy
@@ -442,20 +454,20 @@ function readParameters(filename)
     readline(f) # time repair
     time_repair = parse.(Float64,split(readline(f)))
     readline(f) # blank
-    readline(f) # num destroy
-    num_destroy = parse.(Int64,split(readline(f)))
-    readline(f) # blank
-    readline(f) # num repair
-    num_repair = parse.(Int64,split(readline(f)))
-    readline(f) # blank
     readline(f) # destroy names
     destroy_names =  split(readline(f), " ")
     readline(f) # blank
     readline(f) # repair names
     repair_names =  split(readline(f), " ")
+    readline(f) # blank
+    readline(f) # iterations
+    iter = parse(Int64,readline(f))
+    readline(f) # blank
+    readline(f) # temperature
+    T_it = parse.(Float64,split(readline(f)))
     
-    return (prob_destroy=prob_destroy, prob_repair=prob_repair, destroys=destroys,  prob_destroy_t = prob_destroy_t,
-    prob_repair_t = prob_repair_t, repairs=repairs, current_obj=current_obj, current_best=current_best, status=status, 
+    return (prob_destroy=prob_destroy, prob_repair=prob_repair, destroys=destroys, prob_destroy_it = prob_destroy_it,
+    prob_repair_it = prob_repair_it, repairs=repairs, current_obj=current_obj, current_best=current_best, status=status, 
     time_repair=time_repair, time_destroy=time_destroy, num_repair=num_repair, num_destroy=num_destroy, 
-    destroy_names=destroy_names, repair_names=repair_names)
+    destroy_names=destroy_names, repair_names=repair_names, iter = iter, T_it = T_it)
 end
