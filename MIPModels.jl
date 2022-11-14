@@ -20,6 +20,7 @@ function MIPBaseline(data, solver, log=1, time_limit=60, solution_limit=0)
     if time_limit > 0
         if solver == "Gurobi"
             set_optimizer_attribute(model, "TimeLimit", time_limit)
+            set_optimizer_attribute(model, "Threads", 4)
         else
             set_optimizer_attribute(model, "time_limit", time_limit*1.0)
         end
@@ -85,6 +86,7 @@ function MIPExpansion(data, solver, log=1, time_limit=60, solution_limit=0)
     if time_limit > 0
         if solver == "Gurobi"
             set_optimizer_attribute(model, "TimeLimit", time_limit)
+            set_optimizer_attribute(model, "Threads", 4)
         else
             set_optimizer_attribute(model, "time_limit", time_limit*1.0)
         end
