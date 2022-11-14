@@ -503,7 +503,7 @@ function readParameters(filename)
     readline(f) # temperature
     T_it = parse.(Float64,split(readline(f)))
     
-    return (prob_destroy=prob_destroy, prob_repair=prob_repair, destroys=destroys, prob_destroy_iit = prob_destroy_iit,
+    return (prob_destroy=prob_destroy, prob_repair=prob_repair, destroys=destroys, prob_destroy_it = prob_destroy_it,
     prob_repair_iit = prob_repair_iit, repairs=repairs, current_obj=current_obj, current_best=current_best, status=status, 
     time_repair=time_repair, time_destroy=time_destroy, num_repair=num_repair, num_destroy=num_destroy, 
     destroy_names=destroy_names, repair_names=repair_names, iter = iter, T_it = T_it)
