@@ -7,9 +7,10 @@ data = read_DR_data(P)
 model = "ALNS"
 type = "baseline"
 modelrepair = "false"
-filename = "results/"*model*"_"*type*"_"*modelrepair
-sol = readSolution(filename, data)
-params = readParameters(filename*"_parameters")
+prefix = "results/"
+filename = model*"_"*type*"_"*modelrepair
+sol = readSolution(prefix * filename, data)
+params = readParameters(prefix * filename*"_parameters")
 
 solutionTracking_all(params, filename*"_sol_tracking")
 
