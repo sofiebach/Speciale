@@ -1,5 +1,6 @@
 include("HeuristicFunctions.jl")
 include("ConstructionHeuristics.jl")
+include("MIPModels.jl")
 
 function setProb(rho)
     return rho./sum(rho)
@@ -29,7 +30,7 @@ function isValid(data, temp_sol, sol)
 end
 
 
-function ALNS(data,time_limit,type="baseline",modelRepair=false,T=1000,alpha=0.9,gamma=0.9,frac_cluster=0.1,frac_random=0.1,thres_worst=10,frac_related=0.2)    
+function ALNS(data,time_limit,type="baseline",modelRepair=false,T=10000,alpha=0.99975,gamma=0.9,frac_cluster=0.2,frac_random=0.2,thres_worst=10,frac_related=0.2)    
     it = 1
     # best_it = 1
     # long_term_update = 1000
