@@ -81,14 +81,14 @@ function ALNS(data,time_limit,type="baseline",modelRepair=false,T=10000,alpha=0.
     w3 = 1
     w4 = 0
 
-    destroys = []
-    repairs = []
-    current_obj = []
-    current_best = []
-    status = []
-    prob_destroy_it = [] 
-    prob_repair_it = []
-    T_it = []
+    destroys = Int64[]
+    repairs = Int64[]
+    current_obj = Float64[]
+    current_best = Float64[]
+    status = Int64[]
+    prob_destroy_it = Float64[] 
+    prob_repair_it = Float64[]
+    T_it = Float64[]
 
     while elapsedTime(start_time) < time_limit
         # intensification

@@ -414,13 +414,13 @@ function writeParameters(filename, params)
 
     write(outFile, "prob destroy iter\n")
     for i = 1:length(params.num_destroy)
-        write(outFile, join(params.prob_destroy_iit[i,:]," ")*"\n")
+        write(outFile, join(params.prob_destroy_it[i,:]," ")*"\n")
     end
     write(outFile, "\n")
 
     write(outFile, "prob repair iter\n")
     for i = 1:length(params.num_repair)
-        write(outFile, join(params.prob_repair_iit[i,:]," ")*"\n")
+        write(outFile, join(params.prob_repair_it[i,:]," ")*"\n")
     end
     write(outFile, "\n")
 
@@ -504,7 +504,7 @@ function readParameters(filename)
     T_it = parse.(Float64,split(readline(f)))
     
     return (prob_destroy=prob_destroy, prob_repair=prob_repair, destroys=destroys, prob_destroy_it = prob_destroy_it,
-    prob_repair_iit = prob_repair_iit, repairs=repairs, current_obj=current_obj, current_best=current_best, status=status, 
+    prob_repair_it = prob_repair_it, repairs=repairs, current_obj=current_obj, current_best=current_best, status=status, 
     time_repair=time_repair, time_destroy=time_destroy, num_repair=num_repair, num_destroy=num_destroy, 
     destroy_names=destroy_names, repair_names=repair_names, iter = iter, T_it = T_it)
 end
