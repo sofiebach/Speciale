@@ -185,8 +185,8 @@ function ALNS(data,time_limit,type="baseline",modelRepair=false,T=10000,alpha=0.
         T = alpha * T
      
     end
-    prob_destroy_t = reshape(prob_destroy_it, length(num_destroy),:)
-    prob_repair_t = reshape(prob_repair_it, length(num_repair),:)
+    prob_destroy_it = reshape(prob_destroy_it, length(num_destroy),:)
+    prob_repair_it = reshape(prob_repair_it, length(num_repair),:)
     println("T: ", T)
 
     return best_sol, (prob_destroy=prob_destroy, prob_repair=prob_repair, destroys=destroys,  prob_destroy_it = prob_destroy_it,

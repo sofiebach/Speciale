@@ -100,11 +100,12 @@ mutable struct ExpandedSol
     P::Int64
     T::Int64
     M::Int64
+    C::Int64
     I_cap::Array{Float64,2}
     H_cap::Array{Float64,2}
     ExpandedSol(data) = new(0.0, 0.0, Objective(), 0,
     zeros(Int64,data.T,data.P), zeros(Float64,data.T,data.M), deepcopy(data.S), 
     zeros(Int64, data.P), zeros(Int64, data.T, data.P), 
-    data.P, data.T, data.M, 
+    data.P, data.T, data.M, data.C, 
     deepcopy(data.I), deepcopy(data.H))
 end

@@ -277,14 +277,20 @@ end
 # Write solution
 function writeSolution(filename, data, sol)
     outFile = open(filename, "w")
-    write(outFile, "T P M\n")
-    write(outFile, join([data.T, data.P, data.M]," ")*"\n\n")
+    write(outFile, "T P M C\n")
+    write(outFile, join([data.T, data.P, data.M, data.C]," ")*"\n\n")
 
     write(outFile, "base obj\n")
     write(outFile, join(sol.base_obj," ")*"\n\n")
 
     write(outFile, "exp obj\n")
     write(outFile, join(sol.exp_obj," ")*"\n\n")
+
+    write(outFile, "Objective struct\n")
+    write(outFile, join([sol.objective.x_reward, sol.objective.k_penalty, sol.objective.g_penalty, sol.objective.L_reward]," ")*"\n\n")
+
+    write(outFile, "num campaigns\n")
+    write(outFile, join(sol.num_campaigns," ")*"\n\n")
 
     write(outFile, "x\n")
     for p = 1:sol.P
@@ -308,20 +314,41 @@ function writeSolution(filename, data, sol)
     for p = 1:sol.P
         write(outFile,join(sol.g[:,p]," ")*"\n")
     end
+    write(outFile, "\n")
+
+    write(outFile, "I cap\n")
+    for c = 1:sol.C
+        write(outFile,join(sol.I_cap[:,c]," ")*"\n")
+    end
+    write(outFile, "\n")
+
+    write(outFile, "H cap\n")
+    for m = 1:sol.M
+        write(outFile,join(sol.H_cap[:,m]," ")*"\n")
+    end
+    write(outFile, "\n")
+
     close(outFile)
 end
 
-function readSolution(filename)
+function readSolution(filename, data)
     f = open(filename)
     readline(f) # T P M
-    T, P, M = parse.(Int,split(readline(f)))
+    T, P, M, C = parse.(Int,split(readline(f)))
     readline(f) # blank
 
     sol = ExpandedSol(data)
     readline(f) # baseobj
     sol.base_obj = parse.(Float64, readline(f))
+    readline(f) # blank
     readline(f) # exp obj
     sol.exp_obj = parse.(Float64, readline(f))
+    readline(f) # blank
+    readline(f) # Objective struct
+    sol.objective.x_reward, sol.objective.k_penalty, sol.objective.g_penalty, sol.objective.L_reward = parse.(Float64,split(readline(f)))
+    readline(f) # blank
+    readline(f) # num campaigns
+    sol.num_campaigns = parse.(Int64, readline(f))
     readline(f) # blank
     readline(f) # x
     for p in 1:P
@@ -342,6 +369,16 @@ function readSolution(filename)
     readline(f) # g 
     for p = 1:P
         sol.g[:,p] = parse.(Int,split(readline(f)))
+    end
+    readline(f) # blank
+    readline(f) # I_cap
+    for c = 1:C
+        sol.I_cap[:,c] = parse.(Float64,split(readline(f)))
+    end
+    readline(f) # blank
+    readline(f) # H_cap
+    for m = 1:M
+        sol.H_cap[:,m] = parse.(Float64,split(readline(f)))
     end
     return sol
 end
