@@ -1,8 +1,7 @@
 include("PlotSolution.jl")
 include("../ReadWrite.jl")
 
-P = 37
-data = read_DR_data(P)
+data = readInstance("dataset/100_0_0.txt")
 
 model = "ALNS"
 type = "baseline"
