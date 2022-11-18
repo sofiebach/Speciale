@@ -63,6 +63,24 @@ function relatedDestroy!(data, sol, frac)
     end
 end
 
+function spreadModelRepair!(data, sol, type)
+    MIPdata = deepcopy(data)
+
+    time_limit = 120
+    MIPx = MIPExpansion(MIPdata, "HiGHS", 1, time_limit, 0, sol.x)
+
+    if MIPx == 0
+        return
+    else
+        for p = 1:data.P, t = 1:data.T 
+            N = MIPx[t,p] - sol.x[t,p]
+            for n = 1:N
+                insert!(data, sol, t, p)
+            end
+        end
+    end
+end
+
 function modelRepair!(data, sol, type)
     MIPdata = deepcopy(data)
     MIPdata.I = deepcopy(sol.I_cap)
@@ -71,17 +89,10 @@ function modelRepair!(data, sol, type)
     MIPdata.F = deepcopy(data.F - transpose(sum(sol.f, dims=1))[:,1])
     MIPdata.S = deepcopy(sol.k)
 
-    sol_limit = 2
-    if type == "expanded"
-        time_limit = 10
-        MIPx = MIPExpansion(MIPdata, "HiGHS", 0, time_limit, 0)
-    elseif type == "baseline" 
-        time_limit = 10
-        MIPx = MIPBaseline(MIPdata, "HiGHS", 0, time_limit, 0)
-    else
-        println("Enter valid model type")
-        return
-    end
+    time_limit = 10
+    logging = 1
+    sol_limit = 0
+    MIPx = MIPBaseline(MIPdata, "HiGHS", logging, time_limit, sol_limit)
 
     if MIPx == 0
         return

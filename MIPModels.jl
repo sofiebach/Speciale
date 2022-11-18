@@ -69,7 +69,7 @@ function MIPBaseline(data, solver, log=1, time_limit=60, solution_limit=0)
 end
 
 
-function MIPExpansion(data, solver, log=1, time_limit=60, solution_limit=0)
+function MIPExpansion(data, solver, log=1, time_limit=60, solution_limit=0, destroyed_sol=0)
     if solver == "Gurobi"
         model = Model(optimizer_with_attributes(() -> Gurobi.Optimizer(genv)))
     elseif solver == "HiGHS"
@@ -106,6 +106,15 @@ function MIPExpansion(data, solver, log=1, time_limit=60, solution_limit=0)
     epsilon = 0.5
     
     @objective(model, Min, sum(g[t,p] for t=1:data.T, p=1:data.P) - sum(L[p] for p=1:data.P) - sum(data.reward[p]*sum(x[t,p,n] for n=1:data.S[p]) for t = 1:data.T for p = 1:data.P) + sum(k[p]*data.penalty_S[p] for p = 1:data.P) + sum(f[t,m]*data.penalty_f[m] for t = 1:data.T for m = 1:data.M))
+
+    # If destroyed solution is inputted
+    if destroyed_sol != 0
+        for t = 1:data.T, p=1:data.P 
+            if destroyed_sol[t,p] > 0
+                @constraint(model, sum(x[t,p,n] for n=1:data.S[p]) >= destroyed_sol[t,p])
+            end
+        end
+    end
 
     #It is not possible to slack on Flagskib DR1 and DR2 (p=1 and p=8)
     @constraint(model, [p in data.P_bar], k[p] == 0)
