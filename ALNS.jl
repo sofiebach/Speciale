@@ -56,9 +56,9 @@ function ALNS(data,time_limit,type="baseline",modelRepair=false,T=10000,alpha=0.
             n_r = 2
         end
     elseif type == "expanded"
-        repair_functions = [greedyRepair!, firstRepair!, regretRepair!, modelRepair!, spreadModelRepair!]
+        repair_functions = [greedyRepair!, firstRepair!, regretRepair!, modelRepair!]
         if modelRepair
-            n_r = 5
+            n_r = 4
         else
             n_r = 3
         end

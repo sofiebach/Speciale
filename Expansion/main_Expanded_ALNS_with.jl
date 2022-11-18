@@ -2,11 +2,10 @@ include("../ReadWrite.jl")
 include("../ALNS.jl")
 
 # Read data 
-P = 37
-data = read_DR_data(P)
-time_limit = 60
+data = readInstance("dataset/25_0_0.txt")
 
 # Run ALNS without modelRepair
+time_limit = 60
 type = "expanded"
 modelrepair = false
 sol, params = ALNS(data, time_limit, type, modelrepair)
@@ -16,11 +15,6 @@ writeParameters(filename * "_parameters", params)
 
 # Print to check that no errors occured
 println("--- Script successful! ---")
-
-
-randomDestroy!(data, sol, 0.2)
-
-spreadModelRepair!(data, sol, type)
 
 
 
