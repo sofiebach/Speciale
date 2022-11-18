@@ -1,5 +1,5 @@
 include("ReadWrite.jl")
-include("MIPModels.jl")
+include("MIP_tradeoff.jl")
 include("BasicFunctions.jl")
 
 data = readInstance("dataset/25_0_0.txt")
@@ -25,4 +25,10 @@ for i = 1:N
 end
 
 
+outFile = open("results/trade-off", "w")
+write(outFile, "X\n")
+write(outFile, join(X," ")*"\n\n")
+write(outFile, "Y\n")
+write(outFile, join(Y," ")*"\n\n")
+close(outFile)
 
