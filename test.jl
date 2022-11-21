@@ -6,24 +6,29 @@ data = readInstance("dataset/25_0_0.txt")
 
 logging = 1
 time_limit = 0
-solution_limit = 0
+gap = 0
 spreading = 0
 
-x = MIPExpansion(data, logging, time_limit, solution_limit, spreading)
-sol = MIPtoSol(data, x)
-X = collect(1.0:-0.1:0.1)*sol.base_obj
+# Find maximum objective for campaigns
+sol_max = ExpandedSol(data)
+randomInsert!(data, sol_max, data.P_bar)
 
-N = length(X)
+# Find minimum objective for campaigns
+x = MIPExpansion(data, logging, time_limit, gap, spreading)
+sol_min = MIPtoSol(data, x)
+
+# Initialize points on x-axis
+N = 10
+X = LinRange(sol_min.base_obj, sol_max.base_obj, N)
 Y = zeros(Float64, N)
+
 gap = 0.05
 spreading = 1
-
 for i = 1:N
     x2 = MIPExpansion(data, logging, time_limit, gap, spreading, X[i])
     sol2 = MIPtoSol(data, x2)
     Y[i] = sol2.objective.g_penalty - sol2.objective.L_reward
 end
-
 
 outFile = open("results/trade-off", "w")
 write(outFile, "X\n")
