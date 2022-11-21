@@ -25,13 +25,41 @@ function clusterDestroy!(data, sol, frac)
     end   
 end
 
-function worstDestroy!(data, sol, thres)
-    for t = data.start:data.stop, m = 1:data.M
-        while sol.f[t,m] > thres
-            t_hat = rand((t-data.Q_upper):(t-data.Q_lower))
-            p_worst = findall(x -> x > 0, sol.x[t_hat,:].*data.w[:,m])
-            if length(p_worst) > 0
-                remove!(data,sol,t_hat,rand(p_worst))
+function worstSpreadDestroy!(data, sol, frac)
+    n_destroy = round(sol.num_campaigns*frac)
+    perfect_spread = data.timeperiod./(sum(sol.x, dims = 1) .- 1)
+    div_spread = zeros(Float64, data.P)
+    replace!(perfect_spread, Inf=>-1)
+    for p = 1:data.P
+        if perfect_spread[p] > 0
+            div_spread[p] = perfect_spread[p] - sol.L[p] 
+        end 
+    end
+    sorted_p = sortperm(-div_spread)
+    for p in sorted_p
+        if div_spread[p] == 0 || n_destroy == 0 # There are no campaigns to remove in the rest of the array either
+            break
+        end
+        while n_destroy > 0 
+            if sum(sol.x[:,p]) == 0
+                break
+            end
+            
+            r_times = findall(x -> x > 0, sol.x[:,p])
+            t = r_times[rand(1:length(r_times))]
+            remove!(data, sol, t, p)
+            n_destroy -= 1
+        end
+    end
+end
+
+function stackDestroy!(data, sol, frac)
+    for p = 1:data.P
+        if maximum(sol.x[:,p]) > data.aimed[p]
+            for t = data.start:data.stop
+                while sol.x[t,p] > data.aimed[p]
+                    remove!(data, sol, t, p)
+                end
             end
         end
     end
