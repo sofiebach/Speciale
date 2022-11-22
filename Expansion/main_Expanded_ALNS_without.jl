@@ -1,12 +1,8 @@
 include("../ReadWrite.jl")
 include("../ALNS.jl")
-using Dates
 
-# Read data 
-P = 37
-data = read_DR_data(P)
-time_limit = 3600
-date_today = string(Dates.today())
+data = readInstance("dataset/100_0_0.txt")
+time_limit = 120
 
 # Run ALNS without modelRepair
 type = "expanded"
