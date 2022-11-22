@@ -18,11 +18,11 @@ x = MIPExpansion(data, logging, time_limit, gap, spreading)
 sol_min = MIPtoSol(data, x)
 
 # Initialize points on x-axis
-N = 10
+N = 15
 X = LinRange(sol_min.base_obj, sol_max.base_obj, N)
 Y = zeros(Float64, N)
 
-gap = 0.05
+gap = 0.02
 spreading = 1
 for i = 1:N
     x2 = MIPExpansion(data, logging, time_limit, gap, spreading, X[i])
@@ -36,4 +36,3 @@ write(outFile, join(X," ")*"\n\n")
 write(outFile, "Y\n")
 write(outFile, join(Y," ")*"\n\n")
 close(outFile)
-
