@@ -29,6 +29,7 @@ mutable struct Instance
     M_names::Array{String,1}
     BC_names::Array{String,1}
     campaign_type::Array{String,1}
+    sim::Array{Float64, 2}
     Instance(P,C,M,timeperiod,L_lower,L_upper,Q_lower,Q_upper,T) = new(P,[1,8],C,M,timeperiod,
         L_lower,L_upper,indexin(0,collect(L_lower:L_upper))[],
         Q_lower,Q_upper,
@@ -45,10 +46,12 @@ mutable struct Instance
         zeros(Float64, M),
         zeros(Int64, M),
         zeros(Int64,P),
+        Vector(undef,P),
         Vector(undef,C),
         Vector(undef,M),
         Vector(undef,P),
-        Vector(undef,P))
+        Vector(undef,P),
+        zeros(Float64,P,P))
 end
 
 # mutable struct Sol

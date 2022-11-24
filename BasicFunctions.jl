@@ -279,28 +279,6 @@ function elapsedTime(start_time)
     return round((time_ns()-start_time)/1e9, digits = 3)
 end
 
-function findSimilarity(data)
-    sim = zeros(data.P, data.P)
-    for p1 = 1:(data.P-1)
-        for p2 = (p1+1):data.P
-            sim_u = pearsonSimilarity(data.u[:,p1,:], data.u[:,p2,:])
-            sim_w = pearsonSimilarity(data.w[p1,:], data.w[p2,:])
-
-            sim[p1,p2] = mean([sim_u, sim_w])
-            sim[p2,p1] = mean([sim_u, sim_w])
-        end 
-    end
-    return sim
-end
-
-function pearsonSimilarity(a, b)
-    mu_a =  mean(a)
-    mu_b = mean(b)
-    t = (sum((a.-mu_a).*(b.-mu_b)))
-    n = sqrt(sum((a.-mu_a).^2))*sqrt(sum((b.-mu_b).^2))
-    return t/n
-end
-
 function checkReplace(data, sol, t1, p1, p2)
     # checks if p2 can be placed at t1 INSTEAD of p1
     if t1 < data.start || t1 > data.stop 

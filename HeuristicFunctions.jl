@@ -39,16 +39,15 @@ end
 
 function relatedDestroy!(data, sol, frac)
     n_destroy = round(sol.num_campaigns*frac)
-    sim = findSimilarity(data)
     tabu = []
     while n_destroy > 0
         idx = filter!(x -> x ∉ tabu, collect(1:data.P))
         max_k, p_idx = findmax(sol.k[idx])
         p = idx[p_idx]
         push!(tabu, p)
-        p_related = sortperm(-sim[p,:])
+        p_related = sortperm(-data.sim[p,:])
         for p_r in p_related 
-            if sim[p,p_r] > 0 && sum(sol.x[:,p_r]) > 0
+            if data.sim[p,p_r] > 0 && sum(sol.x[:,p_r]) > 0
                 n_remove = ceil(sum(sol.x[:,p_r]) / 2)
                 while n_remove > 0
                     r_times = findall(x -> x > 0, sol.x[:,p_r])

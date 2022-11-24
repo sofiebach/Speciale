@@ -271,6 +271,9 @@ function readInstance(filename)
     readline(f) # campaign_type
     data.campaign_type = split(readline(f))
     readline(f) # blank
+
+    data.sim = findSimilarity(data)
+
     return data
 end
 
@@ -507,4 +510,26 @@ function readParameters(filename)
     prob_repair_it = prob_repair_it, repairs=repairs, current_obj=current_obj, current_best=current_best, status=status, 
     time_repair=time_repair, time_destroy=time_destroy, num_repair=num_repair, num_destroy=num_destroy, 
     destroy_names=destroy_names, repair_names=repair_names, iter = iter, T_it = T_it)
+end
+
+function findSimilarity(data)
+    sim = zeros(Float64, data.P, data.P)
+    for p1 = 1:(data.P-1)
+        for p2 = (p1+1):data.P
+            sim_u = pearsonSimilarity(data.u[:,p1,:], data.u[:,p2,:])
+            sim_w = pearsonSimilarity(data.w[p1,:], data.w[p2,:])
+
+            sim[p1,p2] = mean([sim_u, sim_w])
+            sim[p2,p1] = mean([sim_u, sim_w])
+        end 
+    end
+    return sim
+end
+
+function pearsonSimilarity(a, b)
+    mu_a =  mean(a)
+    mu_b = mean(b)
+    t = (sum((a.-mu_a).*(b.-mu_b)))
+    n = sqrt(sum((a.-mu_a).^2))*sqrt(sum((b.-mu_b).^2))
+    return t/n
 end
