@@ -32,7 +32,7 @@ end
 
 function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.05,alpha=0.99975,W=[10,5,1],gamma=0.9,destroy_frac=0.2,segment_size=10,long_term_update=5000)    
     it = 1
-    it_best = 1
+    best_it = 1
     best_sol = deepcopy(sol)
     temp_sol = deepcopy(sol)
     start_time = time_ns()
@@ -153,10 +153,9 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.05,a
         if temp_obj < best_obj
             best_sol = deepcopy(temp_sol)
             w = W[1]
-            # best_it = 1
             println("New best")
             println(best_obj)
-            it_best = 1
+            best_it = 1
         elseif temp_obj < sol_obj
             sol = deepcopy(temp_sol)
             w = W[2]
