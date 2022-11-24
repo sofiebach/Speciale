@@ -11,7 +11,7 @@ long_term_update=[5000]
 
 stds, averages = tune(thetas,alphas,Ws,gammas,destroy_fracs,segment_sizes,long_term_updates) 
 
-filename = "tuning/results/initial_gamma.txt"
+filename = "results/initial_gamma.txt"
 outFile = open(filename, "w")
 write(outFile, "Tuning parameter: Gamma\n\n")
 

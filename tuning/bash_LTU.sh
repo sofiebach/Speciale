@@ -29,5 +29,5 @@ module load gurobi/9.5.2
 module load julia/1.7.0
 
 # here follow the commands you want to execute
-julia-current tuning/long_term_updates.jl &> results_initial_LTU.txt
+julia-current long_term_updates.jl &> results_initial_LTU.txt
 
