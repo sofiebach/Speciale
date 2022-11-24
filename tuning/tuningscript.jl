@@ -15,7 +15,7 @@ function tune(thetas,alphas,Ws,gammas,destroy_fracs,segment_sizes,long_term_upda
     stds = zeros(Float64,N_dataset,N_values)
     for i in size
         data_idx += 1
-        filename = "dataset/25_"*string(i)*"_0.txt"
+        filename = "../dataset/25_"*string(i)*"_0.txt"
         data = readInstance(filename)
         init_sol = randomInitial(data)
         value_idx = 0
@@ -32,7 +32,7 @@ function tune(thetas,alphas,Ws,gammas,destroy_fracs,segment_sizes,long_term_upda
     end
     for i in size[2:end]
         data_idx += 1
-        filename = "dataset/25_0_"*string(i)*".txt"
+        filename = "../dataset/25_0_"*string(i)*".txt"
         data = readInstance(filename)
         init_sol = randomInitial(data)
         value_idx = 0
