@@ -135,23 +135,49 @@ end
 
 function firstRepair!(data, sol, type)
     for p_bar in data.P_bar, n = 1:sol.k[p_bar]
-        t, p = firstInsertion(data, sol, [p_bar], type)
+        t, p = bestInsertion(data, sol, [p_bar], type)
         if t != 0 && p != 0
             insert!(data, sol, t, p)
         end
     end
-
-    shuffled_idx = shuffle(1:data.P)
-    while true
-        #println("Vi er i while")
-        t, p = firstInsertion(data, sol, shuffled_idx, type)
-        if t != 0 && p != 0
+    for t = data.start:data.stop
+        while true
+            p = firstInsertion(data, sol, t, type)
+            if p == 0
+                break
+            end
             insert!(data, sol, t, p)
-        else
-            break
         end
     end
 end
+
+function firstInsertion(data, sol, t, type)
+    if type == "baseline"
+        best_obj = sol.base_obj
+    elseif type == "expanded"
+        best_obj = sol.exp_obj
+    else
+        println("Enter valid model type")
+        return
+    end
+    shuffled_idx = shuffle(1:data.P)
+    for p in shuffled_idx
+        if fits(data, sol, t, p) && sol.k[p] > 0
+            delta_obj = deltaInsert(data, sol, t, p)
+            if type == "expanded"       
+                new_obj = delta_obj.delta_exp 
+            elseif type == "baseline"
+                new_obj = delta_obj.delta_base
+            end
+            if new_obj < best_obj
+                best_obj = new_obj
+                return p
+            end
+        end
+    end
+    return 0
+end
+
 
 function greedyRepair!(data, sol, type)
     for p_bar in data.P_bar, n = 1:sol.k[p_bar]
@@ -209,42 +235,7 @@ function bestInsertion(data, sol, sorted_idx, type)
 end
 
 
-function firstInsertion(data, sol, shuffled_idx, type)
-    if type == "baseline"
-        best_obj = sol.base_obj
-    elseif type == "expanded"
-        best_obj = sol.exp_obj
-    else
-        println("Enter valid model type")
-        return
-    end
-    best_p = 0
-    best_t = 0
-    
-    for t = data.start:data.stop
-        for p in shuffled_idx
-            if fits(data, sol, t, p) 
-                delta_obj = deltaInsert(data, sol, t, p)
-                if type == "expanded"
-                    new_obj = delta_obj.delta_exp 
-                elseif type == "baseline"
-                    new_obj = delta_obj.delta_base
-                else
-                    println("Enter valid model type")
-                    return
-                end
 
-                if new_obj < best_obj
-                    best_obj = new_obj
-                    best_p = p 
-                    best_t = t
-                    break
-                end 
-            end
-        end
-    end
-    return best_t, best_p
-end
 
 function regretRepair!(data, sol, type)
     for p_bar in data.P_bar, n = 1:sol.k[p_bar]

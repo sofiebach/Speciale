@@ -30,17 +30,15 @@ function isValid(data, temp_sol, sol)
 end
 
 
-function ALNS(data,time_limit,type="baseline",modelRepair=false,T=10000,alpha=0.99975,gamma=0.9,frac_cluster=0.2,frac_random=0.2, frac_worstspread=0.2, frac_stack=0,frac_related=0.2)    
+function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.05,alpha=0.99975,W=[10,5,1],gamma=0.9,destroy_frac=0.2,segment_size=10,long_term_update=5000)    
     it = 1
-    T_start = T
-    T_threshold = 5 # Minimum T before we want to intensify
-
-    sol = randomInitial(data)
+    it_best = 1
     best_sol = deepcopy(sol)
     temp_sol = deepcopy(sol)
     start_time = time_ns()
 
     if type == "baseline"
+        T_start = -theta*sol.base_obj/ln(0.5)
         repair_functions = [greedyRepair!, firstRepair!, modelRepair!]
         destroy_functions = [clusterDestroy!, randomDestroy!, relatedDestroy!]
         n_d = 3
@@ -50,6 +48,7 @@ function ALNS(data,time_limit,type="baseline",modelRepair=false,T=10000,alpha=0.
             n_r = 2
         end
     elseif type == "expanded"
+        T_start = -theta*sol.exp_obj/log(0.5)
         repair_functions = [greedyRepair!, firstRepair!, regretRepair!, modelRepair!]
         destroy_functions = [clusterDestroy!, randomDestroy!, worstSpreadDestroy!, stackDestroy!, relatedDestroy!]
         n_d = 5
@@ -63,11 +62,12 @@ function ALNS(data,time_limit,type="baseline",modelRepair=false,T=10000,alpha=0.
         return
     end
 
+    T = T_start
+
     rho_destroy = ones(n_d)
     time_destroy = zeros(n_d)
     num_destroy = zeros(Int64, n_d)
     destroy_names = string.(destroy_functions)[1:n_d]
-    destroy_fracs = [frac_cluster, frac_random, frac_worstspread, frac_stack, frac_related]
 
     rho_repair = ones(n_r)
     time_repair = zeros(n_r)
@@ -76,11 +76,6 @@ function ALNS(data,time_limit,type="baseline",modelRepair=false,T=10000,alpha=0.
     
     prob_destroy = setProb(rho_destroy)
     prob_repair = setProb(rho_repair)
-
-    w1 = 10
-    w2 = 5
-    w3 = 1
-    w4 = 0
 
     destroys = Int64[]
     repairs = Int64[]
@@ -93,11 +88,12 @@ function ALNS(data,time_limit,type="baseline",modelRepair=false,T=10000,alpha=0.
 
     while elapsedTime(start_time) < time_limit
         # Intensification
-        if T < T_threshold
+        if best_it > long_term_update
             sol = deepcopy(best_sol)
             temp_sol = deepcopy(sol)
-            println("Intensified!")
+            #println("Intensified!")
             T = T_start
+            best_it = 1
 
             # Reset probabilities
             rho_destroy = ones(n_d)
@@ -107,7 +103,7 @@ function ALNS(data,time_limit,type="baseline",modelRepair=false,T=10000,alpha=0.
         end
 
         # update probabilities
-        if (it % 10 == 0)
+        if (it % segment_size == 0)
             prob_destroy = setProb(rho_destroy)
             prob_repair = setProb(rho_repair)
         end
@@ -115,7 +111,7 @@ function ALNS(data,time_limit,type="baseline",modelRepair=false,T=10000,alpha=0.
         # Choose destroy method
         selected_destroy = selectMethod(prob_destroy)
         destroy_time = time_ns()
-        destroy_functions[selected_destroy](data, temp_sol, destroy_fracs[selected_destroy])
+        destroy_functions[selected_destroy](data, temp_sol, destroy_frac)
         elapsed_destroy = elapsedTime(destroy_time)
 
         # Update destroy time
@@ -134,6 +130,7 @@ function ALNS(data,time_limit,type="baseline",modelRepair=false,T=10000,alpha=0.
         end
 
         it += 1
+        best_it += 1
 
         # Update repair time
         time_repair[selected_repair] += elapsed_repair
@@ -155,18 +152,19 @@ function ALNS(data,time_limit,type="baseline",modelRepair=false,T=10000,alpha=0.
 
         if temp_obj < best_obj
             best_sol = deepcopy(temp_sol)
-            w = w1
+            w = W[1]
             # best_it = 1
             println("New best")
             println(best_obj)
+            it_best = 1
         elseif temp_obj < sol_obj
             sol = deepcopy(temp_sol)
-            w = w2
+            w = W[2]
         elseif rand() < exp(-(temp_obj-sol_obj)/T)
                 sol = deepcopy(temp_sol)
-                w = w3
+                w = W[3]
         else
-            w = w4
+            w = 0
         end
 
         append!(repairs, selected_repair)
