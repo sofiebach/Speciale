@@ -4,7 +4,7 @@ include("../ReadWrite.jl")
 data = readInstance("dataset/100_0_0.txt")
 
 model = "ALNS"
-type = "baseline"
+type = "expanded"
 modelrepair = "false"
 prefix = "results/"
 filename = model*"_"*type*"_"*modelrepair
@@ -16,3 +16,5 @@ solutionTracking_all(params, filename*"_sol_tracking")
 probabilityTracking(params, filename*"_prob_tracking")
    
 temperatureTracking(params, filename*"temp_tracking")
+
+drawTVSchedule(data,sol,"hej")
