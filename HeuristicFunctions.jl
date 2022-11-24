@@ -93,27 +93,31 @@ end
 function relatedDestroy!(data,sol,frac)
     n_destroy = ceil(sol.num_campaigns*frac)
     while n_destroy > 0
+        
         p = rand(findall(sol.k.>0))
+        
         p_related = sortperm(-data.sim[p,:])
+        println("P: ", p)
+
         p_remove = min(sol.k[p], n_destroy)
         for p_r in p_related 
-            while sum(sol.x[:,p_r]) > 0
-
-            if data.sim[p,p_r] > 0 && sum(sol.x[:,p_r]) > 0
+            if data.sim[p,p_r] <= 0 
+                break
+            end
+            while sum(sol.x[:,p_r]) > 0 && p_remove > 0
                 r_times = findall(x -> x > 0, sol.x[:,p_r])
                 t = r_times[rand(1:length(r_times))]
+                println("P_related: ", p_r)
+                println("T: ", t)
                 remove!(data, sol, t, p_r)
                 n_destroy -= 1
                 p_remove -= 1
-
+            end
+            if p_remove == 0
+                break
             end
         end
-        for i = 1:sol.k[p]
-            if sum(sol.x[:,p_re])
-        end
     end
-
-
 end
 
 function spreadModelRepair!(data, sol, type)
