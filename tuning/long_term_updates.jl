@@ -11,7 +11,7 @@ long_term_update=[1000,5000,10000,15000,20000]
 
 stds, averages = tune(thetas,alphas,Ws,gammas,destroy_fracs,segment_sizes,long_term_updates) 
 
-filename = "tuning/results/initial_LTU.txt"
+filename = "results/initial_LTU.txt"
 outFile = open(filename, "w")
 write(outFile, "Tuning parameter: Long term update\n\n")
 
