@@ -22,8 +22,8 @@
 #BSUB -N
 ### -- Specify the output and error file. %J is the job-id --
 ### -- -o and -e mean append, -oo and -eo mean overwrite --
-#BSUB -oo Output_%J.out
-#BSUB -eo Error_%J.err
+#BSUB -oo Output.out
+#BSUB -eo Error.err
 
 module load gurobi/9.5.2
 module load julia/1.7.0
