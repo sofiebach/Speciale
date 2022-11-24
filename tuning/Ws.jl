@@ -20,7 +20,10 @@ write(outFile,join(thetas," ")*"\n\n")
 write(outFile, "alphas\n")
 write(outFile,join(alphas," ")*"\n\n")
 write(outFile, "Ws\n")
-write(outFile,join(Ws," ")*"\n\n")
+for i = 1:5
+    write(outFile,join(Ws[i]," ")*"\n")
+end
+write(outFile, "\n")
 write(outFile, "gammas\n")
 write(outFile,join(gammas," ")*"\n\n")
 write(outFile, "destroy_fracs\n")
