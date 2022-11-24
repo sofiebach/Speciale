@@ -26,7 +26,7 @@ function clusterDestroy!(data, sol, frac)
 end
 
 function worstSpreadDestroy!(data, sol, frac)
-    n_destroy = round(sol.num_campaigns*frac)
+    n_destroy = ceil(sol.num_campaigns*frac)
     perfect_spread = data.timeperiod./(sum(sol.x, dims = 1) .- 1)
     div_spread = zeros(Float64, data.P)
     replace!(perfect_spread, Inf=>-1)
@@ -65,8 +65,8 @@ function stackDestroy!(data, sol, frac)
     end
 end
 
-function relatedDestroy!(data, sol, frac)
-    n_destroy = round(sol.num_campaigns*frac)
+function OLDrelatedDestroy!(data, sol, frac)
+    n_destroy = ceil(sol.num_campaigns*frac)
     tabu = []
     while n_destroy > 0
         idx = filter!(x -> x ∉ tabu, collect(1:data.P))
@@ -88,6 +88,32 @@ function relatedDestroy!(data, sol, frac)
             end
         end
     end
+end
+
+function relatedDestroy!(data,sol,frac)
+    n_destroy = ceil(sol.num_campaigns*frac)
+    while n_destroy > 0
+        p = rand(findall(sol.k.>0))
+        p_related = sortperm(-data.sim[p,:])
+        p_remove = min(sol.k[p], n_destroy)
+        for p_r in p_related 
+            while sum(sol.x[:,p_r]) > 0
+
+            if data.sim[p,p_r] > 0 && sum(sol.x[:,p_r]) > 0
+                r_times = findall(x -> x > 0, sol.x[:,p_r])
+                t = r_times[rand(1:length(r_times))]
+                remove!(data, sol, t, p_r)
+                n_destroy -= 1
+                p_remove -= 1
+
+            end
+        end
+        for i = 1:sol.k[p]
+            if sum(sol.x[:,p_re])
+        end
+    end
+
+
 end
 
 function spreadModelRepair!(data, sol, type)
@@ -177,7 +203,6 @@ function firstInsertion(data, sol, t, type)
     return 0
 end
 
-
 function greedyRepair!(data, sol, type)
     for p_bar in data.P_bar, n = 1:sol.k[p_bar]
         t, p = bestInsertion(data, sol, [p_bar], type)
@@ -232,9 +257,6 @@ function bestInsertion(data, sol, sorted_idx, type)
     end
     return best_t, best_p
 end
-
-
-
 
 function regretRepair!(data, sol, type)
     for p_bar in data.P_bar, n = 1:sol.k[p_bar]
