@@ -7,7 +7,7 @@ Ws = [[10,5,1]]
 gammas=[0.9]
 destroy_fracs=[0.1, 0.2, 0.3, 0.4, 0.5]
 segment_sizes=[10]
-long_term_update=[5000]
+long_term_updates=[5000]
 
 stds, averages = tune(thetas,alphas,Ws,gammas,destroy_fracs,segment_sizes,long_term_updates) 
 
@@ -28,7 +28,7 @@ write(outFile,join(destroy_fracs," ")*"\n\n")
 write(outFile, "segment_sizes\n")
 write(outFile,join(segment_sizes," ")*"\n\n")
 write(outFile, "long_term_update\n")
-write(outFile,join(long_term_update," ")*"\n\n")
+write(outFile,join(long_term_updates," ")*"\n\n")
 
 write(outFile, "Standard deviations\n")
 for i = 1:5
