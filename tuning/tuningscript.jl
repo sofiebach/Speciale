@@ -72,16 +72,16 @@ function write_tuning(filename)
     write(outFile, "long_term_update\n")
     write(outFile,join(long_term_updates," ")*"\n\n")
 
-    #write(outFile, "Standard deviations\n")
-    #for i = 1:5
-    #    write(outFile,join(stds[:,i]," ")*"\n")
-    #end
-    #write(outFile, "\n")
-    #write(outFile, "Average\n")
-    #for i = 1:5
-    #    write(outFile,join(averages[:,i]," ")*"\n")
-    #end
-    #write(outFile, "\n")
+    write(outFile, "Standard deviations\n")
+    for i = 1:5
+        write(outFile,join(stds[:,i]," ")*"\n")
+    end
+    write(outFile, "\n")
+    write(outFile, "Average\n")
+    for i = 1:5
+        write(outFile,join(averages[:,i]," ")*"\n")
+    end
+    write(outFile, "\n")
 
     close(outFile)
 end
