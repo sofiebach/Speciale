@@ -65,31 +65,6 @@ function stackDestroy!(data, sol, frac)
     end
 end
 
-function OLDrelatedDestroy!(data, sol, frac)
-    n_destroy = ceil(sol.num_campaigns*frac)
-    tabu = []
-    while n_destroy > 0
-        idx = filter!(x -> x ∉ tabu, collect(1:data.P))
-        max_k, p_idx = findmax(sol.k[idx])
-        p = idx[p_idx]
-        push!(tabu, p)
-        p_related = sortperm(-data.sim[p,:])
-        for p_r in p_related 
-            if data.sim[p,p_r] > 0 && sum(sol.x[:,p_r]) > 0
-                n_remove = ceil(sum(sol.x[:,p_r]) / 2)
-                while n_remove > 0
-                    r_times = findall(x -> x > 0, sol.x[:,p_r])
-                    t = r_times[rand(1:length(r_times))]
-                    remove!(data, sol, t, p_r)
-                    n_remove -= 1
-                    n_destroy -= 1
-                end
-                break
-            end
-        end
-    end
-end
-
 function relatedDestroy!(data,sol,frac)
     n_destroy = ceil(sol.num_campaigns*frac)
     while n_destroy > 0
@@ -97,7 +72,7 @@ function relatedDestroy!(data,sol,frac)
         p = rand(findall(sol.k.>0))
         
         p_related = sortperm(-data.sim[p,:])
-        println("P: ", p)
+        #println("P: ", p)
 
         p_remove = min(sol.k[p], n_destroy)
         for p_r in p_related 
@@ -107,8 +82,8 @@ function relatedDestroy!(data,sol,frac)
             while sum(sol.x[:,p_r]) > 0 && p_remove > 0
                 r_times = findall(x -> x > 0, sol.x[:,p_r])
                 t = r_times[rand(1:length(r_times))]
-                println("P_related: ", p_r)
-                println("T: ", t)
+                #println("P_related: ", p_r)
+                #println("T: ", t)
                 remove!(data, sol, t, p_r)
                 n_destroy -= 1
                 p_remove -= 1

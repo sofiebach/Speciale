@@ -369,7 +369,7 @@ function drawHeatmap(inventory_used, staff_used, data, sol, filename)
         f.tight_layout(rect=[0, 0, .9, 1])
 
         plt.savefig("output/" + filename + ".png")
-        plt.show()
+        # plt.show()
     """
 
     py"heatmap"(used_cap_inv, used_cap_prod, data.C_names, data.M_names, filename)
@@ -397,7 +397,7 @@ function solutionTracking(params, filename)
         plt.plot(params.current_best 'k-' , markersize = 4)
         plt.legend(["Rejected", "Accepted", "New best"])
         plt.savefig("output/" + filename + ".png")
-        plt.show()
+        # plt.show()
     """
     py"solutionPlot"(params,rejected, accepted, better, filename)
 end
@@ -423,7 +423,7 @@ function solutionTracking_all(params, filename)
         plt.plot(params.current_best, 'k-' , markersize = 4)
         plt.legend(["Rejected", "Accepted", "New best"])
         plt.savefig("output/" + filename + ".png")
-        plt.show()
+        # plt.show()
     """
     py"solutionPlot"(params,rejected, accepted, better, filename)
 end
@@ -444,7 +444,7 @@ function temperatureTracking(params, filename)
         
         plt.plot(params.T_it)
         plt.savefig("output/" + filename + ".png")
-        plt.show()
+        # plt.show()
     """
     py"tempPlot"(params, filename)
 end
@@ -478,7 +478,7 @@ function probabilityTracking(params, filename)
             ax2.title.set_text('Repair')
             i += 1
         plt.savefig("output/" + filename + ".png")
-        plt.show()
+        # plt.show()
     """
     py"progDR"(params, filename)
 end

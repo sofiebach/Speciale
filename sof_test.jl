@@ -2,20 +2,15 @@ include("ReadWrite.jl")
 include("MIPModels.jl")
 include("ConstructionHeuristics.jl")
 include("ALNS.jl")
+include("Validation/PlotSolution.jl")
 
-data = read_DR_data(37)
+data = readInstance("dataset/25_0_0.txt")
 
-sol1 = randomInitial(data)
+sol = randomInitial(data)
+time_limit = 60*5
+sol, params = ALNS(data,sol,time_limit,"expanded")
 
-sol2, params = ALNS(data, 30, "baseline", false)
+filename = "test"
+probabilityTracking(params, filename*"_prob_tracking")
 
-sol2.base_obj
-sol2.exp_obj
-
-sol2.objective
-sol2.objective.k_penalty - sol2.objective.x_reward + sol2.objective.g_penalty - sol2.objective.L_reward
-
-x = MIPExpansion(data,"HiGHS")
-
-
-
+temperatureTracking(params, filename)
