@@ -25,20 +25,22 @@ def tradeoffIllustration(X, Y, Y_gap, filename):
     
     # plt.plot(X, Y, 'bo', markersize = 4)
     # plt.plot(X, Y_gap, 'yo', markersize = 4)
-
+    #background = plt.imread("background.png")
     fig, ax = plt.subplots()
+    #implot = plt.imshow(background)
+    #ax.imshow(background)
     ax.plot(X, Y, '-', color='tab:blue')
     ax.plot(X, Y_gap, '--', linewidth=0.5, color='tab:blue')
     ax.fill_between(X, Y, Y_gap, alpha=0.2)
-    y_min = min(Y) * 1.1
-    y_max = max(Y) * 1.1
-    x_min = min(X)
-    x_max = max(X)
-    ax.set_ylim([y_min, y_max])
-    ax.axhspan(y_min, (y_max+y_min)/2, 0, 0.5, facecolor='green', alpha=0.2)
-    ax.axhspan(y_min, (y_max+y_min)/2, 0.5, 1, facecolor='orange', alpha=0.2)
-    ax.axhspan((y_max+y_min)/2, y_max, 0, 0.5, facecolor='orange', alpha=0.2)
-    ax.axhspan((y_max+y_min)/2, y_max, 0.5, 1, facecolor='red', alpha=0.2)
+    #y_min = min(Y) * 1.1
+    #y_max = max(Y) * 1.1
+    #x_min = min(X)
+    #x_max = max(X)
+    #ax.set_ylim([y_min, y_max])
+    #ax.axhspan(y_min, (y_max+y_min)/2, 0, 0.5, facecolor='green', alpha=0.2)
+    #ax.axhspan(y_min, (y_max+y_min)/2, 0.5, 1, facecolor='orange', alpha=0.2)
+    #ax.axhspan((y_max+y_min)/2, y_max, 0, 0.5, facecolor='orange', alpha=0.2)
+    #ax.axhspan((y_max+y_min)/2, y_max, 0.5, 1, facecolor='red', alpha=0.2)
     
     plt.title("Minizing spreading term, fixed campaign term")
     plt.xlabel("Campaign term")
