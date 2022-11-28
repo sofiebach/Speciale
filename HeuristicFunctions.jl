@@ -32,7 +32,7 @@ function worstSpreadDestroy!(data, sol, frac)
     replace!(perfect_spread, Inf=>-1)
     for p = 1:data.P
         if perfect_spread[p] > 0
-            div_spread[p] = perfect_spread[p] - sol.L[p] 
+            div_spread[p] = (perfect_spread[p] - sol.L[p]) / perfect_spread[p]
         end 
     end
     sorted_p = sortperm(-div_spread)
