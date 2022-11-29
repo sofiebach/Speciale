@@ -105,7 +105,7 @@ function MIPExpansion(data, solver, log=1, time_limit=60, solution_limit=0, dest
     M_S = maximum(data.S) + 1
     epsilon = 0.5
     
-    @objective(model, Min, 0*(sum(g[t,p] for t=1:data.T, p=1:data.P) - sum(L[p] for p=1:data.P)) - sum(data.reward[p]*sum(x[t,p,n] for n=1:data.S[p]) for t = 1:data.T for p = 1:data.P) + sum(k[p]*data.penalty_S[p] for p = 1:data.P))
+    @objective(model, Min, (sum(g[t,p] for t=1:data.T, p=1:data.P) - sum(L[p] for p=1:data.P)) - sum(data.reward[p]*sum(x[t,p,n] for n=1:data.S[p]) for t = 1:data.T for p = 1:data.P) + sum(k[p]*data.penalty_S[p] for p = 1:data.P))
 
     # If destroyed solution is inputted
     if destroyed_sol != 0
