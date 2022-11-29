@@ -1,26 +1,12 @@
 include("../ReadWrite.jl")
 
-data = readInstance("create_data/original.txt")
-
-percent = [0.25,0.5,1]
-U = [0, 0.05, 0.1, 0.15]
-W = [0, 0.05, 0.1, 0.15]
-
-for p in percent, u in U
-    createNewInstance(data,p,0,u)
-end
-
-for p in percent, w in W
-    createNewInstance(data,p,w,0)
-end
-
-function createNewInstance(data, p, w, u)
-    timeperiod = Int(round(data.timeperiod*p))
+function createNewInstance(data, d, w, u)
+    timeperiod = Int(round(data.timeperiod*d))
     stop = abs(data.Q_lower)+timeperiod
     T = timeperiod + data.start + abs(data.Q_lower) 
-    S = Int64.(round.(data.S*p))
+    S = Int64.(round.(data.S*d))
     
-    outFile = open("dataset/"*string(Int(p*100))*"_"*string(Int(w*100))*"_"*string(Int(u*100))*".txt", "w")
+    outFile = open("dataset/"*string(Int(d*100))*"_"*string(Int(w*100))*"_"*string(Int(u*100))*".txt", "w")
     write(outFile, "timeperiod P M C T\n")
     write(outFile, join([data.timeperiod, data.P, data.M, data.C, T]," ")*"\n\n")
 
@@ -78,7 +64,7 @@ function createNewInstance(data, p, w, u)
     write(outFile,join(data.penalty_f," ")*"\n\n")
 
     write(outFile, "F\n")
-    write(outFile,join(data.F," ")*"\n\n")
+    write(outFile,join(data.F*d," ")*"\n\n")
 
     write(outFile, "aimed\n")
     write(outFile,join(Int64.(ceil.(S/T))," ")*"\n\n")
@@ -100,3 +86,18 @@ function createNewInstance(data, p, w, u)
 
     close(outFile)
 end
+
+data = readInstance("create_data/original.txt")
+
+percent = [0.25,0.5,1]
+U = [0, 0.05, 0.1, 0.15]
+W = [0, 0.05, 0.1, 0.15]
+
+for p in percent, u in U
+    createNewInstance(data,p,0,u)
+end
+
+for p in percent, w in W
+    createNewInstance(data,p,w,0)
+end
+
