@@ -135,7 +135,7 @@ function MIPExpansion(data, solver, log=1, time_limit=60, solution_limit=0, dest
     # Scope constraint
     @constraint(model, [p=1:data.P], sum(sum(x[t,p,n] for n=1:data.S[p]) for t = data.start:data.stop) >= data.S[p] - k[p])
 
-    # Uppder limit of x_priority
+    # Upper limit of x_priority
     @constraint(model, [p=1:data.P, n = 1:data.S[p]], sum(x[t,p,n] for t=1:data.T) <= 1)
     
     # Make order of n 
