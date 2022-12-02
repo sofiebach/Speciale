@@ -72,7 +72,6 @@ function relatedDestroy!(data,sol,frac)
         p = rand(findall(sol.k.>0))
         
         p_related = sortperm(-data.sim[p,:])
-        #println("P: ", p)
 
         p_remove = min(sol.k[p], n_destroy)
         for p_r in p_related 
@@ -82,8 +81,6 @@ function relatedDestroy!(data,sol,frac)
             while sum(sol.x[:,p_r]) > 0 && p_remove > 0
                 r_times = findall(x -> x > 0, sol.x[:,p_r])
                 t = r_times[rand(1:length(r_times))]
-                #println("P_related: ", p_r)
-                #println("T: ", t)
                 remove!(data, sol, t, p_r)
                 n_destroy -= 1
                 p_remove -= 1
@@ -190,9 +187,8 @@ function greedyRepair!(data, sol, type)
         end
     end
 
-    sorted_idx = sortperm(-data.penalty_S)
     while true
-        t, p = bestInsertion(data, sol, sorted_idx, type)
+        t, p = bestInsertion(data, sol, collect(1:data.P), type)
         if t != 0 && p != 0
             insert!(data, sol, t, p)
         else
@@ -201,7 +197,7 @@ function greedyRepair!(data, sol, type)
     end
 end
 
-function bestInsertion(data, sol, sorted_idx, type)
+function bestInsertion(data, sol, priorities, type)
     if type == "baseline"
         best_obj = sol.base_obj
     elseif type == "expanded"
@@ -213,7 +209,7 @@ function bestInsertion(data, sol, sorted_idx, type)
     best_p = 0
     best_t = 0
     
-    for p in sorted_idx 
+    for p in priorities 
         for t = data.start:data.stop
             if fits(data, sol, t, p) 
                 delta_obj = deltaInsert(data, sol, t, p)
@@ -245,9 +241,8 @@ function regretRepair!(data, sol, type)
         end
     end
 
-    shuffled_idx = shuffle(1:data.P)
     while true
-        t, p = regretInsertion(data, sol, shuffled_idx, type)
+        t, p = regretInsertion(data, sol, collect(1:data.P), type)
         if t != 0 && p != 0
             insert!(data, sol, t, p)
         else
