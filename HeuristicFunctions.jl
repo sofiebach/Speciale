@@ -233,16 +233,16 @@ function bestInsertion(data, sol, priorities, type)
     return best_t, best_p
 end
 
-function regretRepair!(data, sol, type)
+function flexibilityRepair!(data, sol, type)
     for p_bar in data.P_bar, n = 1:sol.k[p_bar]
-        t, p = regretInsertion(data, sol, [p_bar], type)
+        t, p = bestInsertion(data, sol, [p_bar], type)
         if t != 0 && p != 0
             insert!(data, sol, t, p)
         end
     end
-
+    
     while true
-        t, p = regretInsertion(data, sol, collect(1:data.P), type)
+        t, p = flexibilityInsertion(data, sol, collect(1:data.P))
         if t != 0 && p != 0
             insert!(data, sol, t, p)
         else
@@ -251,47 +251,147 @@ function regretRepair!(data, sol, type)
     end
 end
 
-function regretInsertion(data, sol, priorities, type)
-    obj_best = ones(Float64, data.P)*Inf
-    obj_second = ones(Float64, data.P)*Inf
-    t_best = zeros(Int64, data.P)
+function flexibilityInsertion(data, sol, priorities)
+    n_fits = zeros(Int64, data.P)
+    ts = zeros(Int64, data.P)
     
-    idx = 1
     for p in priorities
+        t_values = []
         for t = data.start:data.stop
-            if fits(data, sol, t, p) 
-                delta_obj = deltaInsert(data, sol, t, p)
-                if type == "expanded"
-                    new_obj = delta_obj.delta_exp
-                    sol_obj = sol.exp_obj
-                elseif type == "baseline"
-                    new_obj = delta_obj.delta_base
-                    sol_obj = sol.base_obj
-                else
-                    println("Enter valid model type")
-                    return
-                end
+            if fits(data, sol, t, p) && sol.k[p] > 0
+                n_fits[p] += 1
+                append!(t_values, t)
+            end
+        end
+        if n_fits[p] > 0
+            ts[p] = rand(t_values)
+        end
+    end
 
-                if new_obj < obj_best[idx] && new_obj < sol_obj
-                    obj_second[idx] = obj_best[idx]
-                    obj_best[idx] = new_obj
-                    t_best[idx] = t 
-                elseif new_obj < obj_second[idx]
-                    obj_second[idx] = new_obj
+    replace!(n_fits, 0=>data.T)
+    idxs = sortperm(n_fits)
+    p = idxs[1]
+    if n_fits[p] == data.T
+        return 0, 0
+    end
+    return ts[p], p
+end
+
+function regretRepair!(data, sol, type)
+    for p_bar in data.P_bar, n = 1:sol.k[p_bar]
+        t, p = regretInsertion(data, sol, [p_bar], type)
+        if t != 0 && p != 0
+            insert!(data, sol, t[1], p)
+            insert!(data, sol, t[2], p)
+        end
+    end
+        while true
+        t, p = regretInsertion(data, sol, collect(1:data.P), type)
+        if t != 0 && p != 0
+            insert!(data, sol, t[1], p)
+            insert!(data, sol, t[2], p)
+        else
+            break
+        end
+    end
+end
+
+function regretInsertion(data, sol, priorities, type)
+    M = 1000000
+    best1 = ones(Int64, data.P)*M
+    best2 = ones(Int64, data.P)*M
+    best_ts = zeros(Int64, data.P, 2)
+    for p in priorities
+        t, _ = bestInsertion(data, sol, [p], type)
+        for t2 in collect(data.start:data.stop)
+            if fits2times(data, sol, t, t2, p)
+                obj = # delta evaluer 2 lags
+                if obj < best1[p]
+                    best1[p] = obj
+                end
+            end
+            for t1 in collect(data.start:data.stop)
+                if fits2times(data, sol, t1, t2, p)
+                    obj = # delta evaluer 2 lags
+                    if obj < best2[p]
+                        best2[p] = obj
+                        best_ts[p][1] = t1
+                        best_ts[p][2] = t2
+                    end
                 end
             end
         end
-        idx += 1
     end
-    loss = obj_second - obj_best
-    replace!(loss, NaN=>-1)
-    loss, idx = findmax(loss)
+    diff = best1 - best2
+    diff, idx = findmax(diff)
     best_p = priorities[idx]
-    if loss >= 0
-        best_t = t_best[idx]
+    if diff >= 0
+        return best_ts[best_p,:], best_p
     else 
-        best_p = 0
-        best_t = 0
+        return 0, 0
     end
-    return best_t, best_p
 end
+
+
+#function regretRepair!(data, sol, type)
+#    for p_bar in data.P_bar, n = 1:sol.k[p_bar]
+#        t, p = regretInsertion(data, sol, [p_bar], type)
+#        if t != 0 && p != 0
+#            insert!(data, sol, t, p)
+#        end
+#    end
+#
+#    while true
+#        t, p = regretInsertion(data, sol, collect(1:data.P), type)
+#        if t != 0 && p != 0
+#            insert!(data, sol, t, p)
+#        else
+#            break
+#        end
+#    end
+#end
+#
+#function regretInsertion(data, sol, priorities, type)
+#    obj_best = ones(Float64, data.P)*Inf
+#    obj_second = ones(Float64, data.P)*Inf
+#    t_best = zeros(Int64, data.P)
+#    
+#    idx = 1
+#    for p in priorities
+#        for t = data.start:data.stop
+#            if fits(data, sol, t, p) 
+#                delta_obj = deltaInsert(data, sol, t, p)
+#                if type == "expanded"
+#                    new_obj = delta_obj.delta_exp
+#                    sol_obj = sol.exp_obj
+#                elseif type == "baseline"
+#                    new_obj = delta_obj.delta_base
+#                    sol_obj = sol.base_obj
+#                else
+#                    println("Enter valid model type")
+#                    return
+#                end
+#
+#                if new_obj < obj_best[idx] && new_obj < sol_obj
+#                    obj_second[idx] = obj_best[idx]
+#                    obj_best[idx] = new_obj
+#                    t_best[idx] = t 
+#                elseif new_obj < obj_second[idx]
+#                    obj_second[idx] = new_obj
+#                end
+#            end
+#        end
+#        idx += 1
+#    end
+#    loss = obj_second - obj_best
+#    replace!(loss, NaN=>-1)
+#    loss, idx = findmax(loss)
+#    best_p = priorities[idx]
+#    if loss >= 0
+#        best_t = t_best[idx]
+#    else 
+#        best_p = 0
+#        best_t = 0
+#    end
+#    return best_t, best_p
+#end

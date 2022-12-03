@@ -138,6 +138,105 @@ function fits(data, sol, t, p)
     return true
 end
 
+function fits2times(data, sol, t1, t2, p)
+    # Given p will be inserted at t1, can it also be inserted at t2
+    # Check if p fits at t2
+    if !fits(data, sol, t2, p)
+        return false
+    end
+
+    # Check freelance in case of no overlap
+    if abs(t1-t2) > data.L_upper-data.L_lower + 1
+        # Compute freelance hours needed for t1 and t2
+        for m = 1:data.M  
+            freelancers_needed1 = 0
+            freelancers_needed2 = 0
+            
+            for t_hat = (t1+data.Q_lower):(t1+data.Q_upper)
+                if sol.H_cap[t_hat, m] - data.w[p, m] < 0
+                    freelancers_needed1 += -(sol.H_cap[t_hat, m] - data.w[p, m])
+                end
+            end
+
+            for t_hat = (t2+data.Q_lower):(t2+data.Q_upper) 
+                if sol.H_cap[t_hat, m] - data.w[p, m] < 0
+                    freelancers_needed2 += -(sol.H_cap[t_hat, m] - data.w[p, m])
+                    if sum(sol.f[:,m]) + freelancers_needed1 + freelancers_needed2 > data.F[m] 
+                        return false
+                    end
+                end
+            end
+        end    
+    end
+
+    # Check in case of overlap
+    t_hat1 = collect((t1+data.L_lower):(t1+data.L_upper))
+    t_hat2 = collect((t2+data.L_lower):(t2+data.L_upper))
+    
+    t_hat_intersepct = intersect(t_hat1,t_hat2)
+
+    # Find l_idx in original t_hats
+    l_idx1 = findall(x -> x in t_hat_intersepct, t_hat1)
+    l_idx2 = findall(x -> x in t_hat_intersepct, t_hat2)
+
+    idx = 1
+    for t_hat in t_hat_intersepct
+        for c = 1:data.C
+            grp = data.u[l_idx1[idx],p,c] + data.u[l_idx2[idx],p,c] # Add grp contribution from both time steps
+            if sol.I_cap[t_hat, c] - grp < 0
+                return false
+            end
+        end
+        idx += 1
+    end
+
+    # Gå below igennem sammen
+    if abs(t1-t2) <= abs(data.Q_upper-data.Q_lower) # If Q overlap
+        t_hat1 = collect((t1+data.Q_lower):(t1+data.Q_upper))
+        t_hat2 = collect((t2+data.Q_lower):(t2+data.Q_upper))
+        
+        t_hat = vcat(t_hat1, t_hat2)
+        t_count = [count(==(i), t_hat) for i in unique(t_hat)]
+
+        for m = 1:data.M
+            idx = 1
+            freelancers_needed = 0
+            for t_hat in collect(minimum(t_hat):maximum(t_hat)) 
+                if sol.H_cap[t_hat, m] - data.w[p, m]*t_count[idx] < 0
+                    freelancers_needed += -(sol.H_cap[t_hat, m] - data.w[p, m]*t_count[idx])
+                    if sum(sol.f[:,m]) + freelancers_needed > data.F[m] 
+                        return false
+                    end
+                end
+                idx += 1
+            end
+        end
+    else
+        for m = 1:data.M
+            freelancers_needed1 = 0
+            freelancers_needed2 = 0
+
+            for t_hat = (t1+data.Q_lower):(t1+data.Q_upper)
+                if sol.H_cap[t_hat, m] - data.w[p, m] < 0
+                    freelancers_needed1 += -(sol.H_cap[t_hat, m] - data.w[p, m])
+                    if sum(sol.f[:,m]) + freelancers_needed1 + freelancers_needed2 > data.F[m] 
+                        return false
+                    end
+                end
+            end
+            for t_hat = (t2+data.Q_lower):(t2+data.Q_upper) 
+                if sol.H_cap[t_hat, m] - data.w[p, m] < 0
+                    freelancers_needed2 += -(sol.H_cap[t_hat, m] - data.w[p, m])
+                    if sum(sol.f[:,m]) + freelancers_needed1 + freelancers_needed2 > data.F[m] 
+                        return false
+                    end
+                end
+            end
+        end    
+    end   
+    return true 
+end
+
 function MIPtoSol(data, x)
     sol = ExpandedSol(data)
     for t = 1:data.T, p = 1:data.P
