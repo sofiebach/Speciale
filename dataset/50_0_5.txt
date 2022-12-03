@@ -1,5 +1,5 @@
 timeperiod P M C T
-53 37 4 12 35
+26 37 4 12 35
 
 L_lower L_upper L_zero Q_lower Q_upper
 -2 5 3 -4 -3

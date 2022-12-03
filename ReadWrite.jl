@@ -11,7 +11,7 @@ function read_DR_data(P)
     L_upper = 5
     Q_lower = -4
     Q_upper = -3
-    timeperiod = 53
+    timeperiod = 52
     T = abs(Q_lower) + timeperiod + L_upper
 
     data = Instance(P,C,M,timeperiod,L_lower,L_upper,Q_lower,Q_upper,T)
@@ -79,7 +79,7 @@ function read_DR_data(P)
     # reward for Priority
     data.reward = (data.penalty_S.-minimum(data.penalty_S).+1)./(maximum(data.penalty_S)-minimum(data.penalty_S))
 
-    data.aimed = ceil.(data.S/data.T)
+    data.aimed = ceil.(data.S/data.timeperiod)
 
     mapping = XLSX.readdata("data/data_staffing_constraint.xlsx", "Mapping", "B2:D38")[1:data.P,:]
     data.P_names = mapping[:,2]

@@ -8,7 +8,7 @@ function createNewInstance(data, d, w, u)
     
     outFile = open("dataset/"*string(Int(d*100))*"_"*string(Int(w*100))*"_"*string(Int(u*100))*".txt", "w")
     write(outFile, "timeperiod P M C T\n")
-    write(outFile, join([data.timeperiod, data.P, data.M, data.C, T]," ")*"\n\n")
+    write(outFile, join([timeperiod, data.P, data.M, data.C, T]," ")*"\n\n")
 
     write(outFile, "L_lower L_upper L_zero Q_lower Q_upper\n")
     write(outFile, join([data.L_lower, data.L_upper, data.L_zero, data.Q_lower, data.Q_upper]," ")*"\n\n")
@@ -67,7 +67,7 @@ function createNewInstance(data, d, w, u)
     write(outFile,join(data.F*d," ")*"\n\n")
 
     write(outFile, "aimed\n")
-    write(outFile,join(Int64.(ceil.(S/T))," ")*"\n\n")
+    write(outFile,join(Int64.(ceil.(S/timeperiod))," ")*"\n\n")
 
     write(outFile, "P_names\n") 
     write(outFile,join(replace.(data.P_names, " " => "£")," ")*"\n\n")
