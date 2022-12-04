@@ -38,24 +38,24 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.05,a
     start_time = time_ns()
 
     if type == "baseline"
-        T_start = -theta*sol.base_obj/ln(0.5)
-        repair_functions = [greedyRepair!, firstRepair!, modelRepair!]
+        T_start = -theta*sol.base_obj/log(0.5)
+        repair_functions = [greedyRepair!, firstRepair!, flexibilityRepair!, modelRepair!]
         destroy_functions = [clusterDestroy!, randomDestroy!, relatedDestroy!]
-        n_d = 3
+        n_d = length(destroy_functions)
         if modelRepair
-            n_r = 3
+            n_r = length(repair_functions)
         else
-            n_r = 2
+            n_r = length(repair_functions) - 1
         end
     elseif type == "expanded"
         T_start = -theta*sol.exp_obj/log(0.5)
-        repair_functions = [greedyRepair!, firstRepair!, regretRepair!, modelRepair!]
+        repair_functions = [greedyRepair!, firstRepair!, flexibilityRepair!, modelRepair!] # regretRepair!
         destroy_functions = [clusterDestroy!, randomDestroy!, worstSpreadDestroy!, stackDestroy!, relatedDestroy!]
-        n_d = 5
+        n_d = length(destroy_functions)
         if modelRepair
-            n_r = 4
+            n_r = length(repair_functions)
         else
-            n_r = 3
+            n_r = length(repair_functions) - 1
         end
     else
         println("Enter valid model type")
