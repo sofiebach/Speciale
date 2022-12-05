@@ -1,14 +1,11 @@
-include("ConstructionHeuristics_expanded.jl")
-include("HeuristicFunctions.jl")
+include("../ConstructionHeuristics.jl")
 
-function ILS(data, time_limit)
-    sol = randomInitial(data)
+function ILS(data, sol, time_limit)
     localSearch!(data, sol)
     start_time = time_ns()
 
     while elapsed_time(start_time) < time_limit
         temp_sol = deepcopy(sol)
-        pertubate!(data, temp_sol)
         localSearch!(data, temp_sol)
         if temp_sol.obj < sol.obj 
             sol = deepcopy(temp_sol)

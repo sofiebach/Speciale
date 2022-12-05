@@ -83,6 +83,16 @@ function remove!(data, sol, t, p)
     findObjective!(data, sol)
 end
 
+function findCampaign(data, sol, n)
+    count = 0
+    for t = data.start:data.stop, p = 1:data.P
+        count += sol.x[t,p]
+        if count >= n
+            return t, p
+        end
+    end
+end
+
 function findMinIdle(data, xp)
     # If more priorities at same timestep
     if sum(xp.> 1) > 0 
@@ -145,8 +155,17 @@ function fits2times(data, sol, t1, t2, p)
         return false
     end
 
-    # Check freelance in case of no overlap
-    if abs(t1-t2) > data.L_upper-data.L_lower + 1
+    t_hat1L = collect((t1+data.L_lower):(t1+data.L_upper))
+    t_hat2L = collect((t2+data.L_lower):(t2+data.L_upper))
+    t_hat_L_intersect = intersect(t_hat1L,t_hat2L)
+
+    t_hat1Q = collect((t1+data.Q_lower):(t1+data.Q_upper))
+    t_hat2Q = collect((t2+data.Q_lower):(t2+data.Q_upper))
+    t_hat_Q_intersect = intersect(t_hat1Q,t_hat2Q)
+
+    # Check production
+    # Check freelance in case of no overlap in Q
+    if length(t_hat_Q_intersect) == 0
         # Compute freelance hours needed for t1 and t2
         for m = 1:data.M  
             freelancers_needed1 = 0
@@ -166,42 +185,15 @@ function fits2times(data, sol, t1, t2, p)
                     end
                 end
             end
-        end    
-    end
-
-    # Check in case of overlap
-    t_hat1 = collect((t1+data.L_lower):(t1+data.L_upper))
-    t_hat2 = collect((t2+data.L_lower):(t2+data.L_upper))
-    
-    t_hat_intersepct = intersect(t_hat1,t_hat2)
-
-    # Find l_idx in original t_hats
-    l_idx1 = findall(x -> x in t_hat_intersepct, t_hat1)
-    l_idx2 = findall(x -> x in t_hat_intersepct, t_hat2)
-
-    idx = 1
-    for t_hat in t_hat_intersepct
-        for c = 1:data.C
-            grp = data.u[l_idx1[idx],p,c] + data.u[l_idx2[idx],p,c] # Add grp contribution from both time steps
-            if sol.I_cap[t_hat, c] - grp < 0
-                return false
-            end
         end
-        idx += 1
-    end
-
-    # Gå below igennem sammen
-    if abs(t1-t2) <= abs(data.Q_upper-data.Q_lower) # If Q overlap
-        t_hat1 = collect((t1+data.Q_lower):(t1+data.Q_upper))
-        t_hat2 = collect((t2+data.Q_lower):(t2+data.Q_upper))
-        
-        t_hat = vcat(t_hat1, t_hat2)
-        t_count = [count(==(i), t_hat) for i in unique(t_hat)]
+    else #  Check if overlap in Q
+        t_hat_cat = vcat(t_hat1Q, t_hat2Q)
+        t_count = [count(==(i), t_hat_cat) for i in unique(t_hat_cat)]
 
         for m = 1:data.M
             idx = 1
             freelancers_needed = 0
-            for t_hat in collect(minimum(t_hat):maximum(t_hat)) 
+            for t_hat = minimum(t_hat_cat):maximum(t_hat_cat) 
                 if sol.H_cap[t_hat, m] - data.w[p, m]*t_count[idx] < 0
                     freelancers_needed += -(sol.H_cap[t_hat, m] - data.w[p, m]*t_count[idx])
                     if sum(sol.f[:,m]) + freelancers_needed > data.F[m] 
@@ -211,29 +203,25 @@ function fits2times(data, sol, t1, t2, p)
                 idx += 1
             end
         end
-    else
-        for m = 1:data.M
-            freelancers_needed1 = 0
-            freelancers_needed2 = 0
+    end
+    # Check inventory in case of overlap in L
+    if length(t_hat_L_intersect) > 0
+        # Find l_idx in original t_hats
+        l_idx1 = findall(x -> x in t_hat_L_intersect, t_hat1L)
+        l_idx2 = findall(x -> x in t_hat_L_intersect, t_hat2L)
 
-            for t_hat = (t1+data.Q_lower):(t1+data.Q_upper)
-                if sol.H_cap[t_hat, m] - data.w[p, m] < 0
-                    freelancers_needed1 += -(sol.H_cap[t_hat, m] - data.w[p, m])
-                    if sum(sol.f[:,m]) + freelancers_needed1 + freelancers_needed2 > data.F[m] 
-                        return false
-                    end
+        idx = 1
+        for t_hat in t_hat_L_intersect
+            for c = 1:data.C
+                grp = data.u[l_idx1[idx],p,c] + data.u[l_idx2[idx],p,c] # Add grp contribution from both time steps
+                if sol.I_cap[t_hat, c] - grp < 0
+                    return false
                 end
             end
-            for t_hat = (t2+data.Q_lower):(t2+data.Q_upper) 
-                if sol.H_cap[t_hat, m] - data.w[p, m] < 0
-                    freelancers_needed2 += -(sol.H_cap[t_hat, m] - data.w[p, m])
-                    if sum(sol.f[:,m]) + freelancers_needed1 + freelancers_needed2 > data.F[m] 
-                        return false
-                    end
-                end
-            end
-        end    
-    end   
+            idx += 1
+        end
+    end
+
     return true 
 end
 
@@ -262,20 +250,21 @@ function findObjective!(data, sol)
     sol.exp_obj =  sol.objective.k_penalty - sol.objective.x_reward + sol.objective.g_penalty - sol.objective.L_reward
 end
 
-function randomInsert!(data, sol, priorities)
-    for p in priorities
-        r_times = shuffle(collect(data.start:data.stop))
-        for n = 1:data.S[p], t in r_times
-            if sol.k[p] == 0
-                break
-            end
-            if fits(data, sol, t, p)
-                insert!(data, sol, t, p)
-            end
-        end
-    end
-end
+function deltaCompareRegret(data, sol, t1, t2, p)
+    xp = deepcopy(sol.x[:,p])
+    xp[t1] += 1
+    xp[t2] += 1
+    new_idle = findMinIdle(data,xp)
 
+    aimed_wrong = 0
+    if xp[t1] > data.aimed[p]
+        aimed_wrong += 1 #aimed wrong penalty is set to 1
+    end
+    if xp[t2] > data.aimed[p]
+        aimed_wrong += 1 #aimed wrong penalty is set to 1
+    end
+    return -new_idle + aimed_wrong #Minimize
+end
 
 function deltaInsert(data, sol, t, p)
     if sol.k[p] > 0

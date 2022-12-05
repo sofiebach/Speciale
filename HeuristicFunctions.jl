@@ -3,29 +3,28 @@ include("BasicFunctions.jl")
 function randomDestroy!(data, sol, frac)
     n_destroy = ceil(sol.num_campaigns*frac)
     while n_destroy > 0 
-        p = rand(1:data.P)
-        if sum(sol.x[:,p]) == 0
-            continue
-        end
-        r_times = findall(x -> x > 0, sol.x[:,p])
-
-        t = r_times[rand(1:length(r_times))]
+        n = rand(1:sol.num_campaigns)
+        t, p = findCampaign(data, sol, n)
         remove!(data, sol, t, p)
         n_destroy -= 1
     end
 end
 
 function clusterDestroy!(data, sol, frac)
-    t_destroy = Int(ceil((data.stop - data.start)*frac))
-    rand_t = rand(data.start:(data.stop-t_destroy))
-    for t = rand_t:(rand_t+t_destroy), p = 1:data.P
-        while sol.x[t,p] > 0
-            remove!(data, sol, t, p)
+    n_destroy = ceil(sol.num_campaigns*frac)
+    n = rand(1:sol.num_campaigns)
+    n = sol.num_campaigns-3
+    while n_destroy > 0 
+        if n > sol.num_campaigns
+            n = 1
         end
+        t, p = findCampaign(data,sol,n)
+        remove!(data,sol,t,p)
+        n_destroy -= 1
     end   
 end
 
-function worstSpreadDestroy!(data, sol, frac)
+function worstIdleDestroy!(data, sol, frac)
     n_destroy = ceil(sol.num_campaigns*frac)
     perfect_spread = data.timeperiod./(sum(sol.x, dims = 1) .- 1)
     div_spread = zeros(Float64, data.P)
@@ -54,14 +53,25 @@ function worstSpreadDestroy!(data, sol, frac)
 end
 
 function stackDestroy!(data, sol, frac)
-    for p = 1:data.P
-        if maximum(sol.x[:,p]) > data.aimed[p]
-            for t = data.start:data.stop
-                while sol.x[t,p] > data.aimed[p]
-                    remove!(data, sol, t, p)
-                end
+    n_destroy = ceil(sol.num_campaigns*frac)
+    sorted_idx = sortperm(-sum(sol.g[t,:] for t=1:data.T))
+    for p in sorted_idx
+        if sum(sol.g[:,p]) == 0
+            break
+        end
+        for t = data.start:data.stop
+            while sol.g[t,p] > 0 && n_destroy > 0
+                remove!(data, sol, t, p)
+                n_destroy -= 1
             end
         end
+    end
+    # Remove the rest randomly
+    while n_destroy > 0 
+        n = rand(1:sol.num_campaigns)
+        t, p = findCampaign(data, sol, n)
+        remove!(data, sol, t, p)
+        n_destroy -= 1
     end
 end
 
@@ -210,7 +220,9 @@ function bestInsertion(data, sol, priorities, type)
     best_t = 0
     
     for p in priorities 
-        for t = data.start:data.stop
+        #times = shuffle(data.start:data.stop)
+        times = data.start:data.stop
+        for t in times
             if fits(data, sol, t, p) 
                 delta_obj = deltaInsert(data, sol, t, p)
                 if type == "expanded"
@@ -279,17 +291,17 @@ end
 
 function regretRepair!(data, sol, type)
     for p_bar in data.P_bar, n = 1:sol.k[p_bar]
-        t, p = regretInsertion(data, sol, [p_bar], type)
-        if t != 0 && p != 0
-            insert!(data, sol, t[1], p)
-            insert!(data, sol, t[2], p)
+        t1, t2, p = regretInsertion(data, sol, [p_bar], type)
+        if t1 != 0 && t2 != 0 && p != 0
+            insert!(data, sol, t1, p)
+            insert!(data, sol, t2, p)
         end
     end
-        while true
-        t, p = regretInsertion(data, sol, collect(1:data.P), type)
-        if t != 0 && p != 0
-            insert!(data, sol, t[1], p)
-            insert!(data, sol, t[2], p)
+    while true
+        t1, t2, p = regretInsertion(data, sol, collect(1:data.P), type)
+        if t1 != 0 && t2 != 0 && p != 0
+            insert!(data, sol, t1, p)
+            insert!(data, sol, t2, p)
         else
             break
         end
@@ -297,39 +309,51 @@ function regretRepair!(data, sol, type)
 end
 
 function regretInsertion(data, sol, priorities, type)
-    M = 1000000
-    best1 = ones(Int64, data.P)*M
-    best2 = ones(Int64, data.P)*M
-    best_ts = zeros(Int64, data.P, 2)
+    loss = zeros(Float64, data.P)
+    ts = zeros(Int64, data.P, 2)
     for p in priorities
-        t, _ = bestInsertion(data, sol, [p], type)
-        for t2 in collect(data.start:data.stop)
-            if fits2times(data, sol, t, t2, p)
-                obj = # delta evaluer 2 lags
-                if obj < best1[p]
-                    best1[p] = obj
+        if sol.k[p] == 0
+            continue
+        end
+        best_delta1 = Inf
+        best_delta2 = Inf
+        t1, _ = bestInsertion(data, sol, [p], type)
+        if t1 == 0
+            continue
+        end
+        for t2 = data.start:data.stop
+            if fits2times(data, sol, t1, t2, p)
+                delta1 = deltaCompareRegret(data, sol, t1, t2, p)
+                if delta1 < best_delta1
+                    best_delta1 = delta1
                 end
             end
-            for t1 in collect(data.start:data.stop)
-                if fits2times(data, sol, t1, t2, p)
-                    obj = # delta evaluer 2 lags
-                    if obj < best2[p]
-                        best2[p] = obj
-                        best_ts[p][1] = t1
-                        best_ts[p][2] = t2
+        end
+        for t1 = data.start:data.stop
+            if fits(data, sol, t1, p)
+                for t2 = data.start:data.stop
+                    if fits2times(data, sol, t1, t2, p)
+                        delta2 = deltaCompareRegret(data, sol, t1, t2, p)
+                        if delta2 < best_delta2
+                            best_delta2 = delta2
+                            ts[p,:] = [t1,t2]
+                        end
                     end
                 end
             end
         end
+        loss[p] = best_delta1 - best_delta2
     end
-    diff = best1 - best2
-    diff, idx = findmax(diff)
-    best_p = priorities[idx]
-    if diff >= 0
-        return best_ts[best_p,:], best_p
-    else 
-        return 0, 0
+    replace!(loss, NaN=>-1)
+
+    loss, idx = findmax(loss)
+    best_p = collect(1:data.P)[idx]
+    t1 = ts[best_p,1]
+    t2 = ts[best_p,2]
+    if t1 == 0 || t2 == 0
+        return 0, 0, 0
     end
+    return t1, t2, best_p
 end
 
 
