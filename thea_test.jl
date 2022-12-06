@@ -10,8 +10,8 @@ time_limit = 60 #Seconds
 
 sol, params = ALNS(data, sol, time_limit, "expanded")
 probabilityTracking(params, "probability")
-solutionTracking(params, "solution")
-
+solutionTracking_all(params, "solution2")
+temperatureTracking(params, "temp")
 
 
 
