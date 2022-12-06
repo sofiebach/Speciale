@@ -123,7 +123,7 @@ function readSolution(filename)
     T, P, M = parse.(Int,split(readline(f)))
     readline(f) # blank
 
-    sol = ExpandedSol(data)
+    sol = Sol(data)
     readline(f) # obj
     sol.obj = parse.(Float64, readline(f))
     readline(f) # blank

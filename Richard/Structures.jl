@@ -90,7 +90,7 @@ mutable struct Objective
     Objective() = new(0.0, 0.0, 0.0, 0.0)
 end
 
-mutable struct ExpandedSol
+mutable struct Sol
     base_obj::Float64
     exp_obj::Float64
     objective::Objective
@@ -106,7 +106,7 @@ mutable struct ExpandedSol
     C::Int64
     I_cap::Array{Float64,2}
     H_cap::Array{Float64,2}
-    ExpandedSol(data) = new(0.0, 0.0, Objective(), 0,
+    Sol(data) = new(0.0, 0.0, Objective(), 0,
     zeros(Int64,data.T,data.P), zeros(Float64,data.T,data.M), deepcopy(data.S), 
     zeros(Int64, data.P), zeros(Int64, data.T, data.P), 
     data.P, data.T, data.M, data.C, 

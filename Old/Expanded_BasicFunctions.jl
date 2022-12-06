@@ -139,7 +139,7 @@ function fits(data, sol, t, p)
 end
 
 function MIPtoSol(data, x)
-    sol = ExpandedSol(data)
+    sol = Sol(data)
     for t = 1:data.T, p = 1:data.P
         for n = 1:x[t,p]
             insert!(data, sol, t, p)

@@ -76,9 +76,6 @@ function read_DR_data(P)
         data.penalty_f[m] = 0.001
         data.F[m] = 100   
     end
-    # reward for Priority
-    data.reward = (data.penalty_S.-minimum(data.penalty_S).+1)./(maximum(data.penalty_S)-minimum(data.penalty_S))
-
     data.aimed = ceil.(data.S/data.timeperiod)
 
     mapping = XLSX.readdata("data/data_staffing_constraint.xlsx", "Mapping", "B2:D38")[1:data.P,:]
@@ -142,9 +139,6 @@ function writeInstance(filename, data)
 
     write(outFile, "penalty_S\n")
     write(outFile,join(data.penalty_S," ")*"\n\n")
-
-    write(outFile, "reward\n")
-    write(outFile,join(data.reward," ")*"\n\n")
 
     write(outFile, "penalty_f\n")
     write(outFile,join(data.penalty_f," ")*"\n\n")
@@ -236,10 +230,6 @@ function readInstance(filename)
     data.penalty_S = parse.(Float64,split(readline(f)))
     readline(f) # blank
 
-    readline(f) # reward
-    data.reward = parse.(Float64,split(readline(f)))
-    readline(f) # blank
-
     readline(f) # penalty_f
     data.penalty_f = parse.(Float64,split(readline(f)))
     readline(f) # blank
@@ -290,7 +280,7 @@ function writeSolution(filename, data, sol)
     write(outFile, join(sol.exp_obj," ")*"\n\n")
 
     write(outFile, "Objective struct\n")
-    write(outFile, join([sol.objective.x_reward, sol.objective.k_penalty, sol.objective.g_penalty, sol.objective.L_reward]," ")*"\n\n")
+    write(outFile, join([sol.objective.k_penalty, sol.objective.g_penalty, sol.objective.L_reward]," ")*"\n\n")
 
     write(outFile, "num campaigns\n")
     write(outFile, join(sol.num_campaigns," ")*"\n\n")
@@ -340,7 +330,7 @@ function readSolution(filename, data)
     T, P, M, C = parse.(Int,split(readline(f)))
     readline(f) # blank
 
-    sol = ExpandedSol(data)
+    sol = Sol(data)
     readline(f) # baseobj
     sol.base_obj = parse.(Float64, readline(f))
     readline(f) # blank
@@ -348,7 +338,7 @@ function readSolution(filename, data)
     sol.exp_obj = parse.(Float64, readline(f))
     readline(f) # blank
     readline(f) # Objective struct
-    sol.objective.x_reward, sol.objective.k_penalty, sol.objective.g_penalty, sol.objective.L_reward = parse.(Float64,split(readline(f)))
+    sol.objective.k_penalty, sol.objective.g_penalty, sol.objective.L_reward = parse.(Float64,split(readline(f)))
     readline(f) # blank
     readline(f) # num campaigns
     sol.num_campaigns = parse.(Int64, readline(f))

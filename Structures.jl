@@ -20,7 +20,6 @@ mutable struct Instance
     L_l::Array{Int64, 1}
     L_u::Array{Int64, 1}
     penalty_S::Array{Float64, 1}
-    reward::Array{Float64,1}
     penalty_f::Array{Float64, 1}
     F::Array{Float64, 1}
     aimed::Array{Int64,1}
@@ -41,7 +40,6 @@ mutable struct Instance
         zeros(Float64, length(collect(L_lower:L_upper)), P, C),
         zeros(Int64, P),
         zeros(Int64, P),
-        zeros(Float64, P),
         zeros(Float64, P),
         zeros(Float64, M),
         zeros(Int64, M),
@@ -83,14 +81,13 @@ end
 # end
 
 mutable struct Objective
-    x_reward::Float64
     k_penalty::Float64
     g_penalty::Float64
     L_reward::Float64
-    Objective() = new(0.0, 0.0, 0.0, 0.0)
+    Objective() = new(0.0, 0.0, 0.0)
 end
 
-mutable struct ExpandedSol
+mutable struct Sol
     base_obj::Float64
     exp_obj::Float64
     objective::Objective
@@ -106,7 +103,7 @@ mutable struct ExpandedSol
     C::Int64
     I_cap::Array{Float64,2}
     H_cap::Array{Float64,2}
-    ExpandedSol(data) = new(0.0, 0.0, Objective(), 0,
+    Sol(data) = new(0.0, 0.0, Objective(), 0,
     zeros(Int64,data.T,data.P), zeros(Float64,data.T,data.M), deepcopy(data.S), 
     zeros(Int64, data.P), zeros(Int64, data.T, data.P), 
     data.P, data.T, data.M, data.C, 

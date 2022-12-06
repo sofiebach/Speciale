@@ -340,7 +340,7 @@ function readSolution(filename, data)
     T, P, M, C = parse.(Int,split(readline(f)))
     readline(f) # blank
 
-    sol = ExpandedSol(data)
+    sol = Sol(data)
     readline(f) # baseobj
     sol.base_obj = parse.(Float64, readline(f))
     readline(f) # blank

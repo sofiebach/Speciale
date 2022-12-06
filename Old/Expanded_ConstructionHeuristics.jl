@@ -2,7 +2,7 @@ include("BasicFunctions.jl")
 include("../Structures.jl")
 
 function randomInitial(data)
-    sol = ExpandedSol(data)
+    sol = Sol(data)
     
     # Randomly insert priorities from P_bar
     randomInsert!(data, sol, data.P_bar)
