@@ -167,7 +167,6 @@ function writeInstance(filename, data)
     close(outFile)
 end
 
-
 function readInstance(filename)
     f = open(filename)
     readline(f) # timeperiod P M C T
@@ -434,6 +433,9 @@ function writeParameters(filename, params)
 
     write(outFile, "Temperature\n")
     write(outFile, join(params.T_it," ")*"\n\n")
+
+    write(outFile, "W\n")
+    write(outFile, join(params.W," ")*"\n\n")
     close(outFile)
 end
 
@@ -495,11 +497,14 @@ function readParameters(filename)
     readline(f) # blank
     readline(f) # temperature
     T_it = parse.(Float64,split(readline(f)))
+    readline(f) # blank
+    readline(f) # W
+    W = parse.(Float64,split(readline(f)))
     
     return (prob_destroy=prob_destroy, prob_repair=prob_repair, destroys=destroys, prob_destroy_it = prob_destroy_it,
     prob_repair_it = prob_repair_it, repairs=repairs, current_obj=current_obj, current_best=current_best, status=status, 
     time_repair=time_repair, time_destroy=time_destroy, num_repair=num_repair, num_destroy=num_destroy, 
-    destroy_names=destroy_names, repair_names=repair_names, iter = iter, T_it = T_it)
+    destroy_names=destroy_names, repair_names=repair_names, iter = iter, T_it = T_it, W = W)
 end
 
 function findSimilarity(data)
