@@ -311,6 +311,7 @@ function regretInsertion(data, sol, priorities, type)
     loss = zeros(Float64, data.P)
     ts = zeros(Int64, data.P, 2)
     for p in priorities
+        println("p: ", p)
         if sol.k[p] == 0
             continue
         end
@@ -320,14 +321,21 @@ function regretInsertion(data, sol, priorities, type)
         if t1 == 0
             continue
         end
+        temp1 = 0
+        temp2 = 0
         for t2 = data.start:data.stop
             if fits2times(data, sol, t1, t2, p)
                 delta1 = deltaCompareRegret(data, sol, t1, t2, p)
                 if delta1 < best_delta1
                     best_delta1 = delta1
+                    temp1 = t1
+                    temp2 = t2
                 end
             end
         end
+        println("t1: ", temp1)
+        println("t2: ", temp2)
+        println("delta: ", best_delta1)
         for t1 = data.start:data.stop
             if fits(data, sol, t1, p)
                 for t2 = data.start:data.stop
@@ -341,6 +349,10 @@ function regretInsertion(data, sol, priorities, type)
                 end
             end
         end
+        println("t1: ", ts[p,1])
+        println("t2: ", ts[p,2])
+        println("delta: ", best_delta2)
+        println("----------------")
         loss[p] = best_delta1 - best_delta2
     end
     replace!(loss, NaN=>-1)
