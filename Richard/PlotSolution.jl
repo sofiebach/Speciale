@@ -390,7 +390,7 @@ function solutionTracking(params, filename)
     from matplotlib import ticker
     
     def solutionPlot(params, rejected, accepted, better, filename):
-        
+        plt.figure()
         plt.plot(rejected[::10], np.array(params.current_obj)[rejected.astype(int)-1][::10], 'bo', markersize = 4)
         plt.plot(accepted[::10], np.array(params.current_obj)[accepted.astype(int)-1][::10], 'yo', markersize = 4)
         plt.plot(better, np.array(params.current_obj)[better.astype(int)-1], 'ro', markersize = 4)
@@ -416,7 +416,7 @@ function solutionTracking_all(params, filename)
     from matplotlib import ticker
     
     def solutionPlot(params, rejected, accepted, better, filename):
-        
+        plt.figure()
         plt.plot(rejected, np.array(params.current_obj)[rejected.astype(int)-1], 'bo', markersize = 4)
         plt.plot(accepted, np.array(params.current_obj)[accepted.astype(int)-1], 'yo', markersize = 4)
         plt.plot(better, np.array(params.current_obj)[better.astype(int)-1], 'ro', markersize = 4)
@@ -441,7 +441,7 @@ function temperatureTracking(params, filename)
     from matplotlib import ticker
     
     def tempPlot(params, filename):
-        
+        plt.figure()
         plt.plot(params.T_it)
         plt.savefig("output/" + filename + ".png")
         # plt.show()
