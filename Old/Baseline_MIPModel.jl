@@ -51,7 +51,7 @@ function MIPBaseline(data, time_limit, solution_limit, log)
         end
     end
     # # Create solution object
-    # sol = ExpandedSol(data)
+    # sol = Sol(data)
     # sol.obj = objective_value(model)
     # for p = 1:sol.P
     #     sol.k[p] = Int64(round(JuMP.value(k[p])))

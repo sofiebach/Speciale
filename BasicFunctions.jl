@@ -226,7 +226,7 @@ function fits2times(data, sol, t1, t2, p)
 end
 
 function MIPtoSol(data, x)
-    sol = ExpandedSol(data)
+    sol = Sol(data)
     for t = 1:data.T, p = 1:data.P
         for n = 1:x[t,p]
             insert!(data, sol, t, p)
@@ -236,18 +236,12 @@ function MIPtoSol(data, x)
 end
 
 function findObjective!(data, sol)
-    # x_reward = sum(sum(sol.x, dims=1) .* transpose(data.reward))
-    # k_penalty = sum(data.penalty_S .* sol.k)
-    # g_penalty = sum(sum(sol.g))
-    # L_reward = sum(sol.L)
-    # freelance = sum(sum(sol.f, dims=1) .* data.penalty_f)
-    sol.objective.x_reward = sum(sum(sol.x, dims=1) .* transpose(data.reward))
     sol.objective.k_penalty = sum(data.penalty_S .* sol.k)
     sol.objective.g_penalty = sum(sum(sol.g))
     sol.objective.L_reward = sum(sol.L)
 
-    sol.base_obj = sol.objective.k_penalty - sol.objective.x_reward
-    sol.exp_obj =  sol.objective.k_penalty - sol.objective.x_reward + sol.objective.g_penalty - sol.objective.L_reward
+    sol.base_obj = sol.objective.k_penalty
+    sol.exp_obj =  sol.objective.k_penalty + sol.objective.g_penalty - sol.objective.L_reward
 end
 
 function deltaCompareRegret(data, sol, t1, t2, p)
@@ -281,12 +275,12 @@ function deltaInsert(data, sol, t, p)
     xp[t] += 1
     new_idle = findMinIdle(data,xp)
     delta_idle = sol.L[p] - new_idle # Should be positive or zero
-    delta_exp = sol.exp_obj - data.reward[p] + penalty_scope + aimed_wrong + delta_idle
+    delta_exp = sol.exp_obj + penalty_scope + aimed_wrong + delta_idle
 
     if sol.k[p] > 0
-        delta_base =  sol.base_obj - data.penalty_S[p] - data.reward[p]
+        delta_base =  sol.base_obj - data.penalty_S[p]
     else
-        delta_base = sol.base_obj - data.reward[p]
+        delta_base = sol.base_obj
     end
 
     return (delta_base=delta_base, delta_exp=delta_exp)
@@ -307,12 +301,12 @@ function deltaRemove(data, sol, t, p)
     xp[t] -= 1
     new_idle = findMinIdle(data,xp)
     delta_idle = sol.L[p] - new_idle # Should be negative or zero
-    delta_exp = sol.exp_obj + data.reward[p] + penalty_scope + aimed_wrong + delta_idle
+    delta_exp = sol.exp_obj + penalty_scope + aimed_wrong + delta_idle
 
     if sum(sol.x[:,p])-1 < data.S[p]
-        delta_base = sol.base_obj + data.penalty_S[p] + data.reward[p]
+        delta_base = sol.base_obj + data.penalty_S[p]
     else
-        delta_base = sol.base_obj + data.reward[p]
+        delta_base = sol.base_obj
     end
 
     return (delta_base=delta_base, delta_exp=delta_exp)    

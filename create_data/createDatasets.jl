@@ -57,9 +57,6 @@ function createNewInstance(data, d, w, u)
     write(outFile, "penalty_S\n")
     write(outFile,join(data.penalty_S," ")*"\n\n")
 
-    write(outFile, "reward\n")
-    write(outFile,join(data.reward," ")*"\n\n")
-
     write(outFile, "penalty_f\n")
     write(outFile,join(data.penalty_f," ")*"\n\n")
 

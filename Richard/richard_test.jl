@@ -5,7 +5,7 @@ include("PlotSolution.jl")
 data = readInstance("100_0_0.txt")
 sol = randomInitial(data)
 
-# sol = ExpandedSol(data) #Empty solution
+# sol = Sol(data) #Empty solution
 # p = 7
 # insert!(data,sol,data.start, p)
 # insert!(data,sol,data.stop, p)
