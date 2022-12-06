@@ -370,6 +370,7 @@ function drawHeatmap(inventory_used, staff_used, data, sol, filename)
 
         plt.savefig("output/" + filename + ".png")
         # plt.show()
+        plt.close
     """
 
     py"heatmap"(used_cap_inv, used_cap_prod, data.C_names, data.M_names, filename)
@@ -399,6 +400,7 @@ function solutionTracking(params, filename)
         plt.legend(["Rejected", "Accepted", "New best"])
         plt.savefig("output/" + filename + ".png")
         # plt.show()
+        plt.close
     """
     py"solutionPlot"(params,rejected, accepted, better, filename)
 end
@@ -426,6 +428,7 @@ function solutionTracking_all(params, filename)
         plt.legend(["Rejected", "Accepted", "New best"])
         plt.savefig("output/" + filename + ".png")
         # plt.show()
+        plt.close
     """
     py"solutionPlot"(params,rejected, accepted, better, filename)
 end
@@ -447,6 +450,7 @@ function temperatureTracking(params, filename)
         plt.plot(params.T_it)
         plt.savefig("output/" + filename + ".png")
         # plt.show()
+        plt.close
     """
     py"tempPlot"(params, filename)
 end
@@ -481,36 +485,8 @@ function probabilityTracking(params, filename)
             i += 1
         plt.savefig("output/" + filename + ".png")
         # plt.show()
+        plt.close
     """
     py"progDR"(params, filename)
-end
-
-function plotScope(data, sol, filename)
-    total = sum(sol.x, dims=1)
-    BC_names = unique(data.BC_names)
-    num_BC = length(BC_names)
-    campaign_names = unique(data.P_names)
-    num_campaigns = length(campaign_names)
-    output = zeros(Float64, length(BC_names), length(campaign_names))*NaN
-    for p = 1:data.P
-        for bc = 1:num_BC
-            for campaign = 1:num_campaigns
-                if data.BC_names[p] == BC_names[bc] && data.P_names[p] == campaign_names[campaign]
-                    output[bc, campaign] = total[p] - data.S[p]
-                end
-            end
-        end
-    end
-
-    p = plot(heatmap(
-        x = campaign_names,
-        y = BC_names,
-        z = output,
-        theme="plotly_white"))
-    display(p)
-    if Sys.isapple()
-        savefig(p, "output/scope_" * filename * ".png")
-    end
-
 end
 
