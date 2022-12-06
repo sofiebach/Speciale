@@ -378,10 +378,11 @@ function drawHeatmap(inventory_used, staff_used, data, sol, filename)
 end
 
 function solutionTracking(params, filename)
+    W = sort(unique(params.status))
 
-    rejected = findall(x -> x <= 1, params.status)
-    accepted = findall(x -> x == 5, params.status)
-    better = findall(x -> x == 10, params.status)
+    rejected = findall(x -> x <= W[2], params.status)
+    accepted = findall(x -> x == W[3], params.status)
+    better = findall(x -> x == W[4], params.status)
     
     py"""
     import pandas as pd
@@ -405,10 +406,11 @@ function solutionTracking(params, filename)
 end
 
 function solutionTracking_all(params, filename)
+    W = sort(unique(params.status))
 
-    rejected = findall(x -> x <= 1, params.status)
-    accepted = findall(x -> x == 5, params.status)
-    better = findall(x -> x == 10, params.status)
+    rejected = findall(x -> x <= W[2], params.status)
+    accepted = findall(x -> x == W[3], params.status)
+    better = findall(x -> x == W[4], params.status)
     
     py"""
     import pandas as pd

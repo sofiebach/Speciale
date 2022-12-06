@@ -30,9 +30,8 @@ function isValid(data, temp_sol, sol)
 end
 
 
-function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.05,alpha=0.99975,W=[10,5,1],gamma=0.9,destroy_frac=0.2,segment_size=10,long_term_update=5000)    
+function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.05,alpha=0.99975,W=[10,5,1],gamma=0.9,destroy_frac=0.2,segment_size=10,long_term_update=0.05)    
     it = 1
-    best_it = 1
     best_sol = deepcopy(sol)
     temp_sol = deepcopy(sol)
     start_time = time_ns()
@@ -88,12 +87,11 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.05,a
 
     while elapsedTime(start_time) < time_limit
         # Intensification
-        if best_it > long_term_update
+        if T < T_start*long_term_update
             sol = deepcopy(best_sol)
             temp_sol = deepcopy(sol)
             #println("Intensified!")
             T = T_start
-            best_it = 1
 
             # Reset probabilities
             rho_destroy = ones(n_d)
@@ -130,7 +128,6 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.05,a
         end
 
         it += 1
-        best_it += 1
 
         # Update repair time
         time_repair[selected_repair] += elapsed_repair
@@ -167,7 +164,6 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.05,a
             w = W[1]
             println("New best")
             println(best_obj)
-            best_it = 1
         elseif temp_obj < sol_obj
             sol = deepcopy(temp_sol)
             w = W[2]

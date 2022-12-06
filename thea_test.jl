@@ -8,16 +8,13 @@ sol = randomInitial(data)
 
 time_limit = 60 #Seconds
 
-sol, params = ALNS(data, sol, time_limit, "expanded")
+sol, params = ALNS(data, sol, time_limit, "expanded", true)
 probabilityTracking(params, "probability")
+solutionTracking(params, "solution")
 solutionTracking_all(params, "solution2")
 temperatureTracking(params, "temp")
 
-
-
-
 stackDestroy!(data,sol,0.3)
-
 clusterDestroy!(data,sol,0.3)
 
 drawTVSchedule(data,sol,"hej")
