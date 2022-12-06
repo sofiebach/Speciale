@@ -54,18 +54,17 @@ end
 
 function stackDestroy!(data, sol, frac)
     n_destroy = ceil(sol.num_campaigns*frac)
-    sorted_idx = sortperm(-sum(sol.g[t,:] for t=1:data.T))
-    for p in sorted_idx
-        if sum(sol.g[:,p]) == 0
+    while n_destroy > 0
+        val, idx = findmax(sol.g)
+        if val == 0
             break
         end
-        for t = data.start:data.stop
-            while sol.g[t,p] > 0 && n_destroy > 0
-                remove!(data, sol, t, p)
-                n_destroy -= 1
-            end
-        end
+        t = idx[1]
+        p = idx[2]
+        remove!(data, sol, t, p)
+        n_destroy -= 1
     end
+
     # Remove the rest randomly
     while n_destroy > 0 
         n = rand(1:sol.num_campaigns)
