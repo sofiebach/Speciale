@@ -2,19 +2,18 @@ include("ReadWrite.jl")
 include("ALNS.jl")
 include("Validation/PlotSolution.jl")
 
-data = readInstance("dataset/100_0_0.txt")
+data = readInstance("dataset/25_0_0.txt")
 
 sol = randomInitial(data)
-randomDestroy!(data,sol,0.2)
-regretRepair!(data,sol,"expanded")
+
+time_limit = 60 #Seconds
+
+sol, params = ALNS(data, sol, time_limit, "expanded")
+probabilityTracking(params, "probability")
+solutionTracking(params, "solution")
 
 
 
-sol = ExpandedSol(data)
-p = 7
-insert!(data,sol,data.start, p)
-insert!(data,sol,data.stop, p)
-regretInsertion(data,sol,[p], "expanded")
 
 
 stackDestroy!(data,sol,0.3)
