@@ -38,7 +38,7 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.05,a
     start_time = time_ns()
 
     if type == "baseline"
-        T_start = -theta*sol.base_obj/log(0.5)
+        T_start = -theta*temp_sol.base_obj/log(0.5)
         repair_functions = [greedyRepair!, firstRepair!, flexibilityRepair!, modelRepair!]
         destroy_functions = [clusterDestroy!, randomDestroy!, relatedDestroy!]
         n_d = length(destroy_functions)
@@ -48,8 +48,9 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.05,a
             n_r = length(repair_functions) - 1
         end
     elseif type == "expanded"
-        T_start = -theta*sol.exp_obj/log(0.5)
+        T_start = -theta*temp_sol.exp_obj/log(0.5)
         repair_functions = [greedyRepair!, firstRepair!, flexibilityRepair!, regretRepair!, modelRepair!]
+        repair_functions = [firstRepair!, flexibilityRepair!, regretRepair!, modelRepair!]
         destroy_functions = [clusterDestroy!, randomDestroy!, worstIdleDestroy!, stackDestroy!, relatedDestroy!]
         n_d = length(destroy_functions)
         if modelRepair
@@ -152,6 +153,7 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.05,a
 
         if temp_obj < best_obj
             best_sol = deepcopy(temp_sol)
+            sol = deepcopy(temp_sol)
             w = W[1]
             println("New best")
             println(best_obj)
@@ -163,6 +165,7 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.05,a
                 sol = deepcopy(temp_sol)
                 w = W[3]
         else
+            temp_sol = deepcopy(sol)
             w = 0
         end
 
