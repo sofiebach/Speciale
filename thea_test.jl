@@ -3,8 +3,19 @@ include("ALNS.jl")
 include("Validation/PlotSolution.jl")
 
 data = readInstance("dataset/100_0_0.txt")
-p = 1
+
 sol = randomInitial(data)
+randomDestroy!(data,sol,0.2)
+regretRepair!(data,sol,"expanded")
+
+
+
+sol = ExpandedSol(data)
+p = 7
+insert!(data,sol,data.start, p)
+insert!(data,sol,data.stop, p)
+regretInsertion(data,sol,[p], "expanded")
+
 
 stackDestroy!(data,sol,0.3)
 
