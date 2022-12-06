@@ -50,7 +50,6 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.05,a
     elseif type == "expanded"
         T_start = -theta*temp_sol.exp_obj/log(0.5)
         repair_functions = [greedyRepair!, firstRepair!, flexibilityRepair!, regretRepair!, modelRepair!]
-        repair_functions = [firstRepair!, flexibilityRepair!, regretRepair!, modelRepair!]
         destroy_functions = [clusterDestroy!, randomDestroy!, worstIdleDestroy!, stackDestroy!, relatedDestroy!]
         n_d = length(destroy_functions)
         if modelRepair
@@ -151,6 +150,17 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.05,a
             return
         end
 
+        # Save objective before acceptance
+        if type == "baseline"
+            append!(current_obj, temp_sol.base_obj)
+            append!(current_best, best_sol.base_obj)
+        elseif type == "expanded"
+            append!(current_obj, temp_sol.exp_obj)
+            append!(current_best, best_sol.exp_obj)
+        else
+            println("Enter valid model type")
+        end
+
         if temp_obj < best_obj
             best_sol = deepcopy(temp_sol)
             sol = deepcopy(temp_sol)
@@ -175,15 +185,7 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.05,a
         append!(prob_destroy_it, prob_destroy)
         append!(prob_repair_it, prob_repair)
         append!(T_it, T)
-        if type == "baseline"
-            append!(current_obj, temp_sol.base_obj)
-            append!(current_best, best_sol.base_obj)
-        elseif type == "expanded"
-            append!(current_obj, temp_sol.exp_obj)
-            append!(current_best, best_sol.exp_obj)
-        else
-            println("Enter valid model type")
-        end
+        
         
         rho_destroy[selected_destroy] = gamma*rho_destroy[selected_destroy] + (1-gamma)*w
         rho_repair[selected_repair] = gamma*rho_repair[selected_repair] + (1-gamma)*w
