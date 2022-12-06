@@ -7,6 +7,8 @@ include("Validation/PlotSolution.jl")
 data = readInstance("dataset/25_0_0.txt")
 
 sol = randomInitial(data)
+
+stackDestroy!(data, sol, 0.2)
 println(sol.num_campaigns)
 worstSpreadDestroy!(data, sol, 0.2)
 println(sol.num_campaigns)
