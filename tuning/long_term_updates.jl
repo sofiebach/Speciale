@@ -7,7 +7,7 @@ Ws = [[10,5,1]]
 gammas=[0.9]
 destroy_fracs=[0.2]
 segment_sizes=[10]
-long_term_updates=[1000,5000,10000,15000,20000]
+long_term_updates=[0.01, 0.05, 0.1, 0.15, 0.2]
 
 stds, averages = tune(thetas,alphas,Ws,gammas,destroy_fracs,segment_sizes,long_term_updates) 
 
