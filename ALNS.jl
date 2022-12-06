@@ -195,7 +195,7 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.05,a
     return best_sol, (prob_destroy=prob_destroy, prob_repair=prob_repair, destroys=destroys,  prob_destroy_it = prob_destroy_it,
     prob_repair_it = prob_repair_it, repairs=repairs, current_obj=current_obj, current_best=current_best, status=status, 
     time_repair=time_repair, time_destroy=time_destroy, num_repair=num_repair, num_destroy=num_destroy, destroy_names = destroy_names,
-    repair_names = repair_names, iter = it, T_it = T_it)
+    repair_names = repair_names, iter = it, T_it = T_it, W = W)
 end
 
 
