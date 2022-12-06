@@ -30,7 +30,7 @@ function isValid(data, temp_sol, sol)
 end
 
 
-function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.05,alpha=0.99975,W=[10,5,1],gamma=0.9,destroy_frac=0.2,segment_size=10,long_term_update=0.05)    
+function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.05,alpha=0.99975,W=[10,5,1],gamma=0.9,destroy_frac=0.4,segment_size=50,long_term_update=0.05)    
     it = 1
     best_sol = deepcopy(sol)
     temp_sol = deepcopy(sol)
@@ -64,14 +64,21 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.05,a
     T = T_start
 
     rho_destroy = ones(n_d)
+    w_destroy = zeros(Int64, n_d, length(W))
     time_destroy = zeros(n_d)
     num_destroy = zeros(Int64, n_d)
     destroy_names = string.(destroy_functions)[1:n_d]
+    w_destroy_sum = zeros(n_d)
+    w_destroy_count = zeros(n_d)
+            
 
     rho_repair = ones(n_r)
+    w_repair = zeros(Int64, n_r, length(W))
     time_repair = zeros(n_r)
     num_repair = zeros(Int64, n_r)
     repair_names = string.(repair_functions)[1:n_r]
+    w_repair_sum = zeros(n_r)
+    w_repair_count = zeros(n_r)
     
     prob_destroy = setProb(rho_destroy)
     prob_repair = setProb(rho_repair)
@@ -102,8 +109,20 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.05,a
 
         # update probabilities
         if (it % segment_size == 0)
+            w_destroy_mean = (w_destroy_sum ./ w_destroy_count)
+            replace!(w_destroy_mean, NaN=>0)
+            w_repair_mean = (w_repair_sum ./ w_repair_count)
+            replace!(w_repair_mean, NaN=>0)
+            rho_destroy = gamma*rho_destroy + (1-gamma) .* w_destroy_mean
+            rho_repair = gamma*rho_repair + (1-gamma) .* w_repair_mean
+
             prob_destroy = setProb(rho_destroy)
             prob_repair = setProb(rho_repair)
+
+            w_destroy_sum = zeros(n_d)
+            w_destroy_count = zeros(n_d)
+            w_repair_sum = zeros(n_r)
+            w_repair_count = zeros(n_r)
         end
 
         # Choose destroy method
@@ -162,14 +181,20 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.05,a
             best_sol = deepcopy(temp_sol)
             sol = deepcopy(temp_sol)
             w = W[1]
+            w_repair[selected_repair, 1] += 1
+            w_destroy[selected_destroy, 1] += 1
             println("New best")
             println(best_obj)
         elseif temp_obj < sol_obj
             sol = deepcopy(temp_sol)
             w = W[2]
+            w_repair[selected_repair, 2] += 1
+            w_destroy[selected_destroy, 2] += 1
         elseif rand() < exp(-(temp_obj-sol_obj)/T)
-                sol = deepcopy(temp_sol)
-                w = W[3]
+            sol = deepcopy(temp_sol)
+            w = W[3]
+            w_repair[selected_repair, 3] += 1
+            w_destroy[selected_destroy, 3] += 1
         else
             temp_sol = deepcopy(sol)
             w = 0
@@ -181,10 +206,12 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.05,a
         append!(prob_destroy_it, prob_destroy)
         append!(prob_repair_it, prob_repair)
         append!(T_it, T)
-        
-        
-        rho_destroy[selected_destroy] = gamma*rho_destroy[selected_destroy] + (1-gamma)*w
-        rho_repair[selected_repair] = gamma*rho_repair[selected_repair] + (1-gamma)*w
+
+        w_destroy_sum[selected_destroy] += w
+        w_repair_sum[selected_repair] += w
+        w_destroy_count[selected_destroy] += 1
+        w_repair_count[selected_repair] += 1
+
         T = alpha * T
      
     end
@@ -195,7 +222,7 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.05,a
     return best_sol, (prob_destroy=prob_destroy, prob_repair=prob_repair, destroys=destroys,  prob_destroy_it = prob_destroy_it,
     prob_repair_it = prob_repair_it, repairs=repairs, current_obj=current_obj, current_best=current_best, status=status, 
     time_repair=time_repair, time_destroy=time_destroy, num_repair=num_repair, num_destroy=num_destroy, destroy_names = destroy_names,
-    repair_names = repair_names, iter = it, T_it = T_it)
+    repair_names = repair_names, iter = it, T_it = T_it, w_repair=w_repair, w_destroy=w_destroy)
 end
 
 
