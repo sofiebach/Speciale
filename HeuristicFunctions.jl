@@ -251,11 +251,14 @@ function flexibilityRepair!(data, sol, type)
             insert!(data, sol, t, p)
         end
     end
-    
+    count = 1
     while true
         t, p = flexibilityInsertion(data, sol, collect(1:data.P))
         if t != 0 && p != 0
             insert!(data, sol, t, p)
+            drawRadioSchedule(data, sol, string(count)*"_radio")
+            drawTVSchedule(data, sol, string(count)*"_tv")
+            count += 1
         else
             break
         end
@@ -296,11 +299,17 @@ function regretRepair!(data, sol, type)
             insert!(data, sol, t2, p)
         end
     end
+    count = 1
     while true
-        t1, t2, p = regretInsertion(data, sol, collect(1:data.P), type)
+        priorities = shuffle(collect(1:data.P))
+        t1, t2, p = regretInsertion(data, sol, priorities, type)
         if t1 != 0 && t2 != 0 && p != 0
             insert!(data, sol, t1, p)
             insert!(data, sol, t2, p)
+            println("INSERTED p: ", p, " t1: ", t1, " t2: ", t2)
+            drawRadioSchedule(data, sol, string(count)*"_radio")
+            drawTVSchedule(data, sol, string(count)*"_tv")
+            count += 1
         else
             break
         end
@@ -308,11 +317,13 @@ function regretRepair!(data, sol, type)
 end
 
 function regretInsertion(data, sol, priorities, type)
-    loss = zeros(Float64, data.P)
-    ts = zeros(Int64, data.P, 2)
+    # loss = zeros(Float64, data.P)*NaN
+    # ts = zeros(Int64, data.P, 2)
+    loss = zeros(Float64, length(priorities))*NaN
+    ts = zeros(Int64, length(priorities), 2)
+    p_idx = 1
     for p in priorities
-        #println("p: ", p)
-        if sol.k[p] == 0
+        if sol.k[p] < 2
             continue
         end
         best_delta1 = Inf
@@ -321,18 +332,19 @@ function regretInsertion(data, sol, priorities, type)
         if t1 == 0
             continue
         end
-        #temp1 = 0
-        #temp2 = 0
+        temp1 = 0
+        temp2 = 0
         for t2 = data.start:data.stop
             if fits2times(data, sol, t1, t2, p)
                 delta1 = deltaCompareRegret(data, sol, t1, t2, p)
                 if delta1 < best_delta1
                     best_delta1 = delta1
-                    #temp1 = t1
-                    #temp2 = t2
+                    temp1 = t1
+                    temp2 = t2
                 end
             end
         end
+        #println("p: ", p)
         #println("t1: ", temp1)
         #println("t2: ", temp2)
         #println("delta: ", best_delta1)
@@ -343,7 +355,7 @@ function regretInsertion(data, sol, priorities, type)
                         delta2 = deltaCompareRegret(data, sol, t1, t2, p)
                         if delta2 < best_delta2
                             best_delta2 = delta2
-                            ts[p,:] = [t1,t2]
+                            ts[p_idx,:] = [t1,t2]
                         end
                     end
                 end
@@ -353,14 +365,22 @@ function regretInsertion(data, sol, priorities, type)
         #println("t2: ", ts[p,2])
         #println("delta: ", best_delta2)
         #println("----------------")
-        loss[p] = best_delta1 - best_delta2
+        loss[p_idx] = best_delta1 - best_delta2
+        p_idx += 1
     end
     replace!(loss, NaN=>-1)
 
+    # println(loss)
     loss, idx = findmax(loss)
-    best_p = collect(1:data.P)[idx]
-    t1 = ts[best_p,1]
-    t2 = ts[best_p,2]
+    best_p = priorities[idx]
+    t1 = ts[idx,1]
+    t2 = ts[idx,2]
+    # best_p = collect(1:data.P)[idx]
+    #println("BEST P: ",best_p)
+    # t1 = ts[best_p,1]
+    # t2 = ts[best_p,2]
+    #println(t1, " ", t2)
+    #println("------------")
     if t1 == 0 || t2 == 0
         return 0, 0, 0
     end
