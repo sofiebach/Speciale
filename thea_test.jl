@@ -8,11 +8,25 @@ sol = randomInitial(data)
 
 time_limit = 60 #Seconds
 
-sol, params = ALNS(data, sol, time_limit, "expanded", true)
+sol, params = ALNS(data, sol, time_limit, "expanded")
 probabilityTracking(params, "probability")
 solutionTracking(params, "solution")
 solutionTracking_all(params, "solution2")
 temperatureTracking(params, "temp")
+
+
+plot(params.status[8001:12000])
+
+plot(params.current_obj[8000:9500])
+
+plot(params.prob_repair_it[1,8001:12000])
+
+params.repairs[8530]
+params.status[8530]
+
+
+rho_repair_it = reshape(params.rho_repair_it, length(params.num_repair),:)
+rho_repair_it[:,8525:8535]
 
 stackDestroy!(data,sol,0.3)
 clusterDestroy!(data,sol,0.3)
