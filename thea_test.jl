@@ -2,18 +2,41 @@ include("ReadWrite.jl")
 include("ALNS.jl")
 include("Validation/PlotSolution.jl")
 
-data = readInstance("dataset/25_0_0.txt")
+data = readInstance("dataset/100_0_0.txt")
 
-sol = randomInitial(data)
+sol = readSolution("output/theaplot/weighted_InitialSolution",data)
 
-time_limit = 60 #Seconds
+time_limit = 60*3 #Seconds
 
+prefix = "theaplot/weightedmodified_no_greedy"
 sol, params = ALNS(data, sol, time_limit, "expanded")
-probabilityTracking(params, "probability")
-solutionTracking(params, "solution")
-solutionTracking_all(params, "solution2")
-temperatureTracking(params, "temp")
+probabilityTracking(params, prefix * "_probability")
+solutionTracking(params, prefix * "_solution")
+solutionTracking_all(params, prefix * "_solution_all")
+temperatureTracking(params, prefix * "_temp")
 
+writeParameters("output/" * prefix * "_parameters", params)
+
+
+filename = "_performancetable.txt"
+outFile = open("output/" * prefix * filename, "w")
+    write(outFile, "Obj baseline\n")
+    write(outFile, join(sol.base_obj," ")*"\n\n")
+    
+    write(outFile, "Obj Exp\n")
+    write(outFile, join(sol.exp_obj," ")*"\n\n")
+
+    write(outFile, "Repairs\n")
+    for i = 1:length(params.num_repair)
+        write(outFile, join(params.w_repair[i,:]," ")*"\n")
+    end
+    write(outFile, "\n")
+
+    write(outFile, "Destroys\n")
+    for i = 1:length(params.num_destroy)
+        write(outFile, join(params.w_destroy[i,:]," ")*"\n")
+    end
+    close(outFile)
 
 plot(params.status[8001:12000])
 
