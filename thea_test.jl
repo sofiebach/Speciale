@@ -3,12 +3,11 @@ include("ALNS.jl")
 include("Validation/PlotSolution.jl")
 
 data = readInstance("dataset/100_0_0.txt")
-
-sol = readSolution("output/theaplot/weighted_InitialSolution",data)
+sol = randomInitial(data)
 
 time_limit = 60*3 #Seconds
 
-prefix = "theaplot/weightedmodified_no_greedy"
+prefix = ""
 sol, params = ALNS(data, sol, time_limit, "expanded")
 probabilityTracking(params, prefix * "_probability")
 solutionTracking(params, prefix * "_solution")
@@ -17,7 +16,7 @@ temperatureTracking(params, prefix * "_temp")
 
 writeParameters("output/" * prefix * "_parameters", params)
 
-
+drawTVSchedule(data,sol,"hej")
 filename = "_performancetable.txt"
 outFile = open("output/" * prefix * filename, "w")
     write(outFile, "Obj baseline\n")
