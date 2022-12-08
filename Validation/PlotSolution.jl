@@ -470,6 +470,7 @@ function probabilityTracking(params, filename)
             ax1.set_xlabel("Iterations")
             ax1.title.set_text('Probability')
             ax1.title.set_text('Destroy')
+            ax1.set_ylim(0,1)
             i += 1
         i = 0
         while i < len(params.num_repair):
@@ -478,6 +479,7 @@ function probabilityTracking(params, filename)
             ax2.set_xlabel("Iterations")
             ax2.title.set_text('Probability')
             ax2.title.set_text('Repair')
+            ax2.set_ylim(0,1)
             i += 1
         plt.savefig("output/" + filename + ".png")
         # plt.show()
