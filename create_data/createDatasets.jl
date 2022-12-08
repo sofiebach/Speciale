@@ -1,5 +1,10 @@
 include("../ReadWrite.jl")
 
+data = read_DR_data(37)
+
+writeInstance("original2.txt", data)
+
+
 function createNewInstance(data, d, w, u)
     timeperiod = Int(round(data.timeperiod*d))
     stop = abs(data.Q_lower)+timeperiod
@@ -84,7 +89,7 @@ function createNewInstance(data, d, w, u)
     close(outFile)
 end
 
-data = readInstance("create_data/original.txt")
+data = readInstance("create_data/original2.txt")
 
 percent = [0.25,0.5,1]
 U = [0, 0.05, 0.1, 0.15]
