@@ -404,11 +404,9 @@ function solutionTracking(params, filename)
 end
 
 function solutionTracking_all(params, filename)
-    W = sort(unique(params.status))
-
-    rejected = findall(x -> x <= W[2], params.status)
-    accepted = findall(x -> x == W[3], params.status)
-    better = findall(x -> x == W[4], params.status)
+    rejected = findall(x -> x <= params.W[3], params.status)
+    accepted = findall(x -> x == params.W[2], params.status)
+    better = findall(x -> x == params.W[1], params.status)
     
     py"""
     import pandas as pd

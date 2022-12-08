@@ -49,6 +49,7 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.05,a
     elseif type == "expanded"
         T_start = -theta*temp_sol.exp_obj/log(0.5)
         repair_functions = [greedyRepair!, firstRepair!, flexibilityRepair!, regretRepair!, modelRepair!]
+        repair_functions = [firstRepair!, flexibilityRepair!, regretRepair!, modelRepair!]
         destroy_functions = [clusterDestroy!, randomDestroy!, worstIdleDestroy!, stackDestroy!, relatedDestroy!]
         n_d = length(destroy_functions)
         if modelRepair
@@ -84,6 +85,9 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.05,a
     prob_destroy_it = Float64[] 
     prob_repair_it = Float64[]
     T_it = Float64[]
+
+    rho_destroy_it = Float64[]
+    rho_repair_it = Float64[]
 
     while elapsedTime(start_time) < time_limit
         # Intensification
@@ -185,6 +189,10 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.05,a
         
         rho_destroy[selected_destroy] = gamma*rho_destroy[selected_destroy] + (1-gamma)*w
         rho_repair[selected_repair] = gamma*rho_repair[selected_repair] + (1-gamma)*w
+
+        append!(rho_destroy_it, rho_destroy)
+        append!(rho_repair_it, rho_repair)
+
         T = alpha * T
      
     end
@@ -195,7 +203,7 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.05,a
     return best_sol, (prob_destroy=prob_destroy, prob_repair=prob_repair, destroys=destroys,  prob_destroy_it = prob_destroy_it,
     prob_repair_it = prob_repair_it, repairs=repairs, current_obj=current_obj, current_best=current_best, status=status, 
     time_repair=time_repair, time_destroy=time_destroy, num_repair=num_repair, num_destroy=num_destroy, destroy_names = destroy_names,
-    repair_names = repair_names, iter = it, T_it = T_it, W = W)
+    repair_names = repair_names, iter = it, T_it = T_it, W = W, rho_destroy_it = rho_destroy_it, rho_repair_it = rho_repair_it)
 end
 
 
