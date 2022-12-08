@@ -7,36 +7,10 @@ include("Validation/PlotSolution.jl")
 data = readInstance("dataset/100_0_0.txt")
 
 sol = randomInitial(data)
-sol, params = ALNS(data,sol,60,"expanded")
+sol, params = ALNS(data,sol,120,"baseline",true)
 
-drawTVSchedule(data,sol,"test")
-probabilityTracking(params, "test")
+drawTVSchedule(data,sol,"tv")
+drawRadioSchedule(data,sol,"radio")
+probabilityTracking(params, "prob")
 solutionTracking(params, "sol")
-# println("L: ", sol.L')
-# println("sum L: ", sum(sol.L))
-# println(sum(sol.x,dims=1))
-# println(sol.num_campaigns)
-# println("Initial objective: ", sol.exp_obj)
-# worstIdleDestroy!(data, sol, 0.4)
-# println("Destroy objective: ", sol.exp_obj)
-# 
-# drawRadioSchedule(data, sol, "radio_destroy")
-# drawTVSchedule(data, sol, "tv_destroy")
-# 
-# regretRepair!(data, sol, "expanded")
-# println("L: ", sol.L')
-# println("sum L: ", sum(sol.L))
-# println(sum(sol.x,dims=1))
-# println(sol.num_campaigns)
-# println("Repair objective: ", sol.exp_obj)
 
-
-# total = 0
-# for p = 1:data.P
-#     for t = data.start:data.stop
-#         if fits(data,sol,t,p)
-#             println("p: ", p, " t: ", t)
-#             total += 1
-#         end
-#     end
-# end
