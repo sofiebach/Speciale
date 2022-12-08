@@ -26,7 +26,8 @@ function read_DR_data(P)
         data.u[:,p,11] = data.u[:,p,11] ./ population # convert impressions to GRP
 
         # penalty for priority
-        data.penalty_S[p] = sum(data.u[:,p,:])
+        #data.penalty_S[p] = sum(data.u[:,p,:])
+        
 
         for l = 1:(L_upper-L_lower+1)
             if sum(data.u[l,p,:]) > 0
@@ -55,10 +56,11 @@ function read_DR_data(P)
     # Read scope
     # S[p] is scope for priority p
     data.S = convert(Array{Int64,2}, XLSX.readdata("data/data_staffing_constraint.xlsx", "Scope", "D2:D38"))[1:P]
-
+    data.penalty_S = ones(data.P)./data.S
+    
     # Read I
     # [DR1, DR2, Ramasjang, P1, P2, P3, P4, P5, P6, P8, digital, SOME]
-    inventory = XLSX.readdata("data/data_lagerestimater.xlsx", "Sheet1", "B2:M54")
+    inventory = XLSX.readdata("data/data_lagerestimater.xlsx", "Sheet1", "B2:M53")
     inventory = convert(Array{Float64,2}, coalesce.(inventory, NaN))
     inventory[:,11] = inventory[:,11] / population
     I = fill!(zeros(Float64, data.T, data.C), NaN)
