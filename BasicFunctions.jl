@@ -237,11 +237,11 @@ end
 
 function findObjective!(data, sol)
     sol.objective.k_penalty = sum(data.penalty_S .* sol.k)
-    sol.objective.g_penalty = sum(sum(sol.g))
-    sol.objective.L_reward = sum(sol.L./data.timeperiod)
+    sol.objective.g_penalty = sum(sol.g) #sum(1 - 1/(1-sum(sol.g, dims = 1)))
+    sol.objective.L_reward = sum(sol.L)
 
-    sol.base_obj = sol.objective.k_penalty
-    sol.exp_obj =  sol.objective.k_penalty + (sol.objective.g_penalty - sol.objective.L_reward)
+    sol.base_obj = 1000 + sol.objective.k_penalty
+    sol.exp_obj = 1000 + sol.objective.k_penalty + (sol.objective.g_penalty - sol.objective.L_reward)
 end
 
 function deltaCompareRegret(data, sol, t1, t2, p)
@@ -274,7 +274,7 @@ function deltaInsert(data, sol, t, p)
     xp = deepcopy(sol.x[:,p])
     xp[t] += 1
     new_idle = findMinIdle(data,xp)
-    delta_idle = sol.L[p] - new_idle/data.timeperiod # Should be positive or zero
+    delta_idle = sol.L[p] - new_idle # Should be positive or zero
     delta_exp = sol.exp_obj + penalty_scope + (aimed_wrong + delta_idle)
 
     if sol.k[p] > 0
