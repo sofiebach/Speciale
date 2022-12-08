@@ -37,8 +37,8 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.05,a
     start_time = time_ns()
 
     if type == "baseline"
-        # T_start = -theta*temp_sol.base_obj/log(0.5)
-        T_start = 100
+        T_start = -theta*temp_sol.base_obj/log(0.5)
+        
         repair_functions = [greedyRepair!, firstRepair!, flexibilityRepair!, modelRepair!]
         destroy_functions = [clusterDestroy!, randomDestroy!, relatedDestroy!]
         n_d = length(destroy_functions)

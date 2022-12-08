@@ -4,17 +4,18 @@ include("Validation/PlotSolution.jl")
 
 data = readInstance("dataset/100_0_0.txt")
 
-sol = readSolution("output/theaplot/weighted_InitialSolution",data)
+sol = randomInitial(data)
 
 time_limit = 60*3 #Seconds
 
-prefix = "theaplot/weightedmodified_no_greedy"
+prefix = "theaplot/test_expanded"
 sol, params = ALNS(data, sol, time_limit, "expanded")
 probabilityTracking(params, prefix * "_probability")
 solutionTracking(params, prefix * "_solution")
 solutionTracking_all(params, prefix * "_solution_all")
 temperatureTracking(params, prefix * "_temp")
-
+drawTVSchedule(data, sol, prefix * "_TVschedule")
+drawRadioSchedule(data, sol, prefix * "_Radioschedule")
 writeParameters("output/" * prefix * "_parameters", params)
 
 
