@@ -256,8 +256,8 @@ function flexibilityRepair!(data, sol, type)
         t, p = flexibilityInsertion(data, sol, collect(1:data.P))
         if t != 0 && p != 0
             insert!(data, sol, t, p)
-            drawRadioSchedule(data, sol, string(count)*"_radio")
-            drawTVSchedule(data, sol, string(count)*"_tv")
+            # drawRadioSchedule(data, sol, string(count)*"_radio")
+            # drawTVSchedule(data, sol, string(count)*"_tv")
             count += 1
         else
             break
@@ -306,9 +306,9 @@ function regretRepair!(data, sol, type)
         if t1 != 0 && t2 != 0 && p != 0
             insert!(data, sol, t1, p)
             insert!(data, sol, t2, p)
-            println("INSERTED p: ", p, " t1: ", t1, " t2: ", t2)
-            drawRadioSchedule(data, sol, string(count)*"_radio")
-            drawTVSchedule(data, sol, string(count)*"_tv")
+            # println("INSERTED p: ", p, " t1: ", t1, " t2: ", t2)
+            # drawRadioSchedule(data, sol, string(count)*"_radio")
+            # drawTVSchedule(data, sol, string(count)*"_tv")
             count += 1
         else
             break

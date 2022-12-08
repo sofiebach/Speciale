@@ -378,8 +378,8 @@ function drawHeatmap(inventory_used, staff_used, data, sol, filename)
 end
 
 function solutionTracking(params, filename)
-    rejected = findall(x -> x <= params.W[3], params.status)
-    accepted = findall(x -> x == params.W[2], params.status)
+    rejected = findall(x -> x <= 0, params.status)
+    accepted = findall(x -> x == params.W[2] || x == params.W[3], params.status)
     better = findall(x -> x == params.W[1], params.status)
     
     py"""
