@@ -2,21 +2,25 @@ include("ReadWrite.jl")
 include("ALNS.jl")
 include("Validation/PlotSolution.jl")
 
-data = readInstance("dataset/100_0_0.txt")
+data = readInstance("dataset/50_0_0.txt")
 sol = randomInitial(data)
+
+#writeSolution("output/theaplot2/InitialSol", data, sol)
+#sol = readSolution("output/theaplot2/InitialSol", data)
 
 time_limit = 60*3 #Seconds
 
-prefix = ""
+prefix = "theaplot2/normal50"
 sol, params = ALNS(data, sol, time_limit, "expanded")
 probabilityTracking(params, prefix * "_probability")
 solutionTracking(params, prefix * "_solution")
 solutionTracking_all(params, prefix * "_solution_all")
 temperatureTracking(params, prefix * "_temp")
-
+drawTVSchedule(data,sol,prefix * "_TVschedule")
+drawRadioSchedule(data, sol, prefix * "_Radioschedule")
 writeParameters("output/" * prefix * "_parameters", params)
 
-drawTVSchedule(data,sol,"hej")
+
 filename = "_performancetable.txt"
 outFile = open("output/" * prefix * filename, "w")
     write(outFile, "Obj baseline\n")
@@ -24,6 +28,9 @@ outFile = open("output/" * prefix * filename, "w")
     
     write(outFile, "Obj Exp\n")
     write(outFile, join(sol.exp_obj," ")*"\n\n")
+
+    write(outFile, "Objective\n")
+    write(outFile, join([sol.objective.k_penalty,sol.objective.g_penalty,sol.objective.L_reward]," ")*"\n\n")
 
     write(outFile, "Repairs\n")
     for i = 1:length(params.num_repair)

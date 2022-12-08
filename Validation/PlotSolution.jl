@@ -91,7 +91,7 @@ function drawTVSchedule(data, sol, filename)
     h = 0.8
     col = distinguishable_colors(length(unique_P_names)+1)[2:(length(unique_P_names)+1)]
 
-    Drawing((data.T+w)*scalar, height*scalar, "output/schedule_" * filename * ".png")
+    Drawing((data.T+w)*scalar, height*scalar, "output/" * filename * ".png")
     background("white") # color of background
     origin() 
 
@@ -231,7 +231,7 @@ function drawRadioSchedule(data, sol, filename)
     h = 0.8
     col = distinguishable_colors(length(unique_P_names)+1)[2:(length(unique_P_names)+1)]
 
-    Drawing((data.T+w)*scalar, height*scalar, "output/schedule_" * filename * ".png")
+    Drawing((data.T+w)*scalar, height*scalar, "output/" * filename * ".png")
     background("white") # color of background
     origin() 
 
@@ -404,8 +404,8 @@ function solutionTracking(params, filename)
 end
 
 function solutionTracking_all(params, filename)
-    rejected = findall(x -> x <= params.W[3], params.status)
-    accepted = findall(x -> x == params.W[2], params.status)
+    rejected = findall(x -> x <= 0, params.status)
+    accepted = findall(x -> x == params.W[2] || x == params.W[3], params.status)
     better = findall(x -> x == params.W[1], params.status)
     
     py"""

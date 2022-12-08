@@ -30,7 +30,7 @@ function isValid(data, temp_sol, sol)
 end
 
 
-function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.05,alpha=0.99975,W=[10,5,1],gamma=0.9,destroy_frac=0.4,segment_size=50,long_term_update=0.05)    
+function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.2,alpha=0.99975,W=[10,5,1],gamma=0.9,destroy_frac=0.4,segment_size=50,long_term_update=0.05)    
     it = 1
     best_sol = deepcopy(sol)
     temp_sol = deepcopy(sol)
