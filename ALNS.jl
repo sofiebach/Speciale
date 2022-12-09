@@ -49,7 +49,8 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.05,a
         end
     elseif type == "expanded"
         T_start = -theta*temp_sol.exp_obj/log(0.5)
-        repair_functions = [greedyRepair!, firstRepair!, flexibilityRepair!, regretRepair!, modelRepair!]
+        # repair_functions = [greedyRepair!, firstRepair!, flexibilityRepair!, regretRepair!, modelRepair!]
+        repair_functions = [greedyRepair!, flexibilityRepair!, regretRepair!, modelRepair!]
         destroy_functions = [clusterDestroy!, randomDestroy!, worstIdleDestroy!, stackDestroy!, relatedDestroy!]
         n_d = length(destroy_functions)
         if modelRepair

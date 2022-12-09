@@ -173,5 +173,6 @@ function MIPExpansion(data, solver, log=1, time_limit=60, solution_limit=0, dest
             x1[t,p] = Int64(round(JuMP.value(sum(x[t,p,n] for n=1:data.S[p]))))
         end
     end
+
     return x1
 end

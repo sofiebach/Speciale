@@ -26,17 +26,18 @@ end
 
 function worstIdleDestroy!(data, sol, frac)
     n_destroy = ceil(sol.num_campaigns*frac)
-    perfect_spread = data.timeperiod./(sum(sol.x, dims = 1) .- 1)
-    div_spread = zeros(Float64, data.P)
-    replace!(perfect_spread, Inf=>-1)
+    spread_obj = zeros(Float64, data.P)
     for p = 1:data.P
-        if perfect_spread[p] > 0
-            div_spread[p] = (perfect_spread[p] - sol.L[p]) / perfect_spread[p]
-        end 
+        if sum(sol.x[:,p]) < 2
+            spread_obj[p] = NaN
+        else
+            spread_obj[p] = - data.weight_idle[p] * sol.L[p] + data.weight_idle[p] * sol.y[p]
+        end
     end
-    sorted_p = sortperm(-div_spread)
+    replace!(spread_obj, NaN=>-1)
+    sorted_p = sortperm(-spread_obj)
     for p in sorted_p
-        if div_spread[p] == 0 || n_destroy == 0 # There are no campaigns to remove in the rest of the array either
+        if spread_obj[p] == -1 || n_destroy == 0 # There are no campaigns to remove in the rest of the array either
             break
         end
         while n_destroy > 0 
@@ -49,6 +50,14 @@ function worstIdleDestroy!(data, sol, frac)
             remove!(data, sol, t, p)
             n_destroy -= 1
         end
+    end
+
+    # Remove the rest randomly
+    while n_destroy > 0 
+        n = rand(1:sol.num_campaigns)
+        t, p = findCampaign(data, sol, n)
+        remove!(data, sol, t, p)
+        n_destroy -= 1
     end
 end
 
@@ -96,24 +105,6 @@ function relatedDestroy!(data,sol,frac)
             end
             if p_remove == 0
                 break
-            end
-        end
-    end
-end
-
-function spreadModelRepair!(data, sol, type)
-    MIPdata = deepcopy(data)
-
-    time_limit = 120
-    MIPx = MIPExpansion(MIPdata, "HiGHS", 1, time_limit, 0, sol.x)
-
-    if MIPx == 0
-        return
-    else
-        for p = 1:data.P, t = 1:data.T 
-            N = MIPx[t,p] - sol.x[t,p]
-            for n = 1:N
-                insert!(data, sol, t, p)
             end
         end
     end
@@ -190,20 +181,38 @@ end
 
 function greedyRepair!(data, sol, type)
     for p_bar in data.P_bar, n = 1:sol.k[p_bar]
-        t, p = bestInsertion(data, sol, [p_bar], type)
+        t, p = greedyInsertion(data, sol, [p_bar], type)
         if t != 0 && p != 0
             insert!(data, sol, t, p)
         end
     end
 
     while true
-        t, p = bestInsertion(data, sol, collect(1:data.P), type)
+        t, p = greedyInsertion(data, sol, collect(1:data.P), type)
         if t != 0 && p != 0
             insert!(data, sol, t, p)
         else
             break
         end
     end
+end
+
+function greedyInsertion(data, sol, priorities, type)
+    ratio = zeros(Float64, data.P)
+    for p in priorities
+        ratio[p] = data.penalty_S[p] / (sum(data.u[:,p,:]) / sum(data.I) + sum(data.w[p,:]) / sum(data.H))
+    end
+
+    sorted_priorities = sortperm(-ratio)
+    for p in sorted_priorities 
+        times = shuffle(data.start:data.stop)
+        for t in times
+            if fits(data,sol,t,p)
+                return t, p
+            end
+        end
+    end
+    return 0, 0
 end
 
 function bestInsertion(data, sol, priorities, type)
@@ -344,10 +353,10 @@ function regretInsertion(data, sol, priorities, type)
                 end
             end
         end
-        #println("p: ", p)
-        #println("t1: ", temp1)
-        #println("t2: ", temp2)
-        #println("delta: ", best_delta1)
+        # println("p: ", p)
+        # println("t1: ", temp1)
+        # println("t2: ", temp2)
+        # println("delta: ", best_delta1)
         for t1 = data.start:data.stop
             if fits(data, sol, t1, p)
                 for t2 = data.start:data.stop
@@ -361,10 +370,10 @@ function regretInsertion(data, sol, priorities, type)
                 end
             end
         end
-        #println("t1: ", ts[p,1])
-        #println("t2: ", ts[p,2])
-        #println("delta: ", best_delta2)
-        #println("----------------")
+        # println("t1: ", ts[p_idx,1])
+        # println("t2: ", ts[p_idx,2])
+        # println("delta: ", best_delta2)
+        # println("----------------")
         loss[p_idx] = best_delta1 - best_delta2
         p_idx += 1
     end
@@ -388,6 +397,23 @@ function regretInsertion(data, sol, priorities, type)
 end
 
 
+#function spreadModelRepair!(data, sol, type)
+#    MIPdata = deepcopy(data)
+#
+#    time_limit = 120
+#    MIPx = MIPExpansion(MIPdata, "HiGHS", 1, time_limit, 0, sol.x)
+#
+#    if MIPx == 0
+#        return
+#    else
+#        for p = 1:data.P, t = 1:data.T 
+#            N = MIPx[t,p] - sol.x[t,p]
+#            for n = 1:N
+#                insert!(data, sol, t, p)
+#            end
+#        end
+#    end
+#end
 #function regretRepair!(data, sol, type)
 #    for p_bar in data.P_bar, n = 1:sol.k[p_bar]
 #        t, p = regretInsertion(data, sol, [p_bar], type)
