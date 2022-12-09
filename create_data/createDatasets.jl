@@ -2,94 +2,49 @@ include("../ReadWrite.jl")
 
 data = read_DR_data(37)
 
-writeInstance("original2.txt", data)
-
+writeInstance("create_data/original.txt", data)
 
 function createNewInstance(data, d, w, u)
     timeperiod = Int(ceil(data.timeperiod*d))
-    stop = abs(data.Q_lower)+timeperiod
-    T = timeperiod + data.start + abs(data.Q_lower) 
-    S = Int64.(ceil.(data.S*d))
-    
-    outFile = open("dataset/"*string(Int(d*100))*"_"*string(Int(w*100))*"_"*string(Int(u*100))*".txt", "w")
-    write(outFile, "timeperiod P M C T\n")
-    write(outFile, join([timeperiod, data.P, data.M, data.C, T]," ")*"\n\n")
+    T = timeperiod + data.start + abs(data.Q_lower)
 
-    write(outFile, "L_lower L_upper L_zero Q_lower Q_upper\n")
-    write(outFile, join([data.L_lower, data.L_upper, data.L_zero, data.Q_lower, data.Q_upper]," ")*"\n\n")
+    new_instance = Instance(data.P, data.C, data.M, timeperiod, data.L_lower, data.L_upper, data.Q_lower, data.Q_upper, T)
     
-    write(outFile, "start stop\n")
-    write(outFile, join([data.start, stop]," ")*"\n\n")
-    
-    write(outFile, "P_bar\n")
-    write(outFile,join(data.P_bar," ")*"\n\n")
+    new_instance.stop = deepcopy(abs(data.Q_lower)+timeperiod)
+    new_instance.S = deepcopy(Int64.(ceil.(data.S*d)))
+    new_instance.F = deepcopy(data.F*d)
+    new_instance.penalty_S = ones(new_instance.P)./new_instance.S
+    new_instance.aimed_g = Int64.(ceil.(new_instance.S/timeperiod))
+    new_instance.aimed_L = (timeperiod - 1) ./(new_instance.S .- 1)
+    replace!(new_instance.aimed_L, Inf => 0)
+    new_instance.penalty_g = 1 ./ (new_instance.S .- new_instance.aimed_g)
+    replace!(new_instance.penalty_g, Inf => 0)
+    new_instance.weight_idle = (new_instance.S .- 1) / (timeperiod - 1)
 
-    write(outFile, "S \n")
-    write(outFile,join(S," ")*"\n\n")
-    
-    write(outFile, "w\n")
     for m = 1:data.M
-        write(outFile,join(data.w[:,m]*(1-w)," ")*"\n")
+        new_instance.w[:,m] = deepcopy(data.w[:,m]*(1-w))
+        new_instance.H[:,m] = deepcopy(data.H[1:T,m])
     end
-    write(outFile, "\n")
 
-    write(outFile, "H\n")
-    for m = 1:data.M
-        write(outFile,join(data.H[1:T,m]," ")*"\n")
-    end
-    write(outFile, "\n")
-
-    write(outFile, "I\n")
     for c = 1:data.C
-        write(outFile,join(data.I[1:T,c]," ")*"\n")
-    end
-    write(outFile, "\n")
-
-    write(outFile, "u\n")
-    for c = 1:data.C
+        new_instance.I[:,c] = deepcopy(data.I[1:T,c])
         for p=1:data.P
-            write(outFile,join(data.u[:,p,c]*(1-u)," ")*"\n")
+            new_instance.u[:,p,c] = deepcopy(data.u[:,p,c]*(1-u))
         end
     end
-    write(outFile, "\n")
 
-    write(outFile, "L_l\n")
-    write(outFile,join(data.L_l," ")*"\n\n")
+    new_instance.BC_names = deepcopy(data.BC_names)
+    new_instance.P_names = deepcopy(data.P_names)
+    new_instance.C_names = deepcopy(data.C_names)
+    new_instance.M_names = deepcopy(data.M_names)
+    new_instance.campaign_type = deepcopy(data.campaign_type)
 
-    write(outFile, "L_u\n")
-    write(outFile,join(data.L_u," ")*"\n\n")
-
-    write(outFile, "penalty_S\n")
-    write(outFile,join(data.penalty_S," ")*"\n\n")
-
-    write(outFile, "penalty_f\n")
-    write(outFile,join(data.penalty_f," ")*"\n\n")
-
-    write(outFile, "F\n")
-    write(outFile,join(data.F*d," ")*"\n\n")
-
-    write(outFile, "aimed\n")
-    write(outFile,join(Int64.(ceil.(S/timeperiod))," ")*"\n\n")
-
-    write(outFile, "P_names\n") 
-    write(outFile,join(replace.(data.P_names, " " => "£")," ")*"\n\n")
-
-    write(outFile, "C_names\n")
-    write(outFile,join(data.C_names," ")*"\n\n")
-
-    write(outFile, "M_names\n")
-    write(outFile,join(data.M_names," ")*"\n\n")
-
-    write(outFile, "BC_names\n") 
-    write(outFile,join(replace.(data.BC_names, " " => "£")," ")*"\n\n")
-
-    write(outFile, "campaign_type\n") #skal fikses
-    write(outFile,join(replace.(data.campaign_type, " " => "£")," ")*"\n\n")
-
-    close(outFile)
+    filename = "dataset/"*string(Int(d*100))*"_"*string(Int(w*100))*"_"*string(Int(u*100))*".txt"
+    
+    writeInstance(filename, new_instance)
 end
 
-data = readInstance("create_data/original2.txt")
+data = readInstance("create_data/original.txt")
 
 percent = [0.25,0.5,1]
 U = [0, 0.05, 0.1, 0.15]

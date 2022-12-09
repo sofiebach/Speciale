@@ -20,15 +20,17 @@ mutable struct Instance
     L_l::Array{Int64, 1}
     L_u::Array{Int64, 1}
     penalty_S::Array{Float64, 1}
-    penalty_f::Array{Float64, 1}
     F::Array{Float64, 1}
-    aimed::Array{Int64,1}
+    aimed_g::Array{Int64,1}
     P_names::Array{String,1}
     C_names::Array{String,1}
     M_names::Array{String,1}
     BC_names::Array{String,1}
     campaign_type::Array{String,1}
     sim::Array{Float64, 2}
+    penalty_g::Array{Float64,1}
+    aimed_L::Array{Float64,1}
+    weight_idle::Array{Float64,1}
     Instance(P,C,M,timeperiod,L_lower,L_upper,Q_lower,Q_upper,T) = new(P,[1,8],C,M,timeperiod,
         L_lower,L_upper,indexin(0,collect(L_lower:L_upper))[],
         Q_lower,Q_upper,
@@ -41,15 +43,17 @@ mutable struct Instance
         zeros(Int64, P),
         zeros(Int64, P),
         zeros(Float64, P),
-        zeros(Float64, M),
         zeros(Int64, M),
-        zeros(Int64,P),
-        Vector(undef,P),
-        Vector(undef,C),
-        Vector(undef,M),
-        Vector(undef,P),
-        Vector(undef,P),
-        zeros(Float64,P,P))
+        zeros(Int64, P),
+        Vector(undef, P),
+        Vector(undef, C),
+        Vector(undef, M),
+        Vector(undef, P),
+        Vector(undef, P),
+        zeros(Float64, P, P),
+        zeros(Float64, P),
+        zeros(Float64, P),
+        zeros(Float64, P))
 end
 
 # mutable struct Sol

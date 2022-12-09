@@ -30,7 +30,7 @@ function insert!(data, sol, t, p)
     end
 
     # update aimed
-    if (sol.x[t,p] > data.aimed[p])
+    if (sol.x[t,p] > data.aimed_g[p])
         sol.g[t,p] += 1
     else
         sol.g[t,p] = 0
@@ -251,7 +251,7 @@ function deltaCompareRegret(data, sol, t1, t2, p)
     new_idle = findMinIdle(data,xp)
 
     aimed_wrong = 0
-    if xp[t1] > data.aimed[p]
+    if xp[t1] > data.aimed_g[p]
         aimed_wrong += 1 #aimed wrong penalty is set to 1
     end
     if xp[t2] > data.aimed[p]

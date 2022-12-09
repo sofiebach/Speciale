@@ -30,7 +30,7 @@ function insert!(data, sol, t, p)
     end
 
     # update aimed
-    if (sol.x[t,p] > data.aimed[p])
+    if (sol.x[t,p] > data.aimed_g[p])
         sol.g[t,p] += 1
     else
         sol.g[t,p] = 0

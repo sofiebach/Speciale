@@ -57,7 +57,7 @@ function read_DR_data(P)
     # S[p] is scope for priority p
     data.S = convert(Array{Int64,2}, XLSX.readdata("data/data_staffing_constraint.xlsx", "Scope", "D2:D38"))[1:P]
     data.penalty_S = ones(data.P)./data.S
-    
+    data.F = ones(Float64, data.M)*100
     # Read I
     # [DR1, DR2, Ramasjang, P1, P2, P3, P4, P5, P6, P8, digital, SOME]
     inventory = XLSX.readdata("data/data_lagerestimater.xlsx", "Sheet1", "B2:M53")
@@ -73,12 +73,7 @@ function read_DR_data(P)
     end
     data.I = I
 
-    # Penalty for freelance hours (can be modified)
-    for m = 1:data.M
-        data.penalty_f[m] = 0.001
-        data.F[m] = 100   
-    end
-    data.aimed = ceil.(data.S/data.timeperiod)
+    data.aimed_g = ceil.(data.S/data.timeperiod)
 
     mapping = XLSX.readdata("data/data_staffing_constraint.xlsx", "Mapping", "B2:D38")[1:data.P,:]
     data.P_names = mapping[:,2]
@@ -86,7 +81,11 @@ function read_DR_data(P)
     data.M_names = XLSX.readdata("data/data_staffing_constraint.xlsx", "Bemanding", "A2:A5")[1:data.M]
     data.BC_names = mapping[:,1]
     data.campaign_type = mapping[:,3]
-
+    data.penalty_g = 1 ./ (data.S .- data.aimed_g)
+    replace!(data.penalty_g, Inf => 0)
+    data.aimed_L = (data.timeperiod - 1) ./(data.S .- 1)
+    replace!(data.aimed_L, Inf => 0)
+    data.weight_idle = (data.S .- 1) / (data.timeperiod - 1)
     return data
 end
 
@@ -142,14 +141,11 @@ function writeInstance(filename, data)
     write(outFile, "penalty_S\n")
     write(outFile,join(data.penalty_S," ")*"\n\n")
 
-    write(outFile, "penalty_f\n")
-    write(outFile,join(data.penalty_f," ")*"\n\n")
-
     write(outFile, "F\n")
     write(outFile,join(data.F," ")*"\n\n")
 
-    write(outFile, "aimed\n")
-    write(outFile,join(data.aimed," ")*"\n\n")
+    write(outFile, "aimed g\n")
+    write(outFile,join(data.aimed_g," ")*"\n\n")
 
     write(outFile, "P_names\n") 
     write(outFile,join(replace.(data.P_names, " " => "£")," ")*"\n\n")
@@ -166,6 +162,14 @@ function writeInstance(filename, data)
     write(outFile, "campaign_type\n") #skal fikses
     write(outFile,join(replace.(data.campaign_type, " " => "£")," ")*"\n\n")
 
+    write(outFile, "penalty_g\n")
+    write(outFile,join(data.penalty_g," ")*"\n\n")
+
+    write(outFile, "aimed_L\n")
+    write(outFile,join(data.aimed_L," ")*"\n\n")
+
+    write(outFile, "weight_idle\n")
+    write(outFile,join(data.weight_idle," ")*"\n\n")
     close(outFile)
 end
 
@@ -231,16 +235,12 @@ function readInstance(filename)
     data.penalty_S = parse.(Float64,split(readline(f)))
     readline(f) # blank
 
-    readline(f) # penalty_f
-    data.penalty_f = parse.(Float64,split(readline(f)))
-    readline(f) # blank
-
     readline(f) # F
     data.F = parse.(Float64,split(readline(f)))
     readline(f) # blank
 
-    readline(f) # aimed
-    data.aimed = parse.(Int,split(readline(f)))
+    readline(f) # aimed_g
+    data.aimed_g = parse.(Int,split(readline(f)))
     readline(f) # blank
 
     readline(f) # P_names
@@ -264,6 +264,18 @@ function readInstance(filename)
     readline(f) # blank
 
     data.sim = findSimilarity(data)
+
+    readline(f) # penalty_g
+    data.penalty_g = parse.(Float64,split(readline(f)))
+    readline(f) # blank
+
+    readline(f) # aimed_L
+    data.aimed_L = parse.(Float64,split(readline(f)))
+    readline(f) # blank
+
+    readline(f) # weight_idle
+    data.weight_idle = parse.(Float64,split(readline(f)))
+    readline(f) # blank
 
     return data
 end
