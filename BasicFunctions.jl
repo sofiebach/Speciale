@@ -240,8 +240,8 @@ function findObjective!(data, sol)
     sol.objective.g_penalty = sum(sum(sol.g))
     sol.objective.L_reward = sum(sol.L)
 
-    sol.base_obj = sol.objective.k_penalty
-    sol.exp_obj =  sol.objective.k_penalty + sol.objective.g_penalty - sol.objective.L_reward
+    sol.base_obj = 1000 + sol.objective.k_penalty
+    sol.exp_obj = 1000 + sol.objective.k_penalty + sol.objective.g_penalty - sol.objective.L_reward
 end
 
 function deltaCompareRegret(data, sol, t1, t2, p)

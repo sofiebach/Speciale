@@ -7,7 +7,7 @@ data = readInstance("dataset/25_0_0.txt")
 
 logging = 1
 time_limit = 0
-gap = 0
+gap = 0.02
 spreading = 0
 
 # Find maximum objective for campaigns
