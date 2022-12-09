@@ -6,10 +6,10 @@ writeInstance("original2.txt", data)
 
 
 function createNewInstance(data, d, w, u)
-    timeperiod = Int(round(data.timeperiod*d))
+    timeperiod = Int(ceil(data.timeperiod*d))
     stop = abs(data.Q_lower)+timeperiod
     T = timeperiod + data.start + abs(data.Q_lower) 
-    S = Int64.(round.(data.S*d))
+    S = Int64.(ceil.(data.S*d))
     
     outFile = open("dataset/"*string(Int(d*100))*"_"*string(Int(w*100))*"_"*string(Int(u*100))*".txt", "w")
     write(outFile, "timeperiod P M C T\n")

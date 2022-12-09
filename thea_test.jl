@@ -1,14 +1,39 @@
 include("ReadWrite.jl")
 include("ALNS.jl")
 include("Validation/PlotSolution.jl")
+include("MIPModels.jl")
 
-data = readInstance("dataset/100_0_0.txt")
+data = readInstance("dataset/25_0_0.txt")
+
+x = MIPExpansion(data, "Gurobi", 1, 60*5, 0, 0)
+
+sol = MIPtoSol(data, x)
+
+drawRadioSchedule(data, sol, "hej")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 sol = randomInitial(data)
 
 time_limit = 60*3 #Seconds
 
-prefix = "theaplot/test_expanded"
+prefix = "theaplot2/test100"
 sol, params = ALNS(data, sol, time_limit, "expanded")
 probabilityTracking(params, prefix * "_probability")
 solutionTracking(params, prefix * "_solution")

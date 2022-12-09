@@ -100,12 +100,23 @@ function MIPExpansion(data, solver, log=1, time_limit=60, solution_limit=0, dest
     @variable(model, L[1:data.P] >= 0, Int) # Idle time for each priority
     @variable(model, z[1:data.P], Bin) # Constraining min idle time
     @variable(model, g[1:data.T, 1:data.P] >= 0, Int) # Slack for maximum campaigns per week
+    @variable(model, y[1:data.P] >= 0) # Slack for too large idle time
 
     M_T = data.T + 1
     M_S = maximum(data.S) + 1
     epsilon = 0.5
-    
-    @objective(model, Min, sum(k[p]*data.penalty_S[p] for p = 1:data.P) + sum(g[t,p] for t=1:data.T, p=1:data.P) - sum(L[p] for p=1:data.P))
+
+    penalty_g = 1 ./ (data.S .- data.aimed)
+    replace!(penalty_g, Inf => 0)
+
+    penalty_L = (data.timeperiod - 1) ./(data.S .- 1)
+    replace!(penalty_L, Inf => 0)
+
+    @objective(model, Min, 
+        sum(data.penalty_S[p]*k[p] for p = 1:data.P) +                      # Penalty for not fulfilled Scope
+        sum(penalty_g[p] * g[t,p] for t=1:data.T, p=1:data.P) - # Penalty for stacking
+        sum((data.S[p] - 1)/(data.timeperiod - 1) * L[p] for p=1:data.P) +            # Reward for spreading
+        sum((data.S[p] - 1)/(data.timeperiod - 1) * y[p] for p=1:data.P))             # Penalty for spreading too much
 
     # If destroyed solution is inputted
     if destroyed_sol != 0
@@ -152,6 +163,9 @@ function MIPExpansion(data, solver, log=1, time_limit=60, solution_limit=0, dest
 
     # Number of campaigns per week
     @constraint(model, [p=1:data.P, t=1:data.T], sum(x[t,p,n] for n=1:data.S[p]) <= data.aimed[p] + g[t,p])
+
+    # Activate y
+    @constraint(model, [p=1:data.P], L[p] <= penalty_L[p] + y[p])
 
     JuMP.optimize!(model)
 
