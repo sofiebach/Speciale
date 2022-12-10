@@ -47,7 +47,7 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.05,a
         else
             n_r = length(repair_functions) - 1
         end
-    elseif type == "expanded"
+    elseif type == "extended"
         T_start = -theta*temp_sol.exp_obj/log(0.5)
         # repair_functions = [greedyRepair!, firstRepair!, flexibilityRepair!, regretRepair!, modelRepair!]
         repair_functions = [greedyRepair!, flexibilityRepair!, regretRepair!, modelRepair!]
@@ -159,7 +159,7 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.05,a
             temp_obj = temp_sol.base_obj
             best_obj = best_sol.base_obj
             sol_obj = sol.base_obj
-        elseif type == "expanded"
+        elseif type == "extended"
             temp_obj = temp_sol.exp_obj
             best_obj = best_sol.exp_obj
             sol_obj = sol.exp_obj
@@ -172,7 +172,7 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.05,a
         if type == "baseline"
             append!(current_obj, temp_sol.base_obj)
             append!(current_best, best_sol.base_obj)
-        elseif type == "expanded"
+        elseif type == "extended"
             append!(current_obj, temp_sol.exp_obj)
             append!(current_best, best_sol.exp_obj)
         else

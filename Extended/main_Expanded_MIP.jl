@@ -10,9 +10,9 @@ time_limit = 3600
 date_today = string(Dates.today())
 
 # Run MIP Baseline
-x_MIP = MIPExpansion(data, "Gurobi", 1, time_limit, 0)
+x_MIP = MIPExtended(data, "Gurobi", 1, time_limit, 0)
 sol_MIP = MIPtoSol(data, x_MIP)
-filename = "results/MIPExpanded"
+filename = "results/MIPExtended"
 if sol_MIP != 0
     writeSolution(filename, data, sol_MIP)
 end

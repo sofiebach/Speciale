@@ -1,5 +1,5 @@
 include("HeuristicFunctions.jl")
-include("ConstructionHeuristics_expanded.jl")
+include("ConstructionHeuristics_extended.jl")
 
 function setProb(rho)
     return rho./sum(rho)

@@ -155,7 +155,7 @@ end
 function firstInsertion(data, sol, t, type)
     if type == "baseline"
         best_obj = sol.base_obj
-    elseif type == "expanded"
+    elseif type == "extended"
         best_obj = sol.exp_obj
     else
         println("Enter valid model type")
@@ -165,7 +165,7 @@ function firstInsertion(data, sol, t, type)
     for p in shuffled_idx
         if fits(data, sol, t, p) && sol.k[p] > 0
             delta_obj = deltaInsert(data, sol, t, p)
-            if type == "expanded"       
+            if type == "extended"       
                 new_obj = delta_obj.delta_exp 
             elseif type == "baseline"
                 new_obj = delta_obj.delta_base
@@ -218,7 +218,7 @@ end
 function bestInsertion(data, sol, priorities, type)
     if type == "baseline"
         best_obj = sol.base_obj
-    elseif type == "expanded"
+    elseif type == "extended"
         best_obj = sol.exp_obj
     else
         println("Enter valid model type")
@@ -233,7 +233,7 @@ function bestInsertion(data, sol, priorities, type)
         for t in times
             if fits(data, sol, t, p) 
                 delta_obj = deltaInsert(data, sol, t, p)
-                if type == "expanded"
+                if type == "extended"
                     new_obj = delta_obj.delta_exp 
                 elseif type == "baseline"
                     new_obj = delta_obj.delta_base
@@ -265,8 +265,6 @@ function flexibilityRepair!(data, sol, type)
         t, p = flexibilityInsertion(data, sol, collect(1:data.P))
         if t != 0 && p != 0
             insert!(data, sol, t, p)
-            # drawRadioSchedule(data, sol, string(count)*"_radio")
-            # drawTVSchedule(data, sol, string(count)*"_tv")
             count += 1
         else
             break
@@ -315,9 +313,6 @@ function regretRepair!(data, sol, type)
         if t1 != 0 && t2 != 0 && p != 0
             insert!(data, sol, t1, p)
             insert!(data, sol, t2, p)
-            # println("INSERTED p: ", p, " t1: ", t1, " t2: ", t2)
-            # drawRadioSchedule(data, sol, string(count)*"_radio")
-            # drawTVSchedule(data, sol, string(count)*"_tv")
             count += 1
         else
             break
@@ -326,8 +321,6 @@ function regretRepair!(data, sol, type)
 end
 
 function regretInsertion(data, sol, priorities, type)
-    # loss = zeros(Float64, data.P)*NaN
-    # ts = zeros(Int64, data.P, 2)
     loss = zeros(Float64, length(priorities))*NaN
     ts = zeros(Int64, length(priorities), 2)
     p_idx = 1
@@ -385,11 +378,7 @@ function regretInsertion(data, sol, priorities, type)
     t1 = ts[idx,1]
     t2 = ts[idx,2]
     # best_p = collect(1:data.P)[idx]
-    #println("BEST P: ",best_p)
-    # t1 = ts[best_p,1]
-    # t2 = ts[best_p,2]
-    #println(t1, " ", t2)
-    #println("------------")
+    # println("BEST P: ",best_p)
     if t1 == 0 || t2 == 0
         return 0, 0, 0
     end
@@ -401,7 +390,7 @@ end
 #    MIPdata = deepcopy(data)
 #
 #    time_limit = 120
-#    MIPx = MIPExpansion(MIPdata, "HiGHS", 1, time_limit, 0, sol.x)
+#    MIPx = MIPExtended(MIPdata, "HiGHS", 1, time_limit, 0, sol.x)
 #
 #    if MIPx == 0
 #        return
@@ -442,7 +431,7 @@ end
 #        for t = data.start:data.stop
 #            if fits(data, sol, t, p) 
 #                delta_obj = deltaInsert(data, sol, t, p)
-#                if type == "expanded"
+#                if type == "extended"
 #                    new_obj = delta_obj.delta_exp
 #                    sol_obj = sol.exp_obj
 #                elseif type == "baseline"

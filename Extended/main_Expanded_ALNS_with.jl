@@ -1,12 +1,13 @@
 include("../ReadWrite.jl")
 include("../ALNS.jl")
 
+# Read data 
 data = readInstance("dataset/100_0_0.txt")
-time_limit = 120
 
 # Run ALNS without modelRepair
-type = "expanded"
-modelrepair = false
+time_limit = 60
+type = "extended"
+modelrepair = true
 sol, params = ALNS(data, time_limit, type, modelrepair)
 filename = "results/ALNS_" * type * "_" * string(modelrepair)
 writeSolution(filename, data, sol)
