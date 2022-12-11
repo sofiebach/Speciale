@@ -6,11 +6,7 @@ include("MIPModels.jl")
 
 data = readInstance("dataset/100_0_0.txt")
 
-<<<<<<< HEAD
-x = MIPExpansion(data, "Gurobi", 1, 60*30, 0, 0)
-=======
 x = MIPExtended(data, "Gurobi", 1, 60*5, 0, 0)
->>>>>>> d2fb10b13f269914f237843085c0931e6c2c63bb
 
 sol = MIPtoSol(data, x)
 
