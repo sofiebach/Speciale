@@ -1,4 +1,4 @@
-include("../Expansion/ReadWrite.jl")
+include("../Extended/ReadWrite.jl")
 include("../Validation/ValidateSolution.jl")
 include("ALNS_expanded.jl")
 
@@ -11,7 +11,7 @@ sol, params = ALNSExpanded(data, time_limit, modelRepair)
 
 checkSolution(data, sol)
 
-sol = MIPExpansion(data, 120,0, 1)
+sol = MIPExtended(data, 120,0, 1)
 
 checkSolution(data,sol)
 

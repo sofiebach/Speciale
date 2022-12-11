@@ -1,5 +1,5 @@
 include("Expanded_BasicFunctions.jl")
-include("../Expansion/MIPModelSpreading.jl")
+include("../Extended/MIPModelSpreading.jl")
 
 function randomDestroy!(data, sol, frac)
     n_destroy = ceil(sol.num_campaigns*frac)
@@ -72,7 +72,7 @@ function modelRepair!(data, sol)
     MIPdata.F = deepcopy(data.F - transpose(sum(sol.f, dims=1))[:,1])
     MIPdata.S = deepcopy(sol.k)
     
-    MIPsol = MIPExpansion(MIPdata, 0, 2, 0)
+    MIPsol = MIPExtended(MIPdata, 0, 2, 0)
     if MIPsol == 0
         return
     else

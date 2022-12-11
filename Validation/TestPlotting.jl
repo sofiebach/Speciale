@@ -4,7 +4,7 @@ include("../ReadWrite.jl")
 data = readInstance("dataset/100_0_0.txt")
 
 model = "ALNS"
-type = "expanded"
+type = "extended"
 modelrepair = "false"
 prefix = "results/"
 filename = model*"_"*type*"_"*modelrepair

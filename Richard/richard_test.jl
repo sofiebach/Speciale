@@ -9,11 +9,11 @@ sol = randomInitial(data)
 # p = 7
 # insert!(data,sol,data.start, p)
 # insert!(data,sol,data.stop, p)
-# regretInsertion(data,sol,[p], "expanded")
+# regretInsertion(data,sol,[p], "extended")
 
 time_limit = 60 #Seconds
 
-sol, params = ALNS(data, sol, time_limit, "expanded")
+sol, params = ALNS(data, sol, time_limit, "extended")
 
 # Plotting
 probabilityTracking(params, "probability")

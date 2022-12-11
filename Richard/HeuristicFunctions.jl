@@ -105,7 +105,7 @@ function spreadModelRepair!(data, sol, type)
     MIPdata = deepcopy(data)
 
     time_limit = 120
-    MIPx = MIPExpansion(MIPdata, "HiGHS", 1, time_limit, 0, sol.x)
+    MIPx = MIPExtended(MIPdata, "HiGHS", 1, time_limit, 0, sol.x)
 
     if MIPx == 0
         return
@@ -164,7 +164,7 @@ end
 function firstInsertion(data, sol, t, type)
     if type == "baseline"
         best_obj = sol.base_obj
-    elseif type == "expanded"
+    elseif type == "extended"
         best_obj = sol.exp_obj
     else
         println("Enter valid model type")
@@ -174,7 +174,7 @@ function firstInsertion(data, sol, t, type)
     for p in shuffled_idx
         if fits(data, sol, t, p) && sol.k[p] > 0
             delta_obj = deltaInsert(data, sol, t, p)
-            if type == "expanded"       
+            if type == "extended"       
                 new_obj = delta_obj.delta_exp 
             elseif type == "baseline"
                 new_obj = delta_obj.delta_base
@@ -209,7 +209,7 @@ end
 function bestInsertion(data, sol, priorities, type)
     if type == "baseline"
         best_obj = sol.base_obj
-    elseif type == "expanded"
+    elseif type == "extended"
         best_obj = sol.exp_obj
     else
         println("Enter valid model type")
@@ -224,7 +224,7 @@ function bestInsertion(data, sol, priorities, type)
         for t in times
             if fits(data, sol, t, p) 
                 delta_obj = deltaInsert(data, sol, t, p)
-                if type == "expanded"
+                if type == "extended"
                     new_obj = delta_obj.delta_exp 
                 elseif type == "baseline"
                     new_obj = delta_obj.delta_base
@@ -396,7 +396,7 @@ end
 #        for t = data.start:data.stop
 #            if fits(data, sol, t, p) 
 #                delta_obj = deltaInsert(data, sol, t, p)
-#                if type == "expanded"
+#                if type == "extended"
 #                    new_obj = delta_obj.delta_exp
 #                    sol_obj = sol.exp_obj
 #                elseif type == "baseline"

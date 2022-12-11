@@ -56,39 +56,12 @@ mutable struct Instance
         zeros(Float64, P))
 end
 
-# mutable struct Sol
-#     obj::Float64
-#     num_campaigns::Int64
-#     x::Array{Int64,2}
-#     f::Array{Float64,2}
-#     k::Array{Int64,1}
-#     L::Array{Int64, 1}
-#     g::Array{Int64,2}
-#     P::Int64
-#     T::Int64
-#     M::Int64
-#     Sol(T,P,M) = new(0.0, 0, zeros(Int64,T,P), zeros(Float64,T,M), zeros(Int64,P), zeros(Int64,P), zeros(Int64, T, P), P, T, M)
-# end
-# 
-# mutable struct BaselineSol
-#     obj::Float64
-#     num_campaigns::Int64
-#     x::Array{Int64,2}
-#     f::Array{Float64,2}
-#     k::Array{Int64,1}
-#     P::Int64
-#     T::Int64
-#     M::Int64
-#     I_cap::Array{Float64,2}
-#     H_cap::Array{Float64,2}
-#     BaselineSol(data) = new(0.0, 0, zeros(Int64,data.T,data.P), zeros(Float64,data.T,data.M), deepcopy(data.S), data.P, data.T, data.M, deepcopy(data.I), deepcopy(data.H))
-# end
-
 mutable struct Objective
     k_penalty::Float64
     g_penalty::Float64
     L_reward::Float64
-    Objective() = new(0.0, 0.0, 0.0)
+    y_penalty::Float64
+    Objective() = new(0.0, 0.0, 0.0, 0.0)
 end
 
 mutable struct Sol
@@ -101,6 +74,7 @@ mutable struct Sol
     k::Array{Int64,1}
     L::Array{Int64, 1}
     g::Array{Int64,2}
+    y::Array{Float64, 1}
     P::Int64
     T::Int64
     M::Int64
@@ -109,7 +83,7 @@ mutable struct Sol
     H_cap::Array{Float64,2}
     Sol(data) = new(0.0, 0.0, Objective(), 0,
     zeros(Int64,data.T,data.P), zeros(Float64,data.T,data.M), deepcopy(data.S), 
-    zeros(Int64, data.P), zeros(Int64, data.T, data.P), 
+    zeros(Int64, data.P), zeros(Int64, data.T, data.P), zeros(Float64, data.P),
     data.P, data.T, data.M, data.C, 
     deepcopy(data.I), deepcopy(data.H))
 end

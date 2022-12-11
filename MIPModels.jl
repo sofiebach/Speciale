@@ -69,7 +69,7 @@ function MIPBaseline(data, solver, log=1, time_limit=60, solution_limit=0)
 end
 
 
-function MIPExpansion(data, solver, log=1, time_limit=60, solution_limit=0, destroyed_sol=0)
+function MIPExtended(data, solver, log=1, time_limit=60, solution_limit=0, destroyed_sol=0)
     if solver == "Gurobi"
         model = Model(optimizer_with_attributes(() -> Gurobi.Optimizer(genv)))
     elseif solver == "HiGHS"
@@ -110,7 +110,8 @@ function MIPExpansion(data, solver, log=1, time_limit=60, solution_limit=0, dest
         sum(data.penalty_S[p]*k[p] for p = 1:data.P) +               # Penalty for not fulfilled Scope
         sum(data.penalty_g[p] * g[t,p] for t=1:data.T, p=1:data.P) - # Penalty for stacking
         sum(data.weight_idle[p] * L[p] for p=1:data.P) +             # Reward for spreading
-        sum(data.weight_idle[p] * y[p] for p=1:data.P))              # Penalty for spreading too much
+        sum(data.weight_idle[p] * y[p] for p=1:data.P)               # Penalty for spreading too much
+    )
 
     # If destroyed solution is inputted
     if destroyed_sol != 0
@@ -173,5 +174,6 @@ function MIPExpansion(data, solver, log=1, time_limit=60, solution_limit=0, dest
             x1[t,p] = Int64(round(JuMP.value(sum(x[t,p,n] for n=1:data.S[p]))))
         end
     end
+
     return x1
 end

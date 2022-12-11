@@ -1,6 +1,6 @@
 using JuMP, Gurobi
 genv = Gurobi.Env()
-function MIPExpansion(data, time_limit, solution_limit, log)
+function MIPExtended(data, time_limit, solution_limit, log)
     model = Model(optimizer_with_attributes(() -> Gurobi.Optimizer(genv)))
     if log  == 0
         set_silent(model)

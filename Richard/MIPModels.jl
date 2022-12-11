@@ -69,7 +69,7 @@ function MIPBaseline(data, solver, log=1, time_limit=60, solution_limit=0)
 end
 
 
-function MIPExpansion(data, solver, log=1, time_limit=60, solution_limit=0, destroyed_sol=0)
+function MIPExtended(data, solver, log=1, time_limit=60, solution_limit=0, destroyed_sol=0)
     if solver == "Gurobi"
         model = Model(optimizer_with_attributes(() -> Gurobi.Optimizer(genv)))
     elseif solver == "HiGHS"

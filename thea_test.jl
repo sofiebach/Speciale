@@ -6,7 +6,11 @@ include("MIPModels.jl")
 
 data = readInstance("dataset/100_0_0.txt")
 
+<<<<<<< HEAD
 x = MIPExpansion(data, "Gurobi", 1, 60*30, 0, 0)
+=======
+x = MIPExtended(data, "Gurobi", 1, 60*5, 0, 0)
+>>>>>>> d2fb10b13f269914f237843085c0931e6c2c63bb
 
 sol = MIPtoSol(data, x)
 
@@ -34,8 +38,13 @@ sol = randomInitial(data)
 
 time_limit = 60*3 #Seconds
 
+<<<<<<< HEAD
 prefix = "MIP/test100"
 sol, params = ALNS(data, sol, time_limit, "expanded")
+=======
+prefix = "theaplot2/test100"
+sol, params = ALNS(data, sol, time_limit, "extended")
+>>>>>>> d2fb10b13f269914f237843085c0931e6c2c63bb
 probabilityTracking(params, prefix * "_probability")
 solutionTracking(params, prefix * "_solution")
 solutionTracking_all(params, prefix * "_solution_all")
@@ -83,7 +92,7 @@ clusterDestroy!(data,sol,0.3)
 
 drawTVSchedule(data,sol,"hej")
 drawRadioSchedule(data,sol,"hej1")
-regretRepair!(data,sol,"expanded")
+regretRepair!(data,sol,"extended")
 
 
 p = 16
@@ -124,7 +133,7 @@ data = readInstance("dataset/100_0_0.txt")
 sol = randomInitial(data)
 
 time_limit = 60*10
-sol, params = ALNS(data,sol,time_limit,"expanded")
+sol, params = ALNS(data,sol,time_limit,"extended")
 
 probabilityTracking(params,"hej_test")
 
@@ -132,5 +141,5 @@ probabilityTracking(params,"hej_test")
 println(sol.exp_obj)
 randomDestroy!(data,sol,0.2)
 println(sol.exp_obj)
-flexibilityRepair!(data,sol,"expanded")
+flexibilityRepair!(data,sol,"extended")
 println(sol.exp_obj)

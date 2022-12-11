@@ -15,7 +15,7 @@ sol_max = Sol(data)
 randomInsert!(data, sol_max, data.P_bar)
 
 # Find minimum objective for campaigns
-x = MIPExpansion(data, logging, time_limit, gap, spreading)
+x = MIPExtended(data, logging, time_limit, gap, spreading)
 sol_min = MIPtoSol(data, x)
 
 # Initialize points on x-axis
@@ -26,9 +26,9 @@ Y = zeros(Float64, N)
 gap = 0.02
 spreading = 1
 for i = 1:N
-    x2 = MIPExpansion(data, logging, time_limit, gap, spreading, X[i])
+    x2 = MIPExtended(data, logging, time_limit, gap, spreading, X[i])
     sol2 = MIPtoSol(data, x2)
-    Y[i] = sol2.objective.g_penalty - sol2.objective.L_reward
+    Y[i] = sol2.objective.g_penalty - sol2.objective.L_reward + sol2.objective.y_penalty
 end
 
 outFile = open("results/trade-off", "w")

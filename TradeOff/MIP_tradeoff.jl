@@ -3,7 +3,7 @@ using JuMP, Gurobi
 
 genv = Gurobi.Env()
 
-function MIPExpansion(data, log=1, time_limit=60, gap=0.05, spreading=0, X=100000)
+function MIPExtended(data, log=1, time_limit=60, gap=0.05, spreading=0, X=100000)
 
     model = Model(optimizer_with_attributes(() -> Gurobi.Optimizer(genv)))
     
@@ -19,25 +19,30 @@ function MIPExpansion(data, log=1, time_limit=60, gap=0.05, spreading=0, X=10000
         set_optimizer_attribute(model,"MIPGap", gap)
     end
 
-    @variable(model, x[1:data.T, p = 1:data.P, 1:data.S[p]], Bin) # We can't have more than scope of each priority for now
-    @variable(model, f[1:data.T,1:data.M] >= 0) # Freelance hours
-    @variable(model, k[1:data.P] >= 0, Int) # Slack for scope
-    @variable(model, L[1:data.P] >= 0, Int) # Idle time for each priority
-    @variable(model, z[1:data.P], Bin) # Constraining min idle time
-    @variable(model, g[1:data.T, 1:data.P] >= 0, Int) # Slack for maximum campaigns per week
+    @variable(model, x[1:data.T, p = 1:data.P, 1:data.S[p]], Bin)   # We can't have more than scope of each priority for now
+    @variable(model, f[1:data.T,1:data.M] >= 0)                     # Freelance hours
+    @variable(model, k[1:data.P] >= 0, Int)                         # Slack for scope
+    @variable(model, L[1:data.P] >= 0, Int)                         # Idle time for each priority
+    @variable(model, z[1:data.P], Bin)                              # Constraining min idle time
+    @variable(model, g[1:data.T, 1:data.P] >= 0, Int)               # Slack for maximum campaigns per week
+    @variable(model, y[1:data.P] >= 0)                              # Slack for too large idle time
 
     M_T = data.T + 1
     M_S = maximum(data.S) + 1
     epsilon = 0.5
-    
+
     @objective(model, Min, 
-        spreading * (sum(g[t,p] for t=1:data.T, p=1:data.P) - sum(L[p] for p=1:data.P)) + 
-        (1-spreading) * (sum(k[p]*data.penalty_S[p] for p = 1:data.P)) + 
-        sum(f[t,m]*data.penalty_f[m] for t = 1:data.T for m = 1:data.M)
-    )
+        (1-spreading) * 
+            (sum(data.penalty_S[p]*k[p] for p = 1:data.P)) +               # Penalty for not fulfilled Scope
+        spreading * 
+            (sum(data.penalty_g[p] * g[t,p] for t=1:data.T, p=1:data.P) - # Penalty for stacking
+            sum(data.weight_idle[p] * L[p] for p=1:data.P) +             # Reward for spreading
+            sum(data.weight_idle[p] * y[p] for p=1:data.P)               # Penalty for spreading too much
+            )
+        )
 
     # Constraint non-spreading part
-    @constraint(model, sum(k[p]*data.penalty_S[p] for p = 1:data.P) <= X)
+    @constraint(model, sum(data.penalty_S[p]*k[p] for p = 1:data.P) <= X)
 
     #It is not possible to slack on Flagskib DR1 and DR2 (p=1 and p=8)
     @constraint(model, [p in data.P_bar], k[p] == 0)
@@ -58,7 +63,7 @@ function MIPExpansion(data, log=1, time_limit=60, gap=0.05, spreading=0, X=10000
     # Scope constraint
     @constraint(model, [p=1:data.P], sum(sum(x[t,p,n] for n=1:data.S[p]) for t = data.start:data.stop) >= data.S[p] - k[p])
 
-    # Uppder limit of x_priority
+    # Upper limit of x_priority
     @constraint(model, [p=1:data.P, n = 1:data.S[p]], sum(x[t,p,n] for t=1:data.T) <= 1)
     
     # Make order of n 
@@ -74,7 +79,10 @@ function MIPExpansion(data, log=1, time_limit=60, gap=0.05, spreading=0, X=10000
     @constraint(model, [p=1:data.P], (1 - z[p]) * M_T >= L[p])
 
     # Number of campaigns per week
-    @constraint(model, [p=1:data.P, t=1:data.T], sum(x[t,p,n] for n=1:data.S[p]) <= data.aimed[p] + g[t,p])
+    @constraint(model, [p=1:data.P, t=1:data.T], sum(x[t,p,n] for n=1:data.S[p]) <= data.aimed_g[p] + g[t,p])
+
+    # Activate y
+    @constraint(model, [p=1:data.P], L[p] <= data.aimed_L[p] + y[p])
 
     JuMP.optimize!(model)
 
