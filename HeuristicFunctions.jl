@@ -195,12 +195,6 @@ function modelRepair!(data, sol, type)
 end 
 
 function firstRepair!(data, sol, type)
-    for p_bar in data.P_bar, n = 1:sol.k[p_bar]
-        t, p = bestInsertion(data, sol, [p_bar], type)
-        if t != 0 && p != 0
-            insert!(data, sol, t, p)
-        end
-    end
     for t = data.start:data.stop
         while true
             p = firstInsertion(data, sol, t, type)
@@ -240,13 +234,6 @@ function firstInsertion(data, sol, t, type)
 end
 
 function greedyRepair!(data, sol, type)
-    for p_bar in data.P_bar, n = 1:sol.k[p_bar]
-        t, p = greedyInsertion(data, sol, [p_bar], type)
-        if t != 0 && p != 0
-            insert!(data, sol, t, p)
-        end
-    end
-
     while true
         t, p = greedyInsertion(data, sol, collect(1:data.P), type)
         if t != 0 && p != 0
@@ -314,12 +301,6 @@ function bestInsertion(data, sol, priorities, type)
 end
 
 function flexibilityRepair!(data, sol, type)
-    for p_bar in data.P_bar, n = 1:sol.k[p_bar]
-        t, p = bestInsertion(data, sol, [p_bar], type)
-        if t != 0 && p != 0
-            insert!(data, sol, t, p)
-        end
-    end
     count = 1
     while true
         t, p = flexibilityInsertion(data, sol, collect(1:data.P))
@@ -359,13 +340,6 @@ function flexibilityInsertion(data, sol, priorities)
 end
 
 function regretRepair!(data, sol, type)
-    for p_bar in data.P_bar, n = 1:sol.k[p_bar]
-        t1, t2, p = regretInsertion(data, sol, [p_bar], type)
-        if t1 != 0 && t2 != 0 && p != 0
-            insert!(data, sol, t1, p)
-            insert!(data, sol, t2, p)
-        end
-    end
     count = 1
     while true
         priorities = shuffle(collect(1:data.P))

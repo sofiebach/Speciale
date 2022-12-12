@@ -34,9 +34,6 @@ function MIPBaseline(data, solver, log=1, time_limit=60, solution_limit=0)
     
     @objective(model, Min, sum(k[p]*data.penalty_S[p] for p = 1:data.P))
 
-    #It is not possible to slack on Flagskib DR1 and DR2 (p=1 and p=8)
-    @constraint(model, [p in data.P_bar], k[p] == 0)
-
     # Nothing can be planned before start and after stop
     @constraint(model, [t = 1:(data.start - 1)], sum(x[t,p] for p = 1:data.P) == 0)
     @constraint(model, [t = (data.stop + 1):data.T], sum(x[t,p] for p = 1:data.P) == 0)
@@ -122,9 +119,6 @@ function MIPExtended(data, solver, log=1, time_limit=60, solution_limit=0, destr
         end
     end
 
-    #It is not possible to slack on Flagskib DR1 and DR2 (p=1 and p=8)
-    @constraint(model, [p in data.P_bar], k[p] == 0)
-
     # Nothing can be planned before start and after stop
     @constraint(model, [t = 1:(data.start - 1)], sum(sum(x[t,p,n] for n=1:data.S[p]) for p = 1:data.P) == 0)
     @constraint(model, [t = (data.stop + 1):data.T], sum(sum(x[t,p,n] for n=1:data.S[p]) for p = 1:data.P) == 0)
@@ -204,11 +198,11 @@ function MIPpriority(data, p, xp, log=0, time_limit=10)
         data.weight_idle[p] * y                         # Penalty for spreading too much
     )
 
-    # for t = data.start:data.stop
-    #     if xp[t] > 0
-    #         @constraint(model, sum(x[t,n] for n=1:data.S[p]) >= xp[t])
-    #     end
-    # end
+    for t = data.start:data.stop
+        if xp[t] > 0
+            @constraint(model, sum(x[t,n] for n=1:data.S[p]) >= xp[t])
+        end
+    end
 
     # Nothing can be planned before start and after stop
     @constraint(model, [t = 1:(data.start - 1)], sum(x[t,n] for n=1:data.S[p]) == 0)

@@ -25,10 +25,6 @@ function read_DR_data(P)
         data.u[:,p,:] = transpose(consumption)
         data.u[:,p,11] = data.u[:,p,11] ./ population # convert impressions to GRP
 
-        # penalty for priority
-        #data.penalty_S[p] = sum(data.u[:,p,:])
-        
-
         for l = 1:(L_upper-L_lower+1)
             if sum(data.u[l,p,:]) > 0
                 data.L_l[p] = l-data.L_zero
@@ -57,6 +53,10 @@ function read_DR_data(P)
     # S[p] is scope for priority p
     data.S = convert(Array{Int64,2}, XLSX.readdata("data/data_staffing_constraint.xlsx", "Scope", "D2:D38"))[1:P]
     data.penalty_S = ones(data.P)./data.S
+    for p in data.P_bar 
+        data.penalty_S[p] += 1000
+    end
+
     data.F = ones(Float64, data.M)*100
     # Read I
     # [DR1, DR2, Ramasjang, P1, P2, P3, P4, P5, P6, P8, digital, SOME]
