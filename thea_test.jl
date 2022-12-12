@@ -4,10 +4,18 @@ include("Validation/PlotSolution.jl")
 include("Validation/ValidateSolution.jl")
 include("MIPModels.jl")
 
-data = readInstance("dataset/25_0_0.txt")
+data = readInstance("dataset/100_0_0.txt")
 sol = randomInitial(data)
 
+
 sol, params = ALNS(data,sol,60, "extended")
+
+horizontalModelRepair(data, sol, "extended")
+
+checkSolution(data, sol)
+
+
+
 
 x = MIPExtended(data, "Gurobi", 1, 60*2)
 sol = MIPtoSol(data, x)

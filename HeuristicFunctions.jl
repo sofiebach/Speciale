@@ -130,6 +130,7 @@ function horizontalModelRepair!(data, sol, type)
     obj = zeros(Float64, data.P)
     shuffled_p = shuffle(collect(1:data.P))
     p_idx = 1
+
     for p in shuffled_p
         obj[p_idx] = data.penalty_S[p]*sol.k[p] + sum(data.penalty_g[p] * sol.g[t,p] for t=1:data.T) - data.weight_idle[p] * sol.L[p] + data.weight_idle[p] * sol.y[p] 
         p_idx += 1
@@ -141,10 +142,17 @@ function horizontalModelRepair!(data, sol, type)
             break
         end
         println("p: ", p)
+        c = 1
+        c2 = 1
         xp = deepcopy(sol.x[:,p])
+        println(xp)
+        t = data.start
         while sum(sol.x[:,p]) > 0
-            t = data.start
+            #println("c: ", c)
+            c += 1
             while sol.x[t,p] > 0
+                #println("c2: ", c2)
+                c2 += 1
                 remove!(data, sol, t, p)
             end
             t += 1
@@ -155,7 +163,7 @@ function horizontalModelRepair!(data, sol, type)
         MIPdata.H = deepcopy(sol.H_cap)
         MIPdata.H[MIPdata.H .< 0.0] .= 0.0
         MIPdata.F = deepcopy(data.F - transpose(sum(sol.f, dims=1))[:,1])
-        MIPx = MIPpriority(MIPdata, p, xp, 1, 5)
+        MIPx = MIPpriority(MIPdata, p, xp, 1, 20)
 
         if MIPx == xp || MIPx == 0
             break

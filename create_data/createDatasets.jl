@@ -14,6 +14,9 @@ function createNewInstance(data, d, w, u)
     new_instance.S = deepcopy(Int64.(ceil.(data.S*d)))
     new_instance.F = deepcopy(data.F*d)
     new_instance.penalty_S = ones(new_instance.P)./new_instance.S
+    for p in data.P_bar
+        new_instance.penalty_S[p] += 1000
+    end
     new_instance.aimed_g = Int64.(ceil.(new_instance.S/timeperiod))
     new_instance.aimed_L = (timeperiod - 1) ./(new_instance.S .- 1)
     replace!(new_instance.aimed_L, Inf => 0)
