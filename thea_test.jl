@@ -4,19 +4,29 @@ include("Validation/PlotSolution.jl")
 include("Validation/ValidateSolution.jl")
 include("MIPModels.jl")
 
-data = readInstance("dataset/100_0_0.txt")
+data = readInstance("dataset/25_0_0.txt")
+sol = randomInitial(data)
 
-x = MIPExtended(data, "Gurobi", 1, 60*5, 0, 0)
+sol, params = ALNS(data,sol,60, "extended")
 
+x = MIPExtended(data, "Gurobi", 1, 60*2)
 sol = MIPtoSol(data, x)
+checkSolution(data, sol)
 
 drawTVSchedule(data, sol, "MIP_newobj_TV")
 
-
-
 drawRadioSchedule(data, sol, "MIP_newobj_Radio")
 
-
+obj1 = zeros(Float64, data.P)
+obj2 = zeros(Float64, data.P)
+obj3 = zeros(Float64, data.P)
+obj4 = zeros(Float64, data.P)
+for p = 1:data.P 
+    obj1[p] = data.penalty_S[p]*sol.k[p]
+    obj2[p] = sum(data.penalty_g[p] * sol.g[t,p] for t=1:data.T)
+    obj3[p] = - data.weight_idle[p] * sol.L[p] + data.weight_idle[p] * sol.y[p]
+    obj4[p] = obj1[p] + obj2[p] + obj3[p]
+end
 
 
 
@@ -34,13 +44,8 @@ sol = randomInitial(data)
 
 time_limit = 60*3 #Seconds
 
-<<<<<<< HEAD
-prefix = "MIP/test100"
-sol, params = ALNS(data, sol, time_limit, "expanded")
-=======
 prefix = "theaplot2/test100"
 sol, params = ALNS(data, sol, time_limit, "extended")
->>>>>>> d2fb10b13f269914f237843085c0931e6c2c63bb
 probabilityTracking(params, prefix * "_probability")
 solutionTracking(params, prefix * "_solution")
 solutionTracking_all(params, prefix * "_solution_all")
