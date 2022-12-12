@@ -1,19 +1,20 @@
 include("ReadWrite.jl")
 include("ALNS.jl")
 include("Validation/PlotSolution.jl")
+include("Validation/ValidateSolution.jl")
 include("MIPModels.jl")
 
-data = readInstance("dataset/25_0_0.txt")
+data = readInstance("dataset/100_0_0.txt")
 
 x = MIPExtended(data, "Gurobi", 1, 60*5, 0, 0)
 
 sol = MIPtoSol(data, x)
 
-drawRadioSchedule(data, sol, "hej")
+drawTVSchedule(data, sol, "MIP_newobj_TV")
 
 
 
-
+drawRadioSchedule(data, sol, "MIP_newobj_Radio")
 
 
 
@@ -33,8 +34,13 @@ sol = randomInitial(data)
 
 time_limit = 60*3 #Seconds
 
+<<<<<<< HEAD
+prefix = "MIP/test100"
+sol, params = ALNS(data, sol, time_limit, "expanded")
+=======
 prefix = "theaplot2/test100"
 sol, params = ALNS(data, sol, time_limit, "extended")
+>>>>>>> d2fb10b13f269914f237843085c0931e6c2c63bb
 probabilityTracking(params, prefix * "_probability")
 solutionTracking(params, prefix * "_solution")
 solutionTracking_all(params, prefix * "_solution_all")
