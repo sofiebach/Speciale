@@ -16,7 +16,6 @@ function horizontalDestroy!(data, sol, frac)
         n = rand(1:sol.num_campaigns)
         _, p = findCampaign(data,sol,n)
         for t = data.start:data.stop
-            println(p)
             while sol.x[t,p] > 0 && n_destroy > 0
                 remove!(data,sol,t,p)
                 n_destroy -= 1
@@ -127,23 +126,43 @@ function relatedDestroy!(data,sol,frac)
     end
 end
 
-function horizontalModelRepair(data, sol, type)
-    MIPdata = deepcopy(data)
-    MIPdata.I = deepcopy(sol.I_cap)
-    MIPdata.H = deepcopy(sol.H_cap)
-    MIPdata.H[MIPdata.H .< 0.0] .= 0.0
-    MIPdata.F = deepcopy(data.F - transpose(sum(sol.f, dims=1))[:,1])
-    MIPdata.F = zeros(Float64, data.M)
-    #MIPdata.S = deepcopy(sol.k)
+function horizontalModelRepair!(data, sol, type)
+    obj = zeros(Float64, data.P)
+    shuffled_p = shuffle(collect(1:data.P))
+    p_idx = 1
+    for p in shuffled_p
+        obj[p_idx] = data.penalty_S[p]*sol.k[p] + sum(data.penalty_g[p] * sol.g[t,p] for t=1:data.T) - data.weight_idle[p] * sol.L[p] + data.weight_idle[p] * sol.y[p] 
+        p_idx += 1
+    end
+    sorted_p = shuffled_p[sortperm(-obj)]
 
-    p = 1
-    xp = sol.x[:,p]
-    MIPx = MIPpriority(data, p, xp, 1, 10)
-    println(MIPx)
-    if MIPx == 0
-        return
-    else
-        for t = 1:data.T 
+    for p in sorted_p
+        if obj[findall(x->x==p,shuffled_p)[1]] <= 0
+            break
+        end
+        println("p: ", p)
+        xp = deepcopy(sol.x[:,p])
+        while sum(sol.x[:,p]) > 0
+            t = data.start
+            while sol.x[t,p] > 0
+                remove!(data, sol, t, p)
+            end
+            t += 1
+        end
+
+        MIPdata = deepcopy(data)
+        MIPdata.I = deepcopy(sol.I_cap)
+        MIPdata.H = deepcopy(sol.H_cap)
+        MIPdata.H[MIPdata.H .< 0.0] .= 0.0
+        MIPdata.F = deepcopy(data.F - transpose(sum(sol.f, dims=1))[:,1])
+        MIPx = MIPpriority(MIPdata, p, xp, 1, 5)
+
+        if MIPx == xp || MIPx == 0
+            break
+        end
+        #println(MIPx)
+
+        for t = data.start:data.stop
             for n = 1:MIPx[t]
                 insert!(data, sol, t, p)
             end

@@ -50,7 +50,7 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.05,a
     elseif type == "extended"
         T_start = -theta*temp_sol.exp_obj/log(0.5)
         # repair_functions = [greedyRepair!, firstRepair!, flexibilityRepair!, regretRepair!, modelRepair!]
-        repair_functions = [greedyRepair!, flexibilityRepair!, regretRepair!, modelRepair!]
+        repair_functions = [horizontalModelRepair!, greedyRepair!, flexibilityRepair!, regretRepair!, modelRepair!]
         #destroy_functions = [clusterDestroy!, randomDestroy!, worstIdleDestroy!, stackDestroy!, relatedDestroy!]
         destroy_functions = [horizontalDestroy!, verticalDestroy!, randomDestroy!, worstIdleDestroy!, stackDestroy!, relatedDestroy!]
         n_d = length(destroy_functions)
@@ -131,6 +131,7 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.05,a
         # Choose destroy method
         selected_destroy = selectMethod(prob_destroy)
         destroy_time = time_ns()
+        println(destroy_functions[selected_destroy])
         destroy_functions[selected_destroy](data, temp_sol, destroy_frac)
         elapsed_destroy = elapsedTime(destroy_time)
 
@@ -141,6 +142,7 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.05,a
         # Choose repair method
         selected_repair = selectMethod(prob_repair)
         repair_time = time_ns()
+        println(repair_functions[selected_repair])
         repair_functions[selected_repair](data, temp_sol, type)
         elapsed_repair = elapsedTime(repair_time)
         valid = isValid(data, temp_sol, sol)

@@ -29,7 +29,7 @@ function MIPBaseline(data, solver, log=1, time_limit=60, solution_limit=0)
     end
 
     @variable(model, x[1:data.T, 1:data.P] >= 0, Int)
-    @variable(model, f[1:data.T,1:data.M] >= 0) # freelance hours
+    @variable(model, f[1:data.T,1:data.M] >= 0) 
     @variable(model, k[1:data.P] >= 0, Int)
     
     @objective(model, Min, sum(k[p]*data.penalty_S[p] for p = 1:data.P))
@@ -199,16 +199,16 @@ function MIPpriority(data, p, xp, log=0, time_limit=10)
 
     @objective(model, Min, 
         data.penalty_S[p]*k +                           # Penalty for not fulfilled Scope
-        sum(data.penalty_g[p] * g[t] for t=1:data.T) -  # Penalty for stacking
+        data.penalty_g[p] * sum(g[t] for t=1:data.T) -  # Penalty for stacking
         data.weight_idle[p] * L +                       # Reward for spreading
         data.weight_idle[p] * y                         # Penalty for spreading too much
     )
 
-    for t = data.start:data.stop
-        if xp[t] > 0
-            @constraint(model, sum(x[t,n] for n=1:data.S[p]) >= xp[t])
-        end
-    end
+    # for t = data.start:data.stop
+    #     if xp[t] > 0
+    #         @constraint(model, sum(x[t,n] for n=1:data.S[p]) >= xp[t])
+    #     end
+    # end
 
     # Nothing can be planned before start and after stop
     @constraint(model, [t = 1:(data.start - 1)], sum(x[t,n] for n=1:data.S[p]) == 0)
