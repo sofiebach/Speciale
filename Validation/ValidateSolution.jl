@@ -1,4 +1,5 @@
-function checkSolution(data, sol)
+function checkSolution(data, sol) 
+    eps = 1e-5
     used_inv = zeros(Float64,data.T, data.C)
     cap_inv = zeros(Float64, data.T, data.C)
     used_prod = zeros(Float64, data.T, data.M)
@@ -12,9 +13,11 @@ function checkSolution(data, sol)
         end
         cap_inv[t,:] = data.I[t,:]
         for c = 1:data.C
-            if (used_inv[t,c] > cap_inv[t,c])
+            if (used_inv[t,c] > cap_inv[t,c] + eps)
                 exceeded = true
-                println("Inventory exceeded at time ", t, " media ", c)
+                println("Inventory exceeded at time ", t, " channel ", c)
+                println("Inventory: ", used_inv[t,c])
+                println("Cap: ", cap_inv[t,c])
             end
         end
       
@@ -24,16 +27,18 @@ function checkSolution(data, sol)
         end
         cap_prod[t,:] = data.H[t,:] + sol.f[t,:]
         for m = 1:data.M
-            if (used_prod[t,m] > cap_prod[t,m])
+            if (used_prod[t,m] > cap_prod[t,m] + eps)
                 exceeded = true
                 println("Staff exceeded at time ", t, " media ", m)
+                println("Inventory: ", used_prod[t,m])
+                println("Cap: ", cap_prod[t,m])
             end
         end 
     end
 
     # freelancer check
     for m = 1:data.M
-        if sum(sol.f[:,m]) > data.F[m]
+        if sum(sol.f[:,m]) > data.F[m] + eps
             exceeded = true
             println("Too many freelance hours!")
         end

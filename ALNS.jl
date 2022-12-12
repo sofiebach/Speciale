@@ -135,9 +135,8 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.05,a
         println(repair_functions[selected_repair])
         repair_functions[selected_repair](data, temp_sol, type)
         elapsed_repair = elapsedTime(repair_time)
-        valid = isValid(data, temp_sol, sol)
 
-        if checkSolution(data, sol)
+        if checkSolution(data, temp_sol)
             println("-----------FEEEEEEJL---------")
             continue
         end
