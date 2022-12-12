@@ -18,16 +18,6 @@ function selectMethod(prob)
     end
 end
 
-function isValid(data, temp_sol, sol)
-    # Check if P_bar constraint is exceeded
-    for p_bar in data.P_bar 
-        if temp_sol.k[p_bar] > 0
-            temp_sol = deepcopy(sol)
-            return false
-        end
-    end
-    return true
-end
 
 
 function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.05,alpha=0.99975,W=[10,5,1],gamma=0.9,destroy_frac=0.4,segment_size=50,long_term_update=0.05)    
@@ -50,7 +40,7 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.05,a
     elseif type == "extended"
         T_start = -theta*temp_sol.exp_obj/log(0.5)
         # repair_functions = [greedyRepair!, firstRepair!, flexibilityRepair!, regretRepair!, modelRepair!]
-        repair_functions = [horizontalModelRepair!, greedyRepair!, flexibilityRepair!, regretRepair!, modelRepair!]
+        repair_functions = [greedyRepair!, flexibilityRepair!, regretRepair!, modelRepair!]
         #destroy_functions = [clusterDestroy!, randomDestroy!, worstIdleDestroy!, stackDestroy!, relatedDestroy!]
         destroy_functions = [horizontalDestroy!, verticalDestroy!, randomDestroy!, worstIdleDestroy!, stackDestroy!, relatedDestroy!]
         n_d = length(destroy_functions)
@@ -147,7 +137,8 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.05,a
         elapsed_repair = elapsedTime(repair_time)
         valid = isValid(data, temp_sol, sol)
 
-        if !valid
+        if checkSolution(data, sol)
+            println("-----------FEEEEEEJL---------")
             continue
         end
 

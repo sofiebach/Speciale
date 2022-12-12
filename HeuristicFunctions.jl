@@ -141,9 +141,11 @@ function horizontalModelRepair!(data, sol, type)
         if obj[findall(x->x==p,shuffled_p)[1]] <= 0
             break
         end
+        
         println("p: ", p)
         c = 1
         c2 = 1
+        
         xp = deepcopy(sol.x[:,p])
         println(xp)
         t = data.start
@@ -163,7 +165,7 @@ function horizontalModelRepair!(data, sol, type)
         MIPdata.H = deepcopy(sol.H_cap)
         MIPdata.H[MIPdata.H .< 0.0] .= 0.0
         MIPdata.F = deepcopy(data.F - transpose(sum(sol.f, dims=1))[:,1])
-        MIPx = MIPpriority(MIPdata, p, xp, 1, 20)
+        MIPx = MIPpriority(MIPdata, p, xp, 1, 5)
 
         if MIPx == xp || MIPx == 0
             break

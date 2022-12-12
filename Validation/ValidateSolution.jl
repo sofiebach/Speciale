@@ -38,18 +38,11 @@ function checkSolution(data, sol)
             println("Too many freelance hours!")
         end
     end
-
-    # scope check
-    for p_bar in data.P_bar 
-        if sol.k[p_bar] > 0
-            exceeded = true
-            println("Scope not fulfilled for P_bar!")
-        end
-    end
+    
     if exceeded == false
         println("--- Solution is valid! ---")
     end 
-    return used_inv, used_prod 
+    return exceeded #used_inv, used_prod 
 end
 
 
