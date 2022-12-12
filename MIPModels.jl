@@ -177,3 +177,89 @@ function MIPExtended(data, solver, log=1, time_limit=60, solution_limit=0, destr
 
     return x1
 end
+
+function MIPpriority(data, p, xp, log=0, time_limit=10)
+    model = Model(optimizer_with_attributes(() -> HiGHS.Optimizer()))
+    set_optimizer_attribute(model, "time_limit", time_limit*1.0)
+    if log  == 0
+        set_silent(model)
+    end
+
+    @variable(model, x[1:data.T, 1:data.S[p]], Bin)     # We can't have more than scope of each priority for now
+    @variable(model, f[1:data.T,1:data.M] >= 0)         # Freelance hours
+    @variable(model, k >= 0, Int)                       # Slack for scope
+    @variable(model, L >= 0, Int)                       # Idle time for each priority
+    @variable(model, z, Bin)                            # Constraining min idle time
+    @variable(model, g[1:data.T] >= 0, Int)             # Slack for maximum campaigns per week
+    @variable(model, y >= 0)                            # Slack for too large idle time
+
+    M_T = data.T + 1
+    M_S = data.S[p] + 1
+    epsilon = 0.5
+
+    @objective(model, Min, 
+        data.penalty_S[p]*k +                           # Penalty for not fulfilled Scope
+        sum(data.penalty_g[p] * g[t] for t=1:data.T) -  # Penalty for stacking
+        data.weight_idle[p] * L +                       # Reward for spreading
+        data.weight_idle[p] * y                         # Penalty for spreading too much
+    )
+
+    for t = data.start:data.stop
+        if xp[t] > 0
+            @constraint(model, sum(x[t,n] for n=1:data.S[p]) >= xp[t])
+        end
+    end
+
+    # Nothing can be planned before start and after stop
+    @constraint(model, [t = 1:(data.start - 1)], sum(x[t,n] for n=1:data.S[p]) == 0)
+    @constraint(model, [t = (data.stop + 1):data.T], sum(x[t,n] for n=1:data.S[p]) == 0)
+
+    # Inventory constraint
+    @constraint(model, [t=1:data.T, c=1:data.C], sum(data.u[t-t2+data.L_zero,p,c]*sum(x[t2,n] for n=1:data.S[p]) for t2 = max(t-data.L_upper, data.start):min(data.stop,t-data.L_lower)) <= data.I[t,c])
+
+    # Production constraint
+    @constraint(model, [t=1:data.T, m=1:data.M], sum(data.w[p,m] * sum(x[t2,n] for n=1:data.S[p]) for t2 = max(t-data.Q_upper, data.start):min(data.stop,t-data.Q_lower)) <= data.H[t,m] + f[t,m]) 
+
+    # Maximum number of freelancers (four weeks per media)
+    @constraint(model, [m = 1:data.M], sum(f[t,m] for t = 1:data.T) <= data.F[m]) 
+
+    # Scope constraint
+    @constraint(model, sum(x[t,n] for n=1:data.S[p] for t = data.start:data.stop) >= data.S[p] - k)
+
+    # Upper limit of x_priority
+    @constraint(model, [n = 1:data.S[p]], sum(x[t,n] for t=1:data.T) <= 1)
+    
+    # Make order of n 
+    @constraint(model, [n=1:(data.S[p]-1)], sum(x[t,n] * t for t=1:data.T) <= sum(x[t,n+1] * t for t=1:data.T))
+
+    # Make idle time
+    @constraint(model, [n=1:(data.S[p]-1)], sum(x[t,n+1] * t for t=1:data.T) - sum(x[t,n] * t for t=1:data.T) + M_T*(1 - sum(x[t,n] for t=1:data.T)) >= L)
+
+    # Activate z
+    @constraint(model, 1-sum(x[t,n] for t=1:data.T, n=1:data.S[p]) <= M_S * z - epsilon * (1-z))
+
+    # Constraint L 
+    @constraint(model, (1 - z) * M_T >= L)
+
+    # Number of campaigns per week
+    @constraint(model, [t=1:data.T], sum(x[t,n] for n=1:data.S[p]) <= data.aimed_g[p] + g[t])
+
+    # Activate y
+    @constraint(model, L <= data.aimed_L[p] + y)
+
+    JuMP.optimize!(model)
+
+    if primal_status(model) != FEASIBLE_POINT
+        return 0
+    end
+
+    x1 = zeros(Int64, data.T)
+    for t = 1:data.T
+        if JuMP.value(sum(x[t,:])) > 0.5
+            x1[t] = Int64(round(JuMP.value(sum(x[t,n] for n=1:data.S[p]))))
+        end
+    end
+
+    return x1
+
+end
