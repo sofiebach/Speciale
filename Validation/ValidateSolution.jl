@@ -16,8 +16,8 @@ function checkSolution(data, sol)
             if (used_inv[t,c] > cap_inv[t,c] + eps)
                 exceeded = true
                 println("Inventory exceeded at time ", t, " channel ", c)
-                println("Inventory: ", used_inv[t,c])
-                println("Cap: ", cap_inv[t,c])
+                println("Used: ", used_inv[t,c])
+                println("Capacity: ", cap_inv[t,c])
             end
         end
       
