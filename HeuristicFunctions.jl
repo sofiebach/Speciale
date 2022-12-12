@@ -10,10 +10,27 @@ function randomDestroy!(data, sol, frac)
     end
 end
 
-function clusterDestroy!(data, sol, frac)
+function horizontalDestroy!(data, sol, frac)
+    n_destroy = ceil(sol.num_campaigns*frac)
+    while n_destroy > 0
+        n = rand(1:sol.num_campaigns)
+        _, p = findCampaign(data,sol,n)
+        for t = data.start:data.stop
+            println(p)
+            while sol.x[t,p] > 0 && n_destroy > 0
+                remove!(data,sol,t,p)
+                n_destroy -= 1
+            end
+            if n_destroy == 0
+                break
+            end
+        end
+    end
+end
+
+function verticalDestroy!(data, sol, frac)
     n_destroy = ceil(sol.num_campaigns*frac)
     n = rand(1:sol.num_campaigns)
-    n = sol.num_campaigns-3
     while n_destroy > 0 
         if n > sol.num_campaigns
             n = 1
@@ -105,6 +122,30 @@ function relatedDestroy!(data,sol,frac)
             end
             if p_remove == 0
                 break
+            end
+        end
+    end
+end
+
+function horizontalModelRepair(data, sol, type)
+    MIPdata = deepcopy(data)
+    MIPdata.I = deepcopy(sol.I_cap)
+    MIPdata.H = deepcopy(sol.H_cap)
+    MIPdata.H[MIPdata.H .< 0.0] .= 0.0
+    MIPdata.F = deepcopy(data.F - transpose(sum(sol.f, dims=1))[:,1])
+    MIPdata.F = zeros(Float64, data.M)
+    #MIPdata.S = deepcopy(sol.k)
+
+    p = 1
+    xp = sol.x[:,p]
+    MIPx = MIPpriority(data, p, xp, 1, 10)
+    println(MIPx)
+    if MIPx == 0
+        return
+    else
+        for t = 1:data.T 
+            for n = 1:MIPx[t]
+                insert!(data, sol, t, p)
             end
         end
     end

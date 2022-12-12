@@ -51,7 +51,8 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.05,a
         T_start = -theta*temp_sol.exp_obj/log(0.5)
         # repair_functions = [greedyRepair!, firstRepair!, flexibilityRepair!, regretRepair!, modelRepair!]
         repair_functions = [greedyRepair!, flexibilityRepair!, regretRepair!, modelRepair!]
-        destroy_functions = [clusterDestroy!, randomDestroy!, worstIdleDestroy!, stackDestroy!, relatedDestroy!]
+        #destroy_functions = [clusterDestroy!, randomDestroy!, worstIdleDestroy!, stackDestroy!, relatedDestroy!]
+        destroy_functions = [horizontalDestroy!, verticalDestroy!, randomDestroy!, worstIdleDestroy!, stackDestroy!, relatedDestroy!]
         n_d = length(destroy_functions)
         if modelRepair
             n_r = length(repair_functions)
@@ -168,25 +169,15 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.05,a
             return
         end
 
-        # Save objective before acceptance
-        if type == "baseline"
-            append!(current_obj, temp_sol.base_obj)
-            append!(current_best, best_sol.base_obj)
-        elseif type == "extended"
-            append!(current_obj, temp_sol.exp_obj)
-            append!(current_best, best_sol.exp_obj)
-        else
-            println("Enter valid model type")
-        end
-
         if temp_obj < best_obj
             best_sol = deepcopy(temp_sol)
+            best_obj = temp_obj
             sol = deepcopy(temp_sol)
             w = W[1]
             w_repair[selected_repair, 1] += 1
             w_destroy[selected_destroy, 1] += 1
             println("New best")
-            println(best_obj)
+            println(temp_obj)
         elseif temp_obj < sol_obj
             sol = deepcopy(temp_sol)
             w = W[2]
@@ -202,6 +193,8 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.05,a
             w = 0
         end
 
+        append!(current_obj, temp_obj)
+        append!(current_best, best_obj)
         append!(repairs, selected_repair)
         append!(destroys, selected_destroy)
         append!(status, w)
