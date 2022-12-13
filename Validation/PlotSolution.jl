@@ -418,11 +418,12 @@ function solutionTracking_all(params, filename)
     
     def solutionPlot(params, rejected, accepted, better, filename):
         plt.figure()
-        plt.plot(rejected, np.array(params.current_obj)[rejected.astype(int)-1], 'bo', markersize = 4)
+        #plt.plot(rejected, np.array(params.current_obj)[rejected.astype(int)-1], 'bo', markersize = 4)
         plt.plot(accepted, np.array(params.current_obj)[accepted.astype(int)-1], 'yo', markersize = 4)
         plt.plot(better, np.array(params.current_obj)[better.astype(int)-1], 'ro', markersize = 4)
         plt.plot(params.current_best, 'k-' , markersize = 4)
-        plt.legend(["Rejected", "Accepted", "New best"])
+        #plt.legend(["Rejected", "Accepted", "New best"])
+        plt.legend(["Accepted", "New best"])
         plt.savefig("output/" + filename + ".png")
         # plt.show()
         plt.close

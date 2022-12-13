@@ -20,7 +20,7 @@ end
 
 
 
-function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.5,alpha=0.99975,W=[10,5,1],gamma=0.9,destroy_frac=0.4,segment_size=10,long_term_update=0.05)    
+function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.2,alpha=0.99975,W=[10,5,1],gamma=0.9,destroy_frac=0.4,segment_size=50,long_term_update=0.05)    
     it = 1
     best_sol = deepcopy(sol)
     temp_sol = deepcopy(sol)
@@ -39,7 +39,9 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.5,al
         end
     elseif type == "extended"
         T_start = -theta*temp_sol.exp_obj/log(0.5)
-        repair_functions = [greedyRepair!, firstRepair!, horizontalModelRepair!, flexibilityRepair!, regretRepair!, modelRepair!]
+        repair_functions = [bestRepair!, modelRepair!]
+        #repair_functions = [greedyRepair!, firstRepair!, bestRepair!, horizontalModelRepair!, flexibilityRepair!, regretRepair!, modelRepair!]
+        #repair_functions = [greedyRepair!, horizontalModelRepair!, flexibilityRepair!, regretRepair!, modelRepair!]
         # repair_functions = [greedyRepair!, flexibilityRepair!, regretRepair!, modelRepair!]
         #destroy_functions = [clusterDestroy!, randomDestroy!, worstIdleDestroy!, stackDestroy!, relatedDestroy!]
         destroy_functions = [horizontalDestroy!, verticalDestroy!, randomDestroy!, worstIdleDestroy!, stackDestroy!, relatedDestroy!]
