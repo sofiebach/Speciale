@@ -135,7 +135,7 @@ function horizontalModelRepair!(data, sol, type)
         obj[p_idx] = data.penalty_S[p]*sol.k[p] + sum(data.penalty_g[p] * sol.g[t,p] for t=1:data.T) - data.weight_idle[p] * sol.L[p] + data.weight_idle[p] * sol.y[p] 
         p_idx += 1
     end
-    sorted_p = shuffled_p[sortperm(-obj)]
+    sorted_p = shuffled_p[sortperm(-obj)][1:5] # Choose top 5
 
     for p in sorted_p
         if obj[findall(x->x==p,shuffled_p)[1]] <= 0
@@ -178,6 +178,9 @@ function horizontalModelRepair!(data, sol, type)
             end
         end
     end
+    println(sol.exp_obj)
+    bestRepair!(data, sol, "extended")
+    println(sol.exp_obj)
 end
 
 function modelRepair!(data, sol, type)
@@ -363,7 +366,7 @@ end
 function regretRepair!(data, sol, type)
     count = 1
     while true
-        priorities = shuffle(collect(1:data.P))
+        priorities = sortperm(-data.penalty_S)
         t1, t2, p = regretInsertion(data, sol, priorities, type)
         if t1 != 0 && t2 != 0 && p != 0
             insert!(data, sol, t1, p)
@@ -373,6 +376,9 @@ function regretRepair!(data, sol, type)
             break
         end
     end
+    println(sol.exp_obj)
+    bestRepair!(data, sol, type)
+    println(sol.exp_obj)
 end
 
 function regretInsertion(data, sol, priorities, type)
