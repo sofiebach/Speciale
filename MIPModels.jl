@@ -99,8 +99,8 @@ function MIPExtended(data, solver, log=1, time_limit=60, solution_limit=0, destr
     @variable(model, g[1:data.T, 1:data.P] >= 0, Int)               # Slack for maximum campaigns per week
     @variable(model, y[1:data.P] >= 0)                              # Slack for too large idle time
 
-    M_T = data.T + 1
-    M_S = maximum(data.S) + 1
+    M_T = data.timeperiod
+    M_S = 2
     epsilon = 0.5
 
     @objective(model, Min, 
@@ -109,15 +109,6 @@ function MIPExtended(data, solver, log=1, time_limit=60, solution_limit=0, destr
         sum(data.weight_idle[p] * L[p] for p=1:data.P) +             # Reward for spreading
         sum(data.weight_idle[p] * y[p] for p=1:data.P)               # Penalty for spreading too much
     )
-
-    # If destroyed solution is inputted
-    if destroyed_sol != 0
-        for t = 1:data.T, p=1:data.P 
-            if destroyed_sol[t,p] > 0
-                @constraint(model, sum(x[t,p,n] for n=1:data.S[p]) >= destroyed_sol[t,p])
-            end
-        end
-    end
 
     # Nothing can be planned before start and after stop
     @constraint(model, [t = 1:(data.start - 1)], sum(sum(x[t,p,n] for n=1:data.S[p]) for p = 1:data.P) == 0)
