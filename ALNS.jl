@@ -20,7 +20,7 @@ end
 
 
 
-function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.05,alpha=0.99975,W=[10,5,1],gamma=0.9,destroy_frac=0.4,segment_size=50,long_term_update=0.05)    
+function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.05,alpha=0.99975,W=[10,5,1],gamma=0.9,destroy_frac=0.4,segment_size=10,long_term_update=0.05)    
     it = 1
     best_sol = deepcopy(sol)
     temp_sol = deepcopy(sol)
@@ -39,8 +39,8 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.05,a
         end
     elseif type == "extended"
         T_start = -theta*temp_sol.exp_obj/log(0.5)
-        # repair_functions = [greedyRepair!, firstRepair!, flexibilityRepair!, regretRepair!, modelRepair!]
-        repair_functions = [greedyRepair!, flexibilityRepair!, regretRepair!, modelRepair!]
+        repair_functions = [greedyRepair!, firstRepair!, horizontalModelRepair!, flexibilityRepair!, regretRepair!, modelRepair!]
+        # repair_functions = [greedyRepair!, flexibilityRepair!, regretRepair!, modelRepair!]
         #destroy_functions = [clusterDestroy!, randomDestroy!, worstIdleDestroy!, stackDestroy!, relatedDestroy!]
         destroy_functions = [horizontalDestroy!, verticalDestroy!, randomDestroy!, worstIdleDestroy!, stackDestroy!, relatedDestroy!]
         n_d = length(destroy_functions)
@@ -138,7 +138,10 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.05,a
 
         if checkSolution(data, temp_sol)
             println("-----------FEEEEEEJL---------")
-            continue
+            return temp_sol, (prob_destroy=prob_destroy, prob_repair=prob_repair, destroys=destroys,  prob_destroy_it = prob_destroy_it,
+            prob_repair_it = prob_repair_it, repairs=repairs, current_obj=current_obj, current_best=current_best, status=status, 
+            time_repair=time_repair, time_destroy=time_destroy, num_repair=num_repair, num_destroy=num_destroy, destroy_names = destroy_names,
+            repair_names = repair_names, iter = it, T_it = T_it, w_repair=w_repair, w_destroy=w_destroy, W = W)
         end
 
         it += 1

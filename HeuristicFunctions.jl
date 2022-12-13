@@ -142,12 +142,12 @@ function horizontalModelRepair!(data, sol, type)
             break
         end
         
-        println("p: ", p)
+        # println("p: ", p)
         c = 1
         c2 = 1
         
         xp = deepcopy(sol.x[:,p])
-        println(xp)
+        # println(xp)
         t = data.start
         while sum(sol.x[:,p]) > 0
             #println("c: ", c)
@@ -165,7 +165,7 @@ function horizontalModelRepair!(data, sol, type)
         MIPdata.H = deepcopy(sol.H_cap)
         MIPdata.H[MIPdata.H .< 0.0] .= 0.0
         MIPdata.F = deepcopy(data.F - transpose(sum(sol.f, dims=1))[:,1])
-        MIPx = MIPpriority(MIPdata, p, xp, 1, 5)
+        MIPx = MIPpriority(MIPdata, p, xp, 0, 5)
 
         if MIPx == xp || MIPx == 0
             break
@@ -365,10 +365,12 @@ function regretRepair!(data, sol, type)
 end
 
 function regretInsertion(data, sol, priorities, type)
+    # println("priorities: ", priorities)
     loss = zeros(Float64, length(priorities))*NaN
     ts = zeros(Int64, length(priorities), 2)
-    p_idx = 1
+    p_idx = 0
     for p in priorities
+        p_idx += 1
         if sol.k[p] < 2
             continue
         end
@@ -412,17 +414,19 @@ function regretInsertion(data, sol, priorities, type)
         # println("delta: ", best_delta2)
         # println("----------------")
         loss[p_idx] = best_delta1 - best_delta2
-        p_idx += 1
     end
+    
     replace!(loss, NaN=>-1)
-
-    # println(loss)
+    # println("loss: ", loss)
     loss, idx = findmax(loss)
+    # println(loss, " ", idx)
+    # println("p: ", priorities[idx])
     best_p = priorities[idx]
     t1 = ts[idx,1]
     t2 = ts[idx,2]
     # best_p = collect(1:data.P)[idx]
     # println("BEST P: ",best_p)
+    # println("BEST p: ", best_p, " t1: ", t1, " t2: ", t2)
     if t1 == 0 || t2 == 0
         return 0, 0, 0
     end

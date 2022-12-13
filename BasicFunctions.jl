@@ -160,6 +160,16 @@ function fits(data, sol, t, p)
     return true
 end
 
+function bad_fits2times(data, sol, t1, t2, p)
+    temp = deepcopy(sol)
+    if fits(data, temp, t1, p)
+        insert!(data, temp, t1, p)
+    else
+        return false
+    end
+    return fits(data, temp, t2, p)
+end
+
 function fits2times(data, sol, t1, t2, p)
     # Given p will be inserted at t1, can it also be inserted at t2
     if sol.k[p] < 2
@@ -195,14 +205,15 @@ function fits2times(data, sol, t1, t2, p)
             for t_hat = (t2+data.Q_lower):(t2+data.Q_upper) 
                 if sol.H_cap[t_hat, m] - data.w[p, m] < 0
                     freelancers_needed2 += -(sol.H_cap[t_hat, m] - data.w[p, m])
-                    if sum(sol.f[:,m]) + freelancers_needed1 + freelancers_needed2 > data.F[m] 
-                        return false
-                    end
                 end
+            end
+
+            if sum(sol.f[:,m]) + freelancers_needed1 + freelancers_needed2 > data.F[m] 
+                return false
             end
         end
     else #  Check if overlap in Q
-        t_hat_cat = vcat(t_hat1Q, t_hat2Q)
+        t_hat_cat = sort(vcat(t_hat1Q, t_hat2Q))
         t_count = [count(==(i), t_hat_cat) for i in unique(t_hat_cat)]
 
         for m = 1:data.M
