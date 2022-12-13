@@ -304,6 +304,9 @@ function writeSolution(filename, data, sol)
     end
     write(outFile, "\n")
 
+    write(outFile, "y\n")
+    write(outFile,join(sol.y," ") * "\n\n")
+
     write(outFile, "k\n")
     write(outFile,join(sol.k," ")*"\n\n")
 
@@ -360,6 +363,9 @@ function readSolution(filename, data)
     for p in 1:P
         sol.x[:,p] = parse.(Int,split(readline(f)))
     end
+    readline(f) # blank
+    readline(f) # k
+    sol.y = parse.(Float64,split(readline(f)))
     readline(f) # blank
     readline(f) # k
     sol.k = parse.(Int,split(readline(f)))

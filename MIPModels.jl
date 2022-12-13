@@ -3,7 +3,7 @@ import HiGHS
 
 genv = Gurobi.Env()
 
-function MIPBaseline(data, solver, log=1, time_limit=60, solution_limit=0)
+function MIPBaseline(data, solver, log=1, time_limit=60, gap=0)
     if solver == "Gurobi"
         model = Model(optimizer_with_attributes(() -> Gurobi.Optimizer(genv)))
     elseif solver == "HiGHS"
@@ -24,8 +24,8 @@ function MIPBaseline(data, solver, log=1, time_limit=60, solution_limit=0)
         else
             set_optimizer_attribute(model, "time_limit", time_limit*1.0)
         end
-    elseif solution_limit > 0
-        set_optimizer_attribute(model,"SolutionLimit", solution_limit)
+    elseif gap > 0
+        set_optimizer_attribute(model,"MIPGap", gap)
     end
 
     @variable(model, x[1:data.T, 1:data.P] >= 0, Int)

@@ -50,8 +50,8 @@ end
 data = readInstance("create_data/original.txt")
 
 percent = [0.25,0.5,1]
-U = [0, 0.05, 0.1, 0.15]
-W = [0, 0.05, 0.1, 0.15]
+U = [0, 0.05, 0.1]
+W = [0, 0.05, 0.1]
 
 for p in percent, u in U
     createNewInstance(data,p,0,u)

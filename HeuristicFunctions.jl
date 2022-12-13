@@ -272,6 +272,17 @@ function greedyInsertion(data, sol, priorities, type)
     return 0, 0
 end
 
+function bestRepair!(data, sol, type)
+    while true
+        t, p = bestInsertion(data, sol, collect(1:data.P), type)
+        if t != 0 && p != 0
+            insert!(data, sol, t, p)
+        else
+            break
+        end
+    end
+end
+
 function bestInsertion(data, sol, priorities, type)
     if type == "baseline"
         best_obj = sol.base_obj

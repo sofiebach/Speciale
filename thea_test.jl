@@ -7,9 +7,9 @@ include("MIPModels.jl")
 data = readInstance("dataset/25_0_0.txt")
 sol = randomInitial(data)
 
-time_limit = 60*3 #Seconds
+time_limit = 60*2 #Seconds
 
-prefix = "theaplot2/test25"
+prefix = "theaplot2/Onlybest_25"
 sol, params = ALNS(data, sol, time_limit, "extended")
 probabilityTracking(params, prefix * "_probability")
 solutionTracking(params, prefix * "_solution")
@@ -19,9 +19,23 @@ drawTVSchedule(data, sol, prefix * "_TVschedule")
 drawRadioSchedule(data, sol, prefix * "_Radioschedule")
 writeParameters("output/" * prefix * "_parameters", params)
 
+drawHeatmap(sol.I_cap, sol.H_cap, data, sol, prefix * "_heatmap")
 
+writeSolution("output/" * prefix * "_Solution.txt", data, sol)
 
+for p = 1:data.P 
+    for t = data.start:data.stop
+        if fits(data, sol, t, p)
+            println("FITS")
+            println(deltaInsert(data, sol, t, p))
+            println("t: ", t)
+            println("p: ", p)
+            insert!(data,sol,t,p)
+        end
+    end
+end
 
+drawRadioSchedule(data, sol, "test")
 
 checkSolution(data, sol)
 

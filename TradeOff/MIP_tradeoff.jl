@@ -3,7 +3,7 @@ using JuMP, Gurobi
 
 genv = Gurobi.Env()
 
-function MIPExtended(data, log=1, time_limit=60, gap=0.05, spreading=0, X=100000)
+function MIPTradeoff(data, log=1, time_limit=60, gap=0.05, spreading=0, X=100000)
 
     model = Model(optimizer_with_attributes(() -> Gurobi.Optimizer(genv)))
     
