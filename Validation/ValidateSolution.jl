@@ -45,7 +45,7 @@ function checkSolution(data, sol)
     end
     
     if exceeded == false
-        println("--- Solution is valid! ---")
+        # println("--- Solution is valid! ---")
     end 
     return exceeded #used_inv, used_prod 
 end
