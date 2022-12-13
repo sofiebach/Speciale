@@ -4,11 +4,20 @@ include("Validation/PlotSolution.jl")
 include("Validation/ValidateSolution.jl")
 include("MIPModels.jl")
 
-data = readInstance("dataset/100_0_0.txt")
+data = readInstance("dataset/25_0_0.txt")
 sol = randomInitial(data)
-sol, params = ALNS(data,sol,60, "extended")
 
-horizontalModelRepair!(data, sol, "extended")
+time_limit = 60*3 #Seconds
+
+prefix = "theaplot2/test25"
+sol, params = ALNS(data, sol, time_limit, "extended")
+probabilityTracking(params, prefix * "_probability")
+solutionTracking(params, prefix * "_solution")
+solutionTracking_all(params, prefix * "_solution_all")
+temperatureTracking(params, prefix * "_temp")
+drawTVSchedule(data, sol, prefix * "_TVschedule")
+drawRadioSchedule(data, sol, prefix * "_Radioschedule")
+writeParameters("output/" * prefix * "_parameters", params)
 
 
 
@@ -50,19 +59,7 @@ end
 
 
 
-sol = randomInitial(data)
 
-time_limit = 60*3 #Seconds
-
-prefix = "theaplot2/test100"
-sol, params = ALNS(data, sol, time_limit, "extended")
-probabilityTracking(params, prefix * "_probability")
-solutionTracking(params, prefix * "_solution")
-solutionTracking_all(params, prefix * "_solution_all")
-temperatureTracking(params, prefix * "_temp")
-drawTVSchedule(data, sol, prefix * "_TVschedule")
-drawRadioSchedule(data, sol, prefix * "_Radioschedule")
-writeParameters("output/" * prefix * "_parameters", params)
 
 
 filename = "_performancetable.txt"
