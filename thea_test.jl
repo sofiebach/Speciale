@@ -6,11 +6,13 @@ include("MIPModels.jl")
 
 data = readInstance("dataset/100_0_0.txt")
 sol = randomInitial(data)
-
-
 sol, params = ALNS(data,sol,60, "extended")
 
-horizontalModelRepair(data, sol, "extended")
+horizontalModelRepair!(data, sol, "extended")
+
+
+
+
 
 checkSolution(data, sol)
 
