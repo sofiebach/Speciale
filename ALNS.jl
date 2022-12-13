@@ -20,7 +20,7 @@ end
 
 
 
-function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.05,alpha=0.99975,W=[10,5,1],gamma=0.9,destroy_frac=0.4,segment_size=10,long_term_update=0.05)    
+function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.5,alpha=0.99975,W=[10,5,1],gamma=0.9,destroy_frac=0.4,segment_size=10,long_term_update=0.05)    
     it = 1
     best_sol = deepcopy(sol)
     temp_sol = deepcopy(sol)
@@ -121,7 +121,7 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.05,a
         # Choose destroy method
         selected_destroy = selectMethod(prob_destroy)
         destroy_time = time_ns()
-        println(destroy_functions[selected_destroy])
+        # println(destroy_functions[selected_destroy])
         destroy_functions[selected_destroy](data, temp_sol, destroy_frac)
         elapsed_destroy = elapsedTime(destroy_time)
 
@@ -132,7 +132,7 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.05,a
         # Choose repair method
         selected_repair = selectMethod(prob_repair)
         repair_time = time_ns()
-        println(repair_functions[selected_repair])
+        # println(repair_functions[selected_repair])
         repair_functions[selected_repair](data, temp_sol, type)
         elapsed_repair = elapsedTime(repair_time)
 
