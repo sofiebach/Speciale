@@ -8,7 +8,7 @@ n = 2
 
 filenames = joinpath.("dataset/train/", readdir("dataset/train/"))
 outFile = open("TradeOff/results/trade-off" * string(filenames[n][15:21]), "w")
-for f in filenames[n]
+for f in [filenames[n]]
     data = readInstance(f)
 
     logging = 1
