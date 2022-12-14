@@ -59,8 +59,8 @@ function drawTVSchedule(data, sol, filename)
     num_BC = length(BC)
     for bc = 1:num_BC
         ends = ones(1)
-        for t = 1:data.T
-            for p in BC[bc]
+        for p in BC[bc]
+            for t = 1:data.T
                 if sol.x[t,p] != 0
                     priority = data.P_names
                     for n = 1:sol.x[t,p]
@@ -119,8 +119,8 @@ function drawTVSchedule(data, sol, filename)
         Luxor.rect(0,(c-0.5)*scalar,(data.T+w)*scalar,5, :fill)
         text(string(unique_BC_names[bc]), Point((0.5)*scalar,(c+0.5) * scalar), halign=:left)
         ends = ones(1)
-        for t = 1:data.T
-            for p in BC[bc]
+        for p in BC[bc]
+            for t = 1:data.T
                 if sol.x[t,p] != 0
                     priority = data.P_names[p]
                     for n = 1:sol.x[t,p]
@@ -199,8 +199,8 @@ function drawRadioSchedule(data, sol, filename)
     num_BC = length(BC)
     for bc = 1:num_BC
         ends = ones(1)
-        for t = 1:data.T
-            for p in BC[bc]
+        for p in BC[bc]
+            for t = 1:data.T
                 if sol.x[t,p] != 0
                     priority = data.P_names
                     for n = 1:sol.x[t,p]
@@ -259,8 +259,8 @@ function drawRadioSchedule(data, sol, filename)
         Luxor.rect(0,(c-0.5)*scalar,(data.T+w)*scalar,5, :fill)
         text(string(unique_BC_names[bc]), Point((0.5)*scalar,(c+0.5) * scalar), halign=:left)
         ends = ones(1)
-        for t = 1:data.T
-            for p in BC[bc]
+        for p in BC[bc]    
+            for t = 1:data.T
                 if sol.x[t,p] != 0
                     priority = data.P_names[p]
                     for n = 1:sol.x[t,p]
@@ -490,3 +490,130 @@ function probabilityTracking(params, filename)
     py"progDR"(params, filename)
 end
 
+
+
+
+data = readInstance("dataset/train/25_0_0.txt")
+sol = randomInitial(data)
+filename = "hej"
+
+
+function newdrawTVSchedule(data, sol, filename)
+    p_tv = findall(x -> x == "TV", data.campaign_type)
+    unique_BC_names = unique(data.BC_names[p_tv])
+
+    BC = []
+    for bc in unique_BC_names
+        priorities = []
+        for i in p_tv
+            if data.BC_names[i] == bc
+                push!(priorities, i)
+            end
+        end
+        push!(BC, priorities)
+    end
+
+    unique_P_names = unique(data.P_names)
+    num_P_names = length(unique_P_names)
+    
+    # width of box
+    w = data.L_upper - data.L_lower + 1
+    c = 2
+    row_start = 2
+    height = 0
+
+    num_BC = length(BC)
+
+
+    scalar = 100
+    h = 0.8
+    height = 50
+    col = distinguishable_colors(length(unique_P_names)+1)[2:(length(unique_P_names)+1)]
+
+    Drawing((data.T+w)*scalar, height*scalar, "output/" * filename * ".png")
+    background("white") # color of background
+    origin() 
+
+    translate(-(data.T+w)*scalar/2, -height*scalar/2)
+
+    fontsize(70)
+    sethue("black")
+    offset = 2 
+    
+    for t = 1:data.stop+w
+        time = t-data.start+1
+        #rect((t-1) * scalar,(c-1) * scalar ,1,(height) * scalar, :fill)
+        if time > 0
+            text(string(time), Point((offset + t)*scalar,1 * scalar), halign=:center)
+        end
+    end
+
+    c = 2
+    row_start = 2
+    fontsize(80)
+    tal = 1
+    for bc = 1:num_BC
+        sethue("black")
+        setopacity(1)
+        Luxor.rect(0,(c-0.5)*scalar,(data.T+w)*scalar,5, :fill)
+        text(string(unique_BC_names[bc]), Point((0.5)*scalar,(c+0.5) * scalar), halign=:left)
+        ends = ones(1)
+        for p in BC[bc]
+            for t = 1:data.T
+                if sol.x[t,p] != 0
+                    priority = data.P_names[p]
+                    for n = 1:sol.x[t,p]
+                        isPlaced = false
+                        len_ends = length(ends)
+                        for e = 1:len_ends
+                            if (t+data.L_lower) >= ends[e]
+                                for prio = 1:num_P_names
+                                    if data.P_names[p] == unique_P_names[prio]
+                                        setcolor(col[prio])
+                                    end
+                                end
+                                setopacity(0.5)
+                                Luxor.rect((offset+t+data.L_lower)*scalar, (row_start+e-1)*scalar, w*scalar, h*scalar,:fill)
+                                sethue("black")
+                                setopacity(0.8)
+                                text(string(-, tal, priority), Point((offset+t+data.L_lower+w/2)*scalar, (0.1 + row_start+e-1)*scalar),valign =:top, halign=:center)
+                                setopacity(1)
+                                tal += 1
+                                Luxor.rect((offset+t+data.L_lower)*scalar, (row_start+e-1)*scalar, w*scalar, h*scalar,:stroke)
+                                ends[e] = t + w + data.L_lower
+                                isPlaced = true
+                                break
+                            end
+                        end
+                        if isPlaced == false
+                            c += 1
+                            for prio = 1:num_P_names
+                                if data.P_names[p] == unique_P_names[prio]
+                                    setcolor(col[prio])
+                                end
+                            end
+                            setopacity(0.5)
+                            Luxor.rect((offset+t+data.L_lower)*scalar, c*scalar, w*scalar, h*scalar,:fill)
+                            sethue("black")
+                            setopacity(0.8)
+                            text(string(+, tal, priority), Point((offset+t+data.L_lower+w/2)*scalar, (0.1+c)*scalar), valign =:top, halign=:center)
+                            setopacity(1)
+                            tal += 1
+                            Luxor.rect((offset+t+data.L_lower)*scalar, c*scalar, w*scalar, h*scalar,:stroke)
+                            append!(ends,(t+w+data.L_lower))
+                        end
+                    end
+                end
+            end
+            ends = ones(1)
+            c += 1
+            row_start = c
+            
+        end
+        c = c+2    
+        row_start = row_start + length(ends) + 1
+    end
+
+    finish()
+    preview()
+end

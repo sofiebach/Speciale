@@ -4,10 +4,36 @@ include("Validation/PlotSolution.jl")
 include("Validation/ValidateSolution.jl")
 include("MIPModels.jl")
 
-data = readInstance("dataset/25_0_0.txt")
+data = readInstance("dataset/train/25_0_0.txt")
 sol = randomInitial(data)
 
+sol, params = ALNS(data, sol, 30, "extended")
+
+drawTVSchedule(data, sol, "hej")
+
+x = MIPExtended(data, "Gurobi", 1, 10*60)
+
+sol = randomInitial(data)
+
+randomDestroy!(data, sol, 0.4)
+println(sol.exp_obj)
+horizontalModelRepair!(data,sol,"extended")
+println(sol.exp_obj)
+
+
+regretRepair!(data,sol,"extended")
+
+
+
 time_limit = 60*2 #Seconds
+
+
+
+
+x1 = MIPExtended(data, "Gurobi", 1, time_limit) 
+
+sol1 = MIPtoSol(data,x)
+sol2 = MIPtoSol(data, x1)
 
 prefix = "theaplot2/Onlybest_25"
 sol, params = ALNS(data, sol, time_limit, "extended")
