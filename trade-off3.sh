@@ -3,7 +3,7 @@
 ### -- specify queue --
 #BSUB -q hpc
 ### -- set the job Name --
-#BSUB -J trade-off
+#BSUB -J trade-off3
 ### -- ask for number of cores (default: 1) --
 #BSUB -n 4
 ### -- specify that the cores must be on the same host --
@@ -15,7 +15,7 @@
 ### -- set walltime limit: hh:mm --
 #BSUB -W 24:00
 ### -- set the email address --
-##BSUB -u s174500@student.dtu.dk
+##BSUB -u s161996student.dtu.dk
 ### -- send notification at start --
 #BSUB -B
 ### -- send notification at completion --
