@@ -1,18 +1,27 @@
 using Plots
 using PyCall
 
-gap = 0.02
-f = open("results/trade-off")
-readline(f) # X
-X = parse.(Float64,split(readline(f)))
-readline(f) # blank
-readline(f) # Y
-Y = parse.(Float64,split(readline(f)))
-close(f)
-Y_gap = -(gap .* abs.(Y) .- Y)
-filename = "test"
+filenames = joinpath.("dataset/train/", readdir("dataset/train/"))
+f = open("TradeOff/results/trade-off2")
 
-#plot(X,[Y, Y_gap])
+
+X = []
+Y = []
+
+for _ in filenames
+    readline(f) # X
+    x = parse.(Float64,split(readline(f)))
+    push!(X, x)
+    readline(f) # blank
+    readline(f) # Y
+    y = parse.(Float64,split(readline(f)))
+    push!(Y, y)
+    readline(f) # blank
+end
+close(f)
+
+# gap = 0.1
+# Y_gap = -(gap .* abs.(Y) .- Y)
 
 py"""
 import pandas as pd
@@ -23,30 +32,20 @@ from matplotlib import ticker
 
 def tradeoffIllustration(X, Y, Y_gap, filename):
     
-    # plt.plot(X, Y, 'bo', markersize = 4)
-    # plt.plot(X, Y_gap, 'yo', markersize = 4)
-    #background = plt.imread("background.png")
-    fig, ax = plt.subplots()
-    #implot = plt.imshow(background)
-    #ax.imshow(background)
-    ax.plot(X, Y, '-', color='tab:blue')
-    ax.plot(X, Y_gap, '--', linewidth=0.5, color='tab:blue')
-    ax.fill_between(X, Y, Y_gap, alpha=0.2)
-    #y_min = min(Y) * 1.1
-    #y_max = max(Y) * 1.1
-    #x_min = min(X)
-    #x_max = max(X)
-    #ax.set_ylim([y_min, y_max])
-    #ax.axhspan(y_min, (y_max+y_min)/2, 0, 0.5, facecolor='green', alpha=0.2)
-    #ax.axhspan(y_min, (y_max+y_min)/2, 0.5, 1, facecolor='orange', alpha=0.2)
-    #ax.axhspan((y_max+y_min)/2, y_max, 0, 0.5, facecolor='orange', alpha=0.2)
-    #ax.axhspan((y_max+y_min)/2, y_max, 0.5, 1, facecolor='red', alpha=0.2)
     
+    fig, ax = plt.subplots()
+
+    for i in range(len(X)):
+        ax.plot(X[i], Y[i], '--', linewidth=1, color="black")
+        ax.plot(X[i], Y[i], '.', markersize=10, color='tab:blue')
+        # ax.plot(X, Y_gap, '--', linewidth=0.5, color='tab:blue')
+        # ax.fill_between(X, Y, Y_gap, alpha=0.2)
+        
     plt.title("Minizing spreading term, fixed campaign term")
     plt.xlabel("Campaign term")
     plt.ylabel("Spreading term")
-    plt.savefig("output/" + filename + ".png")
-    
+    plt.savefig("TradeOff/results/" + filename + ".png")
+        
     #plt.show()
 
 """
