@@ -18,19 +18,19 @@ time_limit = data.timeperiod * 60
 
 # Input solutions
 empty_sol = Sol(data)
-global good_obj = Inf
-global good_sol = 0
-global bad_obj = -Inf
-global bad_sol = 0
+good_obj = Inf
+good_sol = 0
+bad_obj = -Inf
+bad_sol = 0
 for n = 1:100
     temp_sol = randomInitial(data)
     if temp_sol.exp_obj < good_obj 
-        good_obj = temp_sol.exp_obj
-        good_sol = deepcopy(temp_sol)
+        global good_obj = temp_sol.exp_obj
+        global good_sol = deepcopy(temp_sol)
     end 
     if temp_sol.exp_obj > bad_obj 
-        bad_obj = temp_sol.exp_obj
-        bad_sol = deepcopy(temp_sol)
+        global bad_obj = temp_sol.exp_obj
+        global bad_sol = deepcopy(temp_sol)
     end
 end
 
