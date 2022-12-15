@@ -1,6 +1,6 @@
 include("ReadWrite.jl")
 
-idx = ENV["LSB_JOBINDEX"]
+idx = parse(Int64, ENV["LSB_JOBINDEX"])
 
 filename = joinpath.("dataset/train/", readdir("dataset/train/"))[idx]
 outFile = open("test/" * string(filename[15:21]), "w")
