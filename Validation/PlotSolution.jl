@@ -240,11 +240,11 @@ function drawTVSchedule(data, sol, filename)
     scalar = 100
     h = 0.8
     offset = 5 
+    height = 0
 
     # Initialize height of plot
     c = 2
     row_start = 2
-    fontsize(80)
     for bc = 1:num_BC
         ends = ones(1)
         for p in BC[bc]
@@ -415,11 +415,11 @@ function drawRadioSchedule(data, sol, filename)
     scalar = 100
     h = 0.8
     offset = 5 
+    height = 0 
 
     # Initialize height of plot
     c = 2
     row_start = 2
-    fontsize(80)
     for bc = 1:num_BC
         ends = ones(1)
         for p in BC[bc]
