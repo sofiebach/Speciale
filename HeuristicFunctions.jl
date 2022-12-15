@@ -29,7 +29,9 @@ end
 
 function verticalDestroy!(data, sol, frac)
     n_destroy = ceil(sol.num_campaigns*frac)
-    n = rand(1:sol.num_campaigns)
+    if sol.num_campaigns != 0
+        n = rand(1:sol.num_campaigns)
+    end
     while n_destroy > 0 
         if n > sol.num_campaigns
             n = 1

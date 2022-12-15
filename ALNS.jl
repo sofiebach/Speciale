@@ -1,6 +1,7 @@
 include("HeuristicFunctions.jl")
 include("ConstructionHeuristics.jl")
 include("MIPModels.jl")
+include("Validation/ValidateSolution.jl")
 
 function setProb(rho)
     return rho./sum(rho)
