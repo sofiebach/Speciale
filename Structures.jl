@@ -61,7 +61,12 @@ mutable struct Objective
     g_penalty::Float64
     L_reward::Float64
     y_penalty::Float64
-    Objective() = new(0.0, 0.0, 0.0, 0.0)
+    Objective(data, k, g, L, y) = new(
+        sum(data.penalty_S[p]*k[p] for p = 1:data.P), 
+        sum(data.penalty_g[p] * g[t,p] for t=1:data.T, p=1:data.P), 
+        sum(data.weight_idle[p] * L[p] for p=1:data.P), 
+        sum(data.weight_idle[p] * y[p] for p=1:data.P)
+        )
 end
 
 mutable struct Sol
@@ -81,9 +86,21 @@ mutable struct Sol
     C::Int64
     I_cap::Array{Float64,2}
     H_cap::Array{Float64,2}
-    Sol(data) = new(0.0, 0.0, Objective(), 0,
-    zeros(Int64,data.T,data.P), zeros(Float64,data.T,data.M), deepcopy(data.S), 
-    zeros(Int64, data.P), zeros(Int64, data.T, data.P), zeros(Float64, data.P),
-    data.P, data.T, data.M, data.C, 
-    deepcopy(data.I), deepcopy(data.H))
+    Sol(data) = new(
+        sum(data.penalty_S[p]*deepcopy(data.S)[p] for p = 1:data.P), 
+        sum(data.penalty_S[p]*deepcopy(data.S)[p] for p = 1:data.P)+sum(data.penalty_g[p] * zeros(Int64, data.T, data.P)[t,p] for t=1:data.T, p=1:data.P)-sum(data.weight_idle[p] * zeros(Int64, data.P)[p] for p=1:data.P)+sum(data.weight_idle[p] * zeros(Float64, data.P)[p] for p=1:data.P), 
+        Objective(data,deepcopy(data.S),zeros(Int64, data.T, data.P),zeros(Int64, data.P),zeros(Float64, data.P)), 
+        0,
+        zeros(Int64,data.T,data.P), 
+        zeros(Float64,data.T,data.M), 
+        deepcopy(data.S), 
+        zeros(Int64, data.P), 
+        zeros(Int64, data.T, data.P), 
+        zeros(Float64, data.P),
+        data.P, 
+        data.T, 
+        data.M, 
+        data.C, 
+        deepcopy(data.I), 
+        deepcopy(data.H))
 end
