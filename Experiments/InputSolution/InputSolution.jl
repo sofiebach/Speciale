@@ -14,13 +14,14 @@ type = "extended"
 modelRepair = false
 N = 5
 time_limit = data.timeperiod * 60
+# time_limit = 10
 
 # Input solutions
 empty_sol = Sol(data)
-good_obj = deepcopy(empty_sol.exp_obj) 
-good_sol = 0
-bad_obj = -deepcopy(empty_sol.exp_obj)
-bad_sol = 0
+global good_obj = Inf
+global good_sol = 0
+global bad_obj = -Inf
+global bad_sol = 0
 for n = 1:100
     temp_sol = randomInitial(data)
     if temp_sol.exp_obj < good_obj 
