@@ -180,9 +180,7 @@ function horizontalModelRepair!(data, sol, type)
             end
         end
     end
-    println(sol.exp_obj)
     bestRepair!(data, sol, "extended")
-    println(sol.exp_obj)
 end
 
 function modelRepair!(data, sol, type)
@@ -378,9 +376,7 @@ function regretRepair!(data, sol, type)
             break
         end
     end
-    println(sol.exp_obj)
     bestRepair!(data, sol, type)
-    println(sol.exp_obj)
 end
 
 function regretInsertion(data, sol, priorities, type)
