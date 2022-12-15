@@ -565,3 +565,62 @@ function drawRadioSchedule(data, sol, filename)
     finish()
     preview()
 end
+
+function plotWparams(params, filename)
+    py"""
+    import matplotlib.pyplot as plt
+    import numpy as np
+    def wPlot(params, filename):
+        # Repair plot
+        labels = params.repair_names
+        best = params.w_repair[:,0]
+        improving = params.w_repair[:,1]
+        accepted = params.w_repair[:,2]
+        x = np.arange(len(labels))  # the label locations
+        width = 0.2  # the width of the bars
+        fig, ax = plt.subplots()
+        rects1 = ax.bar(x - width, best, width, label='Best')
+        rects2 = ax.bar(x, improving, width, label='Improving')
+        rects3 = ax.bar(x + width, accepted, width, label='Accepted')
+        ax.set_ylabel('Scores')
+        ax.set_title('Scores of repair methods')
+        ax.set_xticks(x, labels)
+        plt.xticks(rotation=45)
+        ax.legend()
+        ax.bar_label(rects1, padding=3)
+        ax.bar_label(rects2, padding=3)
+        ax.bar_label(rects3, padding=3)
+        fig.tight_layout()
+        plt.savefig("output/" + filename + "_barRepair.png")
+        #plt.show()
+        plt.close
+
+        # Destroy plot
+        labels = params.destroy_names
+        best = params.w_destroy[:,0]
+        improving = params.w_destroy[:,1]
+        accepted = params.w_destroy[:,2]
+        x = np.arange(len(labels))  # the label locations
+        width = 0.2  # the width of the bars
+        fig, ax = plt.subplots()
+        rects1 = ax.bar(x - width, best, width, label='Best')
+        rects2 = ax.bar(x, improving, width, label='Improving')
+        rects3 = ax.bar(x + width, accepted, width, label='Accepted')
+        ax.set_ylabel('Scores')
+        ax.set_title('Scores of repair methods')
+        ax.set_xticks(x, labels)
+        plt.xticks(rotation=45)
+        ax.legend()
+        ax.bar_label(rects1, padding=3)
+        ax.bar_label(rects2, padding=3)
+        ax.bar_label(rects3, padding=3)
+        fig.tight_layout()
+        plt.savefig("output/" + filename + "_barDestroy.png")
+        #plt.show()
+        plt.close
+    """
+    py"wPlot"(params, filename)
+end
+
+
+
