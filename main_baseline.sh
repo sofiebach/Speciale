@@ -31,4 +31,4 @@ module load gurobi/9.5.2
 module load julia/1.7.0
 
 # here follow the commands you want to execute
-julia-current main_baseline_test.jl &> results_test.txt
+julia-current main_baseline_test.jl &> results_test_baseline.txt
