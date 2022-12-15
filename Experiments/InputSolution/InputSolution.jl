@@ -2,8 +2,8 @@ include("../../ALNS.jl")
 include("../../ReadWrite.jl")
 include("../../ConstructionHeuristics.jl")
 
-#idx = parse(Int64, ENV["LSB_JOBINDEX"])
-idx = 1
+idx = parse(Int64, ENV["LSB_JOBINDEX"])
+# idx = 1
 
 filepath = joinpath.("dataset/train/", readdir("dataset/train/"))[idx]
 filename = split(split(filepath, ".")[1],"/")[3]
