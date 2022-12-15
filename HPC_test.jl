@@ -1,0 +1,10 @@
+include("ReadWrite.jl")
+
+idx = Int64(ENV["LSB_JOBINDEX"])
+
+filename = joinpath.("dataset/train/", readdir("dataset/train/"))[idx]
+outFile = open("test/" * string(filenames[idx][15:21]), "w")
+data = readInstance(filename)
+write(outFile, "Scope\n")
+write(outFile, join(data.S," ")*"\n\n")
+close(outFile)
