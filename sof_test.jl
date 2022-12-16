@@ -9,7 +9,7 @@ data = readInstance("dataset/train/25_0_0.txt")
 sol = randomInitial(data)
 sol, params = ALNS(data,sol,60,"extended",false)
 
-plotWparams(params, "test")
+drawTVSchedule(data, sol, "test")
 
 
 
