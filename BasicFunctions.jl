@@ -262,13 +262,12 @@ function MIPtoSol(data, x)
 end
 
 function findObjective!(data, sol)
-    sol.objective.k_penalty = sum(data.penalty_S[p] * sol.k[p] for p = 1:data.P)                # Penalty for not fulfilled Scope
-    sol.objective.g_penalty = sum(data.penalty_g[p] * sol.g[t,p] for t=1:data.T, p=1:data.P)    # Penalty for stacking
-    sol.objective.L_reward = sum(data.weight_idle[p] * sol.L[p] for p=1:data.P)                 # Reward for spreading
-    sol.objective.y_penalty = sum(data.weight_idle[p] * sol.y[p] for p=1:data.P)                # Penalty for spreading too much
+    sol.objective.k_penalty = sum(data.penalty_S[p] * sol.k[p] for p = 1:data.P)                    # Penalty for not fulfilled Scope
+    sol.objective.g_penalty = sum(data.penalty_g[p] * sol.g[t,p] for t=1:data.T, p=1:data.P)        # Penalty for stacking
+    sol.objective.L_penalty = sum(data.weight_idle[p] * (-sol.L[p]+sol.y[p]) + 1 for p=1:data.P)    # Penalty for no spreading
 
     sol.base_obj =  sol.objective.k_penalty
-    sol.exp_obj =  sol.objective.k_penalty + sol.objective.g_penalty - sol.objective.L_reward + sol.objective.y_penalty
+    sol.exp_obj =  sol.objective.k_penalty + sol.objective.g_penalty + sol.objective.L_penalty
 end
 
 function deltaCompareRegret(data, sol, t1, t2, p)

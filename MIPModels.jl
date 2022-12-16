@@ -104,10 +104,9 @@ function MIPExtended(data, solver, log=1, time_limit=60, solution_limit=0, destr
     epsilon = 0.5
 
     @objective(model, Min, 
-        sum(data.penalty_S[p]*k[p] for p = 1:data.P) +               # Penalty for not fulfilled Scope
-        sum(data.penalty_g[p] * g[t,p] for t=1:data.T, p=1:data.P) - # Penalty for stacking
-        sum(data.weight_idle[p] * L[p] for p=1:data.P) +             # Reward for spreading
-        sum(data.weight_idle[p] * y[p] for p=1:data.P)               # Penalty for spreading too much
+        sum(data.penalty_S[p] * k[p] for p = 1:data.P) +                # Penalty for not fulfilled Scope
+        sum(data.penalty_g[p] * g[t,p] for t=1:data.T, p=1:data.P) +    # Penalty for stacking
+        sum(data.weight_idle[p] * (-L[p]+y[p]) + 1 for p=1:data.P)      # Penalty for no spreading
     )
 
     # Nothing can be planned before start and after stop
