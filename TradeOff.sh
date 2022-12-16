@@ -3,7 +3,9 @@
 ### -- specify queue --
 #BSUB -q hpc
 ### -- set the job Name --
-#BSUB -J trade-off2
+#BSUB -J tester
+### -- set the job Name AND the job array --
+#BSUB -J My_array[1-6]
 ### -- ask for number of cores (default: 1) --
 #BSUB -n 4
 ### -- specify that the cores must be on the same host --
@@ -13,9 +15,9 @@
 ### -- specify that we want the job to get killed if it exceeds 3 GB per core/slot --
 #BSUB -M 3GB
 ### -- set walltime limit: hh:mm --
-#BSUB -W 24:00
+#BSUB -W 48:00
 ### -- set the email address --
-##BSUB -u s161996student.dtu.dk
+##BSUB -u s174500student.dtu.dk
 ### -- send notification at start --
 #BSUB -B
 ### -- send notification at completion --
@@ -29,4 +31,4 @@ module load gurobi/9.5.2
 module load julia/1.7.0
 
 # here follow the commands you want to execute
-julia-current TradeOff/generate_tradeoff2.jl &> results_test.txt
+julia-current TradeOff/generate_tradeoff.jl &> results_TradeOff.txt

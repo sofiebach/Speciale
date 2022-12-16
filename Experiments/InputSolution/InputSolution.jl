@@ -49,7 +49,7 @@ end
 avg_obj = mean(objs, dims=2)
 stds = std(objs, dims=2)
 
-outFile = open("Experiments/InputSolution/" * filename * "_results", "w")
+outFile = open("Experiments/InputSolution/results/" * filename, "w")
 write(outFile, "empty \t bad \t good \n")
 write(outFile, "average objectives\n")
 write(outFile, join(avg_obj," ")*"\n\n")
