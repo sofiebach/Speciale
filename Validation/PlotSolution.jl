@@ -33,11 +33,15 @@ function print_solution(sol)
     println("Total number of campaigns: ", sum(sol.x))
 end
 
-function drawHeatmap(inventory_used, staff_used, data, sol, filename)       
+function drawHeatmap(data, sol, filename)       
       
     staff_incl_freelancer = data.H + sol.f 
-    used_cap_inv = inventory_used ./data.I
-    used_cap_prod = staff_used ./staff_incl_freelancer
+    # used_cap_inv = inventory_used ./ data.I
+    used_cap_inv = (data.I .- sol.I_cap) ./ data.I
+    # used_cap_prod = staff_used ./staff_incl_freelancer
+    used = deepcopy(sol.H_cap)
+    used[used .< 0.0] .= 0.0
+    used_cap_prod = (staff_incl_freelancer .- used) ./ staff_incl_freelancer
 
     pd = pyimport("pandas")
     plt = pyimport("matplotlib.pyplot")
@@ -74,8 +78,6 @@ function drawHeatmap(inventory_used, staff_used, data, sol, filename)
         ax1.set_xlabel("Time (weeks)")
         ax1.title.set_text('Production hours')
         ax1.set_xlim([0, len(used_inv)])
-        
-        
 
         p2 = sns.heatmap(df2, linewidths=.5, ax = ax2, vmin=0, vmax=max_total, cbar_ax = cbar_ax, cmap = 'viridis') 
         ax2.xaxis.set_ticks(np.arange(0,len(used_inv),5))
@@ -209,14 +211,6 @@ function probabilityTracking(params, filename)
     """
     py"progDR"(params, filename)
 end
-
-
-
-
-data = readInstance("dataset/train/25_0_0.txt")
-sol = randomInitial(data)
-filename = "hej"
-
 
 function drawTVSchedule(data, sol, filename)
     p_tv = findall(x -> x == "TV", data.campaign_type)

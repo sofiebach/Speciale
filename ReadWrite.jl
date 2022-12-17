@@ -293,7 +293,7 @@ function writeSolution(filename, data, sol)
     write(outFile, join(sol.exp_obj," ")*"\n\n")
 
     write(outFile, "Objective struct\n")
-    write(outFile, join([sol.objective.k_penalty, sol.objective.g_penalty, sol.objective.L_reward]," ")*"\n\n")
+    write(outFile, join([sol.objective.k_penalty, sol.objective.g_penalty, sol.objective.L_penalty]," ")*"\n\n")
 
     write(outFile, "num campaigns\n")
     write(outFile, join(sol.num_campaigns," ")*"\n\n")
@@ -354,7 +354,7 @@ function readSolution(filename, data)
     sol.exp_obj = parse.(Float64, readline(f))
     readline(f) # blank
     readline(f) # Objective struct
-    sol.objective.k_penalty, sol.objective.g_penalty, sol.objective.L_reward = parse.(Float64,split(readline(f)))
+    sol.objective.k_penalty, sol.objective.g_penalty, sol.objective.L_penalty = parse.(Float64,split(readline(f)))
     readline(f) # blank
     readline(f) # num campaigns
     sol.num_campaigns = parse.(Int64, readline(f))

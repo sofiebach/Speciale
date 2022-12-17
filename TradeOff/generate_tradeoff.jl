@@ -34,7 +34,7 @@ gap = 0.2
 for i = 1:N
     x2 = MIPTradeoff(data, logging, time_limit, gap, spreading, X[i])
     sol2 = MIPtoSol(data, x2)
-    Y[i] = sol2.objective.g_penalty - sol2.objective.L_reward + sol2.objective.y_penalty
+    Y[i] = sol2.objective.g_penalty - sol2.objective.L_penalty
 end
 outFile = open("TradeOff/results/"*filename, "w")
 write(outFile, "X\n")

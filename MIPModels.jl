@@ -50,6 +50,9 @@ function MIPBaseline(data, solver, log=1, time_limit=60, gap=0)
     # Scope constraint
     @constraint(model, [p=1:data.P], sum(x[t,p] for t = data.start:data.stop) >= data.S[p] - k[p])
 
+    # Do not plan more than in scope
+    @constraint(model, [p=1:data.P], sum(x[t,p] for t = data.start:data.stop) <= data.S[p])
+
     JuMP.optimize!(model)
 
     if primal_status(model) != FEASIBLE_POINT
