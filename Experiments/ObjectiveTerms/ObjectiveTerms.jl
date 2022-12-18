@@ -6,14 +6,14 @@ include("../../BasicFunctions.jl")
 
 
 filepath = joinpath.("dataset/train/", readdir("dataset/train/"))
-file = filepath[3]
+file = filepath[1]
 filename = split(split(file, ".")[1],"/")[3]
 
 data = readInstance(file)
 data.I = 10000*ones(data.T, data.C)
 data.H = 10000*ones(data.T, data.M)
 
-mins = 2
+mins = 60
 
 folder = "Experiments/ObjectiveTerms/results/"
 
