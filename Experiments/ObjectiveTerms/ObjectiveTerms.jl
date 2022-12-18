@@ -1,7 +1,6 @@
 include("../../ReadWrite.jl")
 include("MIP_Terms.jl")
 include("../../MIPModels.jl")
-include("../../Validation/PlotSolution.jl")
 include("../../BasicFunctions.jl")
 
 
