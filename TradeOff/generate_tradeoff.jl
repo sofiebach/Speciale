@@ -13,7 +13,7 @@ data = readInstance(filepath)
 
 logging = 1
 time_limit = 0
-gap = 0.1
+gap = 0.05
 spreading = 0
 
 # Find maximum objective for campaigns
@@ -30,7 +30,7 @@ N = 10
 X = LinRange(sol_min.base_obj, sol_max.base_obj, N)
 Y = zeros(Float64, N)
 spreading = 1
-gap = 0.2
+gap = 0.05
 for i = 1:N
     x2 = MIPTradeoff(data, logging, time_limit, gap, spreading, X[i])
     sol2 = MIPtoSol(data, x2)
