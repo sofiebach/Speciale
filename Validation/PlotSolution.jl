@@ -90,7 +90,7 @@ function drawHeatmap(data, sol, filename)
         
         f.tight_layout(rect=[0, 0, .9, 1])
 
-        plt.savefig("output/" + filename + ".png")
+        plt.savefig(filename + ".png")
         # plt.show()
         plt.close
     """
@@ -119,7 +119,7 @@ function solutionTracking(params, filename)
         plt.plot(params.current_best, 'k-' , markersize = 4)
         # plt.legend(["Rejected", "Accepted", "New best"])
         plt.legend(["Accepted", "New best"])
-        plt.savefig("output/" + filename + ".png")
+        plt.savefig(filename + ".png")
         # plt.show()
         plt.close
     """
@@ -146,7 +146,7 @@ function solutionTracking_all(params, filename)
         plt.plot(params.current_best, 'k-' , markersize = 4)
         #plt.legend(["Rejected", "Accepted", "New best"])
         plt.legend(["Accepted", "New best"])
-        plt.savefig("output/" + filename + ".png")
+        plt.savefig(filename + ".png")
         # plt.show()
         plt.close
     """
@@ -168,7 +168,7 @@ function temperatureTracking(params, filename)
     def tempPlot(params, filename):
         plt.figure()
         plt.plot(params.T_it)
-        plt.savefig("output/" + filename + ".png")
+        plt.savefig(filename + ".png")
         # plt.show()
         plt.close
     """
@@ -205,7 +205,7 @@ function probabilityTracking(params, filename)
             ax2.title.set_text('Repair')
             ax2.set_ylim(0,1)
             i += 1
-        plt.savefig("output/" + filename + ".png")
+        plt.savefig(filename + ".png")
         # plt.show()
         plt.close
     """
@@ -283,7 +283,7 @@ function drawTVSchedule(data, sol, filename)
     width = data.T+offset + 2
     col = distinguishable_colors(length(unique_P_names)+1)[2:(length(unique_P_names)+1)]
 
-    Drawing(width*scalar, height*scalar, "output/" * filename * ".png")
+    Drawing(width*scalar, height*scalar, filename * ".png")
     background("white") # color of background
     origin() 
 
@@ -458,7 +458,7 @@ function drawRadioSchedule(data, sol, filename)
     width = data.T+offset + 2
     col = distinguishable_colors(length(unique_P_names)+1)[2:(length(unique_P_names)+1)]
 
-    Drawing(width*scalar, height*scalar, "output/" * filename * ".png")
+    Drawing(width*scalar, height*scalar, filename * ".png")
     background("white") # color of background
     origin() 
 
@@ -585,7 +585,7 @@ function plotWparams(params, filename)
         ax.bar_label(rects2, padding=3)
         ax.bar_label(rects3, padding=3)
         fig.tight_layout()
-        plt.savefig("output/" + filename + "_barRepair.png")
+        plt.savefig(filename + "_barRepair.png")
         #plt.show()
         plt.close
 
@@ -609,7 +609,7 @@ function plotWparams(params, filename)
         ax.bar_label(rects2, padding=3)
         ax.bar_label(rects3, padding=3)
         fig.tight_layout()
-        plt.savefig("output/" + filename + "_barDestroy.png")
+        plt.savefig(filename + "_barDestroy.png")
         #plt.show()
         plt.close
     """
