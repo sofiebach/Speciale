@@ -8,6 +8,7 @@ for file in filepath
     filename = split(split(file, ".")[1],"/")[4]
     data = readInstance("dataset/train/"*filename[1:6]*".txt")
     sol = readSolution(file, data)
-    drawTVSchedule(data, sol, prefix*filename)
+    drawTVSchedule(data, sol, prefix*filename*"_TV")
+    drawRadioSchedule(data, sol, prefix*filename*"_Radio")
 end
 
