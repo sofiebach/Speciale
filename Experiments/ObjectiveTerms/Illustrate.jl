@@ -1,12 +1,13 @@
 include("../../ReadWrite.jl")
 include("../../Validation/PlotSolution.jl")
 
-filepath = joinpath.("Experiments/ObjectiveTerms/results", readdir("Experiments/ObjectiveTerms/results"))[5:8]
+filepath = joinpath.("Experiments/ObjectiveTerms/results", readdir("Experiments/ObjectiveTerms/results"))
 
 for file in filepath
     prefix = "Experiments/ObjectiveTerms/"
     filename = split(split(file, ".")[1],"/")[4]
-    data = readInstance("dataset/train/"*filename[1:6]*".txt")
+    len = length(filename) - 5
+    data = readInstance("dataset/train/"*filename[1:len]*".txt")
     sol = readSolution(file, data)
     drawTVSchedule(data, sol, prefix*filename*"_TV")
     drawRadioSchedule(data, sol, prefix*filename*"_Radio")
