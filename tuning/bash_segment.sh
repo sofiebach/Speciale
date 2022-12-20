@@ -29,5 +29,5 @@ module load gurobi/9.5.2
 module load julia/1.7.0
 
 # here follow the commands you want to execute
-julia-current segment_sizes.jl &> results_initial_segment_sizes.txt
+julia-current segment.jl &> results_initial_segment_sizes.txt
 

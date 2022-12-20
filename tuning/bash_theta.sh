@@ -29,4 +29,4 @@ module load gurobi/9.5.2
 module load julia/1.7.0
 
 # here follow the commands you want to execute
-julia-current thetas.jl &> results_initial_thetas.txt
+julia-current theta.jl &> results_initial_thetas.txt
