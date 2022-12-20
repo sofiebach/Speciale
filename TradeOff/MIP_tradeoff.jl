@@ -3,7 +3,7 @@ using JuMP, Gurobi
 
 genv = Gurobi.Env()
 
-function MIPTradeoff(data, log=1, time_limit=60, gap=0.05, spreading=0, X=100000)
+function MIPTradeoff(data, log=1, time_limit=60, gap=0.05, lambda=0.5)
 
     model = Model(optimizer_with_attributes(() -> Gurobi.Optimizer(genv)))
     
@@ -15,7 +15,8 @@ function MIPTradeoff(data, log=1, time_limit=60, gap=0.05, spreading=0, X=100000
     
     if time_limit > 0
         set_optimizer_attribute(model, "TimeLimit", time_limit)
-    elseif gap > 0
+    end
+    if gap > 0
         set_optimizer_attribute(model,"MIPGap", gap)
     end
 
@@ -32,15 +33,12 @@ function MIPTradeoff(data, log=1, time_limit=60, gap=0.05, spreading=0, X=100000
     epsilon = 0.5
 
     @objective(model, Min, 
-        (1-spreading) * 
+        lambda * 
             (sum(data.penalty_S[p]*k[p] for p = 1:data.P)) +               # Penalty for not fulfilled Scope
-        spreading * 
-            (sum(data.penalty_g[p] * g[t,p] for t=1:data.T, p=1:data.P) + # Penalty for stacking
+        (1-lambda) * 
+            (sum(data.penalty_g[p] * g[t,p] for t=1:data.T, p=1:data.P) +  # Penalty for stacking
             sum(data.weight_idle[p] * (-L[p]+y[p]) + 1 for p=1:data.P))    # Penalty for not spreading
         )
-
-    # Constraint non-spreading part
-    @constraint(model, sum(data.penalty_S[p]*k[p] for p = 1:data.P) <= X)
 
     #It is not possible to slack on Flagskib DR1 and DR2 (p=1 and p=8)
     @constraint(model, [p in data.P_bar], k[p] == 0)

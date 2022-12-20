@@ -5,9 +5,13 @@ filenames = joinpath.("TradeOff/results/", readdir("TradeOff/results/"))
 
 X = []
 Y = []
+lambdas = []
 
 for file in filenames
     f = open(file)
+    readline(f) # lambdas
+    lambdas = parse.(Float64,split(readline(f)))
+    readline(f) # blank
     readline(f) # X
     x = parse.(Float64,split(readline(f)))
     push!(X, x)

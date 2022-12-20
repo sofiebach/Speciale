@@ -1,6 +1,5 @@
 include("../ReadWrite.jl")
 include("MIP_tradeoff.jl")
-include("../MIPModels.jl")
 include("../BasicFunctions.jl")
 include("../ConstructionHeuristics.jl")
 
@@ -14,29 +13,23 @@ data = readInstance(filepath)
 logging = 1
 time_limit = 0
 gap = 0.05
-spreading = 0
-
-# Find maximum objective for campaigns
-sol_max = Sol(data)
-randomInsert!(data, sol_max, data.P_bar)
-
-# Find minimum objective for campaigns
-# x = MIPBaseline(data, "Gurobi", logging, time_limit, gap)
-x = MIPTradeoff(data, logging, time_limit, gap, spreading)
-sol_min = MIPtoSol(data, x)
 
 # Initialize points on x-axis
-N = 10
-X = LinRange(sol_min.base_obj, sol_max.base_obj, N)
+N = 11
+lambdas = LinRange(0, 1, N)
+X = zeros(Float64, N)
 Y = zeros(Float64, N)
-spreading = 1
-gap = 0.05
+
 for i = 1:N
-    x2 = MIPTradeoff(data, logging, time_limit, gap, spreading, X[i])
-    sol2 = MIPtoSol(data, x2)
-    Y[i] = sol2.objective.g_penalty - sol2.objective.L_penalty
+    lambda = lambdas[i]
+    x = MIPTradeoff(data, logging, time_limit, gap, lambda)
+    sol = MIPtoSol(data, x)
+    X[i] = sol.objective.k_penalty
+    Y[i] = sol.objective.g_penalty + sol.objective.L_penalty
 end
 outFile = open("TradeOff/results/"*filename, "w")
+write(outFile, "lambdas\n")
+write(outFile, join(lambdas," ")*"\n\n")
 write(outFile, "X\n")
 write(outFile, join(X," ")*"\n\n")
 write(outFile, "Y\n")
