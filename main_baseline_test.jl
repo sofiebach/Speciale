@@ -10,7 +10,7 @@ filename = split(split(filepath, ".")[1],"/")[3]
 data = readInstance(filepath)
 timelimit = 60*1
 
-x = MIPBaseline(data, "Gurobi", 0, timelimit)
+x, _ = MIPBaseline(data, "Gurobi", 0, timelimit)
 sol = MIPtoSol(data, x)
 
 writeSolution("output/Solution_" * filename, data, sol)

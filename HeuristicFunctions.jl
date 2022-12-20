@@ -194,7 +194,7 @@ function modelRepair!(data, sol, type)
     time_limit = 10
     logging = 1
     sol_limit = 0
-    MIPx = MIPBaseline(MIPdata, "HiGHS", logging, time_limit, sol_limit)
+    MIPx, _ = MIPBaseline(MIPdata, "HiGHS", logging, time_limit, sol_limit)
 
     if MIPx == 0
         return

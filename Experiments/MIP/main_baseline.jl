@@ -10,7 +10,7 @@ folder = "Experiments/MIP/results/"
 
 data = readInstance(filepath)
 
-x = MIPBaseline(data, "Gurobi", 0, data.timeperiod*60)
+x, gap = MIPBaseline(data, "Gurobi", 0, data.timeperiod*60)
 sol = MIPtoSol(data,x)
 
-writeSolution(folder * filename * "_baseline", data, sol)
+writeSolution(folder * filename * "_baseline", data, sol, gap)

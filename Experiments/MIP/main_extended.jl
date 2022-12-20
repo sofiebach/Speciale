@@ -2,7 +2,7 @@ include("../../ReadWrite.jl")
 include("../../MIPModels.jl")
 include("../../BasicFunctions.jl")
 
-idx = parse(Int64, ENV["LSB_JOBINDEX"])
+idx = 4 #parse(Int64, ENV["LSB_JOBINDEX"])
 
 filepath = joinpath.("dataset/test/", readdir("dataset/test/"))[idx]
 filename = split(split(filepath, ".")[1],"/")[3]
@@ -10,7 +10,7 @@ folder = "Experiments/MIP/results/"
 
 data = readInstance(filepath)
 
-x = MIPExtended(data, "Gurobi", 0, data.timeperiod*60)
+x, gap = MIPExtended(data, "Gurobi", 0, 60)
 sol = MIPtoSol(data,x)
 
-writeSolution(folder * filename * "_extended", data, sol)
+writeSolution(folder * filename * "_extended", data, sol, gap)

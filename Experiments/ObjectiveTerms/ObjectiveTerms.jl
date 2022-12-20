@@ -17,7 +17,7 @@ mins = 30
 folder = "Experiments/ObjectiveTerms/results/"
 
 # Only k term
-x1 = MIPBaseline(data, "Gurobi", 1, 60*mins)
+x1, _ = MIPBaseline(data, "Gurobi", 1, 60*mins)
 sol1 = MIPtoSol(data, x1)
 writeSolution(folder*filename*"_sol1", data, sol1)
 
