@@ -11,8 +11,8 @@ long_term_updates=[5000]
 
 sidx = parse(Int64, ENV["LSB_JOBINDEX"])
 
-filepath = joinpath.("../dataset/train/", readdir("dataset/train/"))[idx]
-filename = split(split(filepath, ".")[1],"/")[3]
+filepath = joinpath.("../dataset/train/", readdir("../dataset/train/"))[idx]
+filename = split(split(filepath,"/")[4],".")[1]
 
 stds, averages = tune(thetas,alphas,Ws,gammas,destroy_fracs,segment_sizes,long_term_updates, filepath, filename) 
 
