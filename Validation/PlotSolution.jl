@@ -212,9 +212,13 @@ function probabilityTracking(params, filename)
     py"progDR"(params, filename)
 end
 
-function drawTVSchedule(data, sol, filename)
+function drawTVSchedule(data, sol, filename, plot_channel = 0, pdf = false)
     p_tv = findall(x -> x == "TV", data.campaign_type)
     unique_BC_names = unique(data.BC_names[p_tv])
+
+    if plot_channel != 0
+        unique_BC_names = [data.C_names[plot_channel]]
+    end
 
     BC = []
     for bc in unique_BC_names
@@ -283,7 +287,11 @@ function drawTVSchedule(data, sol, filename)
     width = data.T+offset + 2
     col = distinguishable_colors(length(unique_P_names)+1)[2:(length(unique_P_names)+1)]
 
-    Drawing(width*scalar, height*scalar, filename * ".png")
+    if pdf
+        Drawing(width*scalar, height*scalar, filename * ".pdf")
+    else
+        Drawing(width*scalar, height*scalar, filename * ".png")
+    end
     background("white") # color of background
     origin() 
 
@@ -387,10 +395,14 @@ end
 
 
 
-function drawRadioSchedule(data, sol, filename)
+function drawRadioSchedule(data, sol, filename, plot_channel = 0, pdf = false)
     p_radio = findall(x -> x == "RADIO", data.campaign_type)
     unique_BC_names = unique(data.BC_names[p_radio])
     
+    if plot_channel != 0
+        unique_BC_names = [data.C_names[plot_channel]]
+    end
+
     BC = []
     for bc in unique_BC_names
         priorities = []
@@ -458,7 +470,11 @@ function drawRadioSchedule(data, sol, filename)
     width = data.T+offset + 2
     col = distinguishable_colors(length(unique_P_names)+1)[2:(length(unique_P_names)+1)]
 
-    Drawing(width*scalar, height*scalar, filename * ".png")
+    if pdf
+        Drawing(width*scalar, height*scalar, filename * ".pdf")
+    else
+        Drawing(width*scalar, height*scalar, filename * ".png")
+    end
     background("white") # color of background
     origin() 
 
