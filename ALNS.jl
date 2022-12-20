@@ -27,6 +27,11 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.2,al
     temp_sol = deepcopy(sol)
     start_time = time_ns()
 
+    visited_obj = Float64[]
+    visited_k = Float64[]
+    visited_g = Float64[]
+    visited_L = Float64[]
+
     if type == "baseline"
         T_start = -theta*temp_sol.base_obj/log(0.5)
         
@@ -63,7 +68,6 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.2,al
     w_destroy_sum = zeros(n_d)
     w_destroy_count = zeros(n_d)
             
-
     rho_repair = ones(n_r)
     w_repair = zeros(Int64, n_r, length(W))
     time_repair = zeros(n_r)
@@ -149,7 +153,7 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.2,al
         time_repair[selected_repair] += elapsed_repair
         num_repair[selected_repair] += 1
 
-        # Check acceptance criteria
+        # Find current objective
         if type == "baseline"
             temp_obj = temp_sol.base_obj
             best_obj = best_sol.base_obj
@@ -163,7 +167,38 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.2,al
             return
         end
 
-        if temp_obj < best_obj
+        # Check if objective has been seen before
+        unvisited = true
+        idx = 0
+        for obj in visited_obj
+            idx += 1
+            if obj == temp_obj
+                # println("k: ", visited_k[idx], " ", temp_sol.objective.k_penalty)
+                # println("g: ", visited_g[idx], " ", temp_sol.objective.g_penalty)
+                # println("L: ", visited_L[idx], " ", temp_sol.objective.L_penalty)
+                if visited_k[idx] == temp_sol.objective.k_penalty && visited_g[idx] == temp_sol.objective.g_penalty && visited_L[idx] == temp_sol.objective.L_penalty
+                    unvisited = false
+                    # println("visited: ", obj, " ", temp_obj)
+                    break
+                end
+            elseif obj > temp_obj
+                break
+            end
+        end
+
+        # Append to visited
+        append!(visited_obj, temp_obj)
+        append!(visited_k, temp_sol.objective.k_penalty)
+        append!(visited_g, temp_sol.objective.g_penalty)
+        append!(visited_L, temp_sol.objective.L_penalty)
+        sorted_idx = sortperm(visited_obj)
+        visited_obj = visited_obj[sorted_idx]
+        visited_k = visited_k[sorted_idx]
+        visited_g = visited_g[sorted_idx]
+        visited_L = visited_L[sorted_idx]
+
+        # Check acceptance criteria
+        if temp_obj < best_obj && unvisited
             best_sol = deepcopy(temp_sol)
             best_obj = temp_obj
             sol = deepcopy(temp_sol)
@@ -172,12 +207,12 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.2,al
             w_destroy[selected_destroy, 1] += 1
             println("New best")
             println(temp_obj)
-        elseif temp_obj < sol_obj
+        elseif temp_obj < sol_obj && unvisited
             sol = deepcopy(temp_sol)
             w = W[2]
             w_repair[selected_repair, 2] += 1
             w_destroy[selected_destroy, 2] += 1
-        elseif rand() < exp(-(temp_obj-sol_obj)/T)
+        elseif rand() < exp(-(temp_obj-sol_obj)/T) && unvisited
             sol = deepcopy(temp_sol)
             w = W[3]
             w_repair[selected_repair, 3] += 1
@@ -186,6 +221,7 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.2,al
             temp_sol = deepcopy(sol)
             w = 0
         end
+        
 
         append!(current_obj, temp_obj)
         append!(current_best, best_obj)
