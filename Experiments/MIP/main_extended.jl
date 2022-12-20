@@ -10,7 +10,7 @@ folder = "Experiments/MIP/results/"
 
 data = readInstance(filepath)
 
-x, gap = MIPExtended(data, "Gurobi", 0, data.timestep*60)
+x, gap = MIPExtended(data, "Gurobi", 0, data.timeperiod*60)
 sol = MIPtoSol(data,x)
 
 writeSolution(folder * filename * "_extended", data, sol, gap)
