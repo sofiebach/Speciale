@@ -33,17 +33,17 @@ function MIPSpreadingTerms(data, log=1, time_limit=60, gap=0.05, term=4)
 
     if term == 2
         @objective(model, Min, 
-            sum(data.penalty_S[p]*k[p] for p = 1:data.P) +               # Penalty for not fulfilled Scope
+            2*sum(data.penalty_S[p]*k[p] for p = 1:data.P) +               # Penalty for not fulfilled Scope
             sum(data.penalty_g[p] * g[t,p] for t=1:data.T, p=1:data.P)   # Penalty for stacking
         )
     elseif term == 3
         @objective(model, Min, 
-            sum(data.penalty_S[p]*k[p] for p = 1:data.P) +               # Penalty for not fulfilled Scope
+            2*sum(data.penalty_S[p]*k[p] for p = 1:data.P) +               # Penalty for not fulfilled Scope
             sum(data.weight_idle[p] * (-L[p]+y[p]) + 1 for p=1:data.P)   # Penalty for not spreading
         )
     else
         @objective(model, Min, 
-            sum(data.penalty_S[p]*k[p] for p = 1:data.P) +               # Penalty for not fulfilled Scope
+            2*sum(data.penalty_S[p]*k[p] for p = 1:data.P) +               # Penalty for not fulfilled Scope
             sum(data.penalty_g[p] * g[t,p] for t=1:data.T, p=1:data.P) + # Penalty for stacking
             sum(data.weight_idle[p] * (-L[p]+y[p]) + 1 for p=1:data.P)   # Penalty for not spreading
         )

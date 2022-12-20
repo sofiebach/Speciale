@@ -35,5 +35,3 @@ writeSolution(folder*filename*"_sol3", data, sol3)
 x4 = MIPSpreadingTerms(data, 1, 60*mins, 0, 4)
 sol4 = MIPtoSol(data, x4)
 writeSolution(folder*filename*"_sol4", data, sol4)
-
-

@@ -4,14 +4,15 @@ include("Validation/PlotSolution.jl")
 include("Validation/ValidateSolution.jl")
 include("MIPModels.jl")
 
-data = readInstance("dataset/train/25_0_0.txt")
+data = readInstance("dataset/test/100_0_5.txt")
 sol = randomInitial(data)
 
 sol, params = ALNS(data, sol, 30, "extended")
 
-drawTVSchedule(data, sol, "hej")
+drawTVSchedule(data, sol, "hej2",1)
+drawRadioSchedule(data, sol, "hej")
 
-x = MIPExtended(data, "Gurobi", 1, 10*60)
+x = MIPExtended(data, "Gurobi", 1, 5*60)
 
 sol = randomInitial(data)
 
