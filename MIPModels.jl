@@ -105,11 +105,12 @@ function MIPExtended(data, solver, log=1, time_limit=60, solution_limit=0, destr
     M_T = data.timeperiod
     M_S = 2
     epsilon = 0.5
+    lambda = 2/3
 
     @objective(model, Min, 
-        sum(data.penalty_S[p] * k[p] for p = 1:data.P) +                # Penalty for not fulfilled Scope
-        sum(data.penalty_g[p] * g[t,p] for t=1:data.T, p=1:data.P) +    # Penalty for stacking
-        sum(data.weight_idle[p] * (-L[p]+y[p]) + 1 for p=1:data.P)      # Penalty for no spreading
+        lambda * sum(data.penalty_S[p] * k[p] for p = 1:data.P) +                     # Penalty for not fulfilled Scope
+        (1-lambda) * (sum(data.penalty_g[p] * g[t,p] for t=1:data.T, p=1:data.P) +    # Penalty for stacking
+        sum(data.weight_idle[p] * (-L[p]+y[p]) + 1 for p=1:data.P))                   # Penalty for no spreading
     )
 
     # Nothing can be planned before start and after stop
@@ -183,12 +184,13 @@ function MIPpriority(data, p, xp, log=0, time_limit=10)
     M_T = data.T + 1
     M_S = data.S[p] + 1
     epsilon = 0.5
+    lambda = 2/3
 
     @objective(model, Min, 
-        data.penalty_S[p]*k +                           # Penalty for not fulfilled Scope
-        data.penalty_g[p] * sum(g[t] for t=1:data.T) -  # Penalty for stacking
-        data.weight_idle[p] * L +                       # Reward for spreading
-        data.weight_idle[p] * y                         # Penalty for spreading too much
+        lambda * (data.penalty_S[p]*k +                  # Penalty for not fulfilled Scope
+        data.penalty_g[p] * sum(g[t] for t=1:data.T)) -  # Penalty for stacking
+        (1-lambda) * (data.weight_idle[p] * L +          # Reward for spreading
+        data.weight_idle[p] * y)                         # Penalty for spreading too much
     )
 
     for t = data.start:data.stop
