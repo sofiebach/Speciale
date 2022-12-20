@@ -31,6 +31,7 @@ mutable struct Instance
     penalty_g::Array{Float64,1}
     aimed_L::Array{Float64,1}
     weight_idle::Array{Float64,1}
+    lambda::Float64
     Instance(P,C,M,timeperiod,L_lower,L_upper,Q_lower,Q_upper,T) = new(P,[1,8],C,M,timeperiod,
         L_lower,L_upper,indexin(0,collect(L_lower:L_upper))[],
         Q_lower,Q_upper,
@@ -53,7 +54,8 @@ mutable struct Instance
         zeros(Float64, P, P),
         zeros(Float64, P),
         zeros(Float64, P),
-        zeros(Float64, P))
+        zeros(Float64, P),
+        3/4)
 end
 
 mutable struct Objective
@@ -86,7 +88,8 @@ mutable struct Sol
     H_cap::Array{Float64,2}
     Sol(data) = new(
         sum(data.penalty_S[p]*deepcopy(data.S)[p] for p = 1:data.P), 
-        sum(data.penalty_S[p]*deepcopy(data.S)[p] for p = 1:data.P)+sum(data.penalty_g[p] * zeros(Int64, data.T, data.P)[t,p] for t=1:data.T, p=1:data.P)+sum(data.weight_idle[p] * (-zeros(Int64, data.P)[p]+zeros(Float64, data.P)[p]) + 1 for p=1:data.P), 
+        data.lambda * sum(data.penalty_S[p]*deepcopy(data.S)[p] for p = 1:data.P)
+            + (1-data.lambda) * (sum(data.penalty_g[p] * zeros(Int64, data.T, data.P)[t,p] for t=1:data.T, p=1:data.P)+sum(data.weight_idle[p] * (-zeros(Int64, data.P)[p]+zeros(Float64, data.P)[p]) + 1 for p=1:data.P)), 
         Objective(data,deepcopy(data.S),zeros(Int64, data.T, data.P),zeros(Int64, data.P),zeros(Float64, data.P)), 
         0,
         zeros(Int64,data.T,data.P), 

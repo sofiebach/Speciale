@@ -170,6 +170,9 @@ function writeInstance(filename, data)
 
     write(outFile, "weight_idle\n")
     write(outFile,join(data.weight_idle," ")*"\n\n")
+
+    write(outFile, "lambda\n")
+    write(outFile, join(data.lambda, " ")*"\n\n")
     close(outFile)
 end
 
@@ -277,6 +280,8 @@ function readInstance(filename)
     data.weight_idle = parse.(Float64,split(readline(f)))
     readline(f) # blank
 
+    readline(f) # lambda
+    data.lambda = parse.(Float64,readline(f))
     return data
 end
 

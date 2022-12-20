@@ -267,7 +267,7 @@ function findObjective!(data, sol)
     sol.objective.L_penalty = sum(data.weight_idle[p] * (-sol.L[p]+sol.y[p]) + 1 for p=1:data.P)    # Penalty for no spreading
 
     sol.base_obj =  sol.objective.k_penalty
-    sol.exp_obj =  sol.objective.k_penalty + sol.objective.g_penalty + sol.objective.L_penalty
+    sol.exp_obj =  data.lambda * sol.objective.k_penalty + (1-data.lambda) * (sol.objective.g_penalty + sol.objective.L_penalty)
 end
 
 function deltaCompareRegret(data, sol, t1, t2, p)
@@ -320,7 +320,7 @@ function deltaInsert(data, sol, t, p)
     delta_base =  sol.base_obj + delta_k
 
     # Delta exp
-    delta_exp = sol.exp_obj + delta_k + delta_g + delta_L - delta_y
+    delta_exp = sol.exp_obj + data.lambda * delta_k + (1-data.lambda) * (delta_g + delta_L - delta_y)
     return (delta_base=delta_base, delta_exp=delta_exp)
 end
 

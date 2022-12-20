@@ -105,12 +105,11 @@ function MIPExtended(data, solver, log=1, time_limit=60, solution_limit=0, destr
     M_T = data.timeperiod
     M_S = 2
     epsilon = 0.5
-    lambda = 3/4
 
     @objective(model, Min, 
-        lambda * sum(data.penalty_S[p] * k[p] for p = 1:data.P) +                     # Penalty for not fulfilled Scope
-        (1-lambda) * (sum(data.penalty_g[p] * g[t,p] for t=1:data.T, p=1:data.P) +    # Penalty for stacking
-        sum(data.weight_idle[p] * (-L[p]+y[p]) + 1 for p=1:data.P))                   # Penalty for no spreading
+        data.lambda * sum(data.penalty_S[p] * k[p] for p = 1:data.P) +                     # Penalty for not fulfilled Scope
+        (1-data.lambda) * (sum(data.penalty_g[p] * g[t,p] for t=1:data.T, p=1:data.P) +    # Penalty for stacking
+        sum(data.weight_idle[p] * (-L[p]+y[p]) + 1 for p=1:data.P))                        # Penalty for no spreading
     )
 
     # Nothing can be planned before start and after stop
