@@ -30,7 +30,7 @@ function MIPSpreadingTerms(data, log=1, time_limit=60, gap=0.05, term=4)
     M_T = data.T + 1
     M_S = maximum(data.S) + 1
     epsilon = 0.5
-    lambda = 2/3
+    lambda = 3/4
 
     if term == 2
         @objective(model, Min, 

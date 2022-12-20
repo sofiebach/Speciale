@@ -105,7 +105,7 @@ function MIPExtended(data, solver, log=1, time_limit=60, solution_limit=0, destr
     M_T = data.timeperiod
     M_S = 2
     epsilon = 0.5
-    lambda = 2/3
+    lambda = 3/4
 
     @objective(model, Min, 
         lambda * sum(data.penalty_S[p] * k[p] for p = 1:data.P) +                     # Penalty for not fulfilled Scope
@@ -184,7 +184,7 @@ function MIPpriority(data, p, xp, log=0, time_limit=10)
     M_T = data.T + 1
     M_S = data.S[p] + 1
     epsilon = 0.5
-    lambda = 2/3
+    lambda = 3/4
 
     @objective(model, Min, 
         lambda * (data.penalty_S[p]*k +                  # Penalty for not fulfilled Scope
