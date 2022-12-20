@@ -5,7 +5,7 @@
 ### -- set the job Name --
 #BSUB -J tester
 ### -- set the job Name AND the job array --
-#BSUB -J baseline[1]
+#BSUB -J baseline[1-9]
 ### -- ask for number of cores (default: 1) --
 #BSUB -n 4
 ### -- specify that the cores must be on the same host --
