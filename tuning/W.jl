@@ -16,7 +16,7 @@ filename = split(split(filepath,"/")[4],".")[1]
 
 stds, averages = tune(thetas,alphas,Ws,gammas,destroy_fracs,segment_sizes,long_term_updates, filepath, filename) 
 
-f = "tuning/results/initial_W" * filename * ".txt"
+f = "results/initial_W" * filename * ".txt"
 write_tuning(f)
 
 println("--- Script successful! ---")

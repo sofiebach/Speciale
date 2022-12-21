@@ -9,7 +9,7 @@ destroy_fracs=[0.2]
 segment_sizes=[10]
 long_term_updates=[5000]
 
-sidx = parse(Int64, ENV["LSB_JOBINDEX"])
+idx = parse(Int64, ENV["LSB_JOBINDEX"])
 
 filepath = joinpath.("../dataset/train/", readdir("../dataset/train/"))[idx]
 filename = split(split(filepath,"/")[4],".")[1]
