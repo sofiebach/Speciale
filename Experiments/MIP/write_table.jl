@@ -4,7 +4,7 @@ filepath = joinpath.("Experiments/MIP/results/", readdir("Experiments/MIP/result
 
 outFilebase = open("Experiments/MIP/table_base", "w")
 outFileext = open("Experiments/MIP/table_ext", "w")
-
+N = 3
 for file in filepath
     f = open(file)
     readline(f)
@@ -30,22 +30,22 @@ for file in filepath
         write(outFilebase, "\$" * string(\) * "texttt{")
         write(outFilebase, replace(nameandtype[1], "_" => "\\_") * "} \$")
         write(outFilebase, " & ")
-        write(outFilebase, join(baseline," "))
+        write(outFilebase, join(round(baseline, digits = N)," "))
         write(outFilebase, " &  ")
-        write(outFilebase, join(gap," "))
+        write(outFilebase, join(round(gap*100, digits = N)," "))
         write(outFilebase, " &  ")
-        write(outFilebase, join(time," "))
+        write(outFilebase, join(round(time, digits = N)," "))
         write(outFilebase, "\\\\")
         write(outFilebase, "\n")
     else
         write(outFileext, "\$" * string(\) * "texttt{")
         write(outFileext, replace(nameandtype[1], "_" => "\\_") * "} \$")
         write(outFileext, " & ")
-        write(outFileext, join(extended," "))
+        write(outFileext, join(round(extended, digits = N)," "))
         write(outFileext, " &  ")
-        write(outFileext, join(gap," "))
+        write(outFileext, join(round(gap*100, digits = N)," "))
         write(outFileext, " &  ")
-        write(outFileext, join(time," "))
+        write(outFileext, join(round(time, digits = N)," "))
         write(outFileext, "\\\\")
         write(outFileext, "\n")
     end
