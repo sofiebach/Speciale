@@ -61,7 +61,7 @@ function write_tuning(filename)
 end
 
 function read_parameters()
-    f = open("tuning/parameter_values")
+    f = open("parameter_values")
     readline(f)
     theta = parse.(Float64, readline(f))
     readline(f)

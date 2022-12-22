@@ -79,7 +79,6 @@ write(outFile, "\n")
 write(outFile, "\\cmidrule(r){2-3}\\cmidrule(r){4-5}\\cmidrule(r){6-7}\\cmidrule(r){8-9}\\cmidrule(r){10-11}
 Instance & Avg. imp. (\\%) & Std & Avg. imp. (\\%) & Std & Avg. imp. (\\%) & Std & Avg. imp. (\\%) & Std & Avg. imp. (\\%) & Std \\\\
 \\midrule")
-write(outFile, "\\\\")
 write(outFile, "\n")
 
 for file in filepath
