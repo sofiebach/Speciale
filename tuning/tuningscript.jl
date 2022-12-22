@@ -59,3 +59,22 @@ function write_tuning(filename)
 
     close(outFile)
 end
+
+function read_parameters()
+    f = open("tuning/parameter_values")
+    readline(f)
+    theta = parse.(Float64, readline(f))
+    readline(f)
+    alpha = parse.(Float64, readline(f))
+    readline(f)
+    W = parse.(Int64, split(readline(f)))
+    readline(f)
+    gamma = parse.(Float64, readline(f))
+    readline(f)
+    frac = parse.(Float64, readline(f))
+    readline(f)
+    segment = parse.(Float64, readline(f))
+    readline(f)
+    LTU = parse.(Float64, readline(f))
+    return theta, alpha, W, gamma, frac, segment, LTU
+end
