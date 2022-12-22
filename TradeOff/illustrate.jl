@@ -1,11 +1,40 @@
 using Plots
 using PyCall
 
-filenames = joinpath.("TradeOff/results/", readdir("TradeOff/results/"))
+py"""
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from matplotlib import ticker
+import matplotlib.font_manager
 
-X = []
-Y = []
-lambdas = []
+def tradeoffIllustration(x, y, lambdas, filename):
+    # font = {'fontname':'Times'}
+    
+    #plt.rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
+    fig, ax = plt.subplots()
+    fig.set_figheight(7)
+    fig.set_figwidth(7)
+    ax.plot(x, y, '--', linewidth=1, color="black")
+    ax.plot(x, y, '.', markersize=20, color='tab:blue')
+    # for j in range(len(lambdas)):
+    #     ax.plot(x[j], y[j], '.', markersize=10)
+    # for j, txt in enumerate(lambdas):
+    #     ax.annotate(txt, (x[j], y[j]))
+    # plt.legend(lambdas)
+    ax.tick_params(axis='x', labelsize=15)
+    ax.tick_params(axis='y', labelsize=15)
+    # plt.title("Trade-off between terms in cost function",fontsize="20")
+    plt.title("Data instance: " + filename,fontsize="20")
+    plt.xlabel("Scope-violation",fontsize="20")
+    plt.ylabel("Campaign spread and concurrency",fontsize="20")
+    plt.savefig("TradeOff/" + filename + ".png")
+    plt.close()
+
+"""
+folder = "TradeOff/results/"
+filenames = joinpath.(folder, readdir(folder))
 
 for file in filenames
     f = open(file)
@@ -14,44 +43,13 @@ for file in filenames
     readline(f) # blank
     readline(f) # X
     x = parse.(Float64,split(readline(f)))
-    push!(X, x)
     readline(f) # blank
     readline(f) # Y
     y = parse.(Float64,split(readline(f)))
-    push!(Y, y)
     readline(f) # blank
     close(f)
+    prefix = length(folder)
+    py"tradeoffIllustration"(x, y, lambdas, file[prefix+1:end])
+
 end
-
-# gap = 0.1
-# Y_gap = -(gap .* abs.(Y) .- Y)
-
-py"""
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-from matplotlib import ticker
-
-def tradeoffIllustration(X, Y, filename):
-    
-    
-    fig, ax = plt.subplots()
-
-    for i in range(len(X)):
-        ax.plot(X[i], Y[i], '--', linewidth=1, color="black")
-        ax.plot(X[i], Y[i], '.', markersize=10, color='tab:blue')
-        # ax.plot(X, Y_gap, '--', linewidth=0.5, color='tab:blue')
-        # ax.fill_between(X, Y, Y_gap, alpha=0.2)
-        
-    plt.title("Minimizing spreading term, fixed campaign term")
-    plt.xlabel("Campaign term")
-    plt.ylabel("Spreading term")
-    plt.savefig("TradeOff/results/" + filename + ".png")
-        
-    #plt.show()
-
-"""
-py"tradeoffIllustration"(X, Y, "../test25")
-
 
