@@ -1,7 +1,6 @@
-include("HeuristicFunctions.jl")
-include("ConstructionHeuristics.jl")
-include("MIPModels.jl")
-include("Validation/ValidateSolution.jl")
+include("../../HeuristicFunctions.jl")
+include("../../MIPModels.jl")
+include("../../Validation/ValidateSolution.jl")
 
 function setProb(rho)
     return rho./sum(rho)
@@ -19,10 +18,18 @@ function selectMethod(prob)
     end
 end
 
-
-
-function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.2,alpha=0.99975,W=[10,5,1],gamma=0.9,destroy_frac=0.4,segment_size=50,long_term_update=0.05)    
+function ALNS_analysis(data,sol,time_limit,type,destroy_functions,repair_functions)    
     it = 1
+
+    # Define parameters
+    theta=0.2
+    alpha=0.99975
+    W=[10,5,1]
+    gamma=0.9
+    destroy_frac=0.4
+    segment_size=50
+    long_term_update=0.05
+
     best_sol = deepcopy(sol)
     temp_sol = deepcopy(sol)
     start_time = time_ns()
@@ -34,30 +41,16 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.2,al
 
     if type == "baseline"
         T_start = -theta*temp_sol.base_obj/log(0.5)
-        repair_functions = [greedyRepair!,firstRepair!,flexibilityRepair!,bestRepair!,modelRepair!]
-        destroy_functions = [horizontalDestroy!,verticalDestroy!,randomDestroy!,relatedDestroy!]
-        n_d = length(destroy_functions)
-        if modelRepair
-            n_r = length(repair_functions)
-        else
-            n_r = length(repair_functions) - 1
-        end
     elseif type == "extended"
         T_start = -theta*temp_sol.exp_obj/log(0.5)
-        repair_functions = [greedyRepair!, firstRepair!,flexibilityRepair!,bestRepair!,modelRepair!,horizontalModelRepair!,regretRepair!]
-        destroy_functions = [horizontalDestroy!,verticalDestroy!,randomDestroy!,relatedDestroy!,worstIdleDestroy!,stackDestroy!]
-        n_d = length(destroy_functions)
-        if modelRepair
-            n_r = length(repair_functions)
-        else
-            n_r = length(repair_functions) - 1
-        end
     else
         println("Enter valid model type")
         return
     end
 
     T = T_start
+    n_d = length(destroy_functions)
+    n_r = length(repair_functions)
 
     rho_destroy = ones(n_d)
     w_destroy = zeros(Int64, n_d, length(W))
