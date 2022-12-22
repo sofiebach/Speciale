@@ -2,8 +2,8 @@
 ### General options
 ### -- specify queue --
 #BSUB -q hpc
-### -- set the job Name --
-#BSUB -J Theta
+### -- set the job Name AND the job array --
+#BSUB -J Theta[1-6]
 ### -- ask for number of cores (default: 1) --
 #BSUB -n 1
 ### -- specify that the cores must be on the same host --
@@ -29,4 +29,4 @@ module load gurobi/9.5.2
 module load julia/1.7.0
 
 # here follow the commands you want to execute
-julia-current thetas.jl &> results_initial_thetas.txt
+julia-current theta.jl &> results_initial_thetas.txt

@@ -56,7 +56,7 @@ function MIPBaseline(data, solver, log=1, time_limit=60, gap=0)
     JuMP.optimize!(model)
 
     if primal_status(model) != FEASIBLE_POINT
-        return 0
+        return 0, 0 
     end
 
     x1 = zeros(Int64, data.T, data.P)
@@ -65,7 +65,7 @@ function MIPBaseline(data, solver, log=1, time_limit=60, gap=0)
             x1[t,p] = Int64(round(JuMP.value(x[t,p])))
         end
     end
-    return x1
+    return x1, relative_gap(model)
 end
 
 
@@ -152,8 +152,9 @@ function MIPExtended(data, solver, log=1, time_limit=60, solution_limit=0, destr
     JuMP.optimize!(model)
 
     if primal_status(model) != FEASIBLE_POINT
-        return 0
+        return 0, 0
     end
+    primal_status(model)
 
     x1 = zeros(Int64, data.T, data.P)
     for t = 1:data.T, p = 1:data.P
@@ -162,7 +163,7 @@ function MIPExtended(data, solver, log=1, time_limit=60, solution_limit=0, destr
         end
     end
 
-    return x1
+    return x1, relative_gap(model)
 end
 
 function MIPpriority(data, p, xp, log=0, time_limit=10)

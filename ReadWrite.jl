@@ -286,7 +286,7 @@ function readInstance(filename)
 end
 
 # Write solution
-function writeSolution(filename, data, sol)
+function writeSolution(filename, data, sol, gap = false)
     outFile = open(filename, "w")
     write(outFile, "T P M C\n")
     write(outFile, join([data.T, data.P, data.M, data.C]," ")*"\n\n")
@@ -339,6 +339,12 @@ function writeSolution(filename, data, sol)
     write(outFile, "H cap\n")
     for m = 1:sol.M
         write(outFile,join(sol.H_cap[:,m]," ")*"\n")
+    end
+
+    if gap != false
+        write(outFile, "\n")
+        write(outFile, "Gap\n")
+        write(outFile, join(gap," ")*"\n\n")
     end
     write(outFile, "\n")
 

@@ -10,7 +10,7 @@ time_limit = 3600
 date_today = string(Dates.today())
 
 # Run MIP Baseline
-x_MIP = MIPBaseline(data, "Gurobi", 1, time_limit, 0)
+x_MIP, _ = MIPBaseline(data, "Gurobi", 1, time_limit, 0)
 sol_MIP = MIPtoSol(data, x_MIP)
 filename = "results/MIPBaseline"
 if sol_MIP != 0

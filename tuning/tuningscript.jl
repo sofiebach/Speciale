@@ -3,31 +3,26 @@ include("../ALNS.jl")
 
 using Statistics
 
-function tune(thetas,alphas,Ws,gammas,destroy_fracs,segment_sizes,long_term_updates) 
-
-    filenames = joinpath.("dataset/train/", readdir("dataset/train/"))
-    N = 3
+function tune(thetas,alphas,Ws,gammas,destroy_fracs,segment_sizes,long_term_updates,filepath,filename) 
+    N = 5
     data_idx = 0
     N_values = 5
-    N_dataset = length(filenames)
-    averages = zeros(Float64,N_dataset,N_values)
-    stds = zeros(Float64,N_dataset,N_values)
-    for filename in filenames
-        data_idx += 1
-        data = readInstance(filename)
-        time_limit = data.timeperiod * 60 
-        init_sol = randomInitial(data)
-        value_idx = 0
-        for theta in thetas, alpha in alphas, W in Ws, gamma in gammas, destroy_frac in destroy_fracs, segment_size in segment_sizes, long_term_update in long_term_updates
-            value_idx += 1
-            gap = []
-            for n = 1:N
-                sol, _ = ALNS(data,init_sol,time_limit,"extended",false,theta,alpha,W,gamma,destroy_frac,segment_size,long_term_update)
-                append!(gap,(init_sol.exp_obj - sol.exp_obj)/init_sol.exp_obj)
-            end
-            stds[data_idx, value_idx] = std(gap)
-            averages[data_idx, value_idx] = mean(gap)
+    averages = zeros(Float64,N_values)
+    stds = zeros(Float64,N_values)
+    data_idx += 1
+    data = readInstance(filepath)
+    time_limit = data.timeperiod * 60 
+    init_sol = randomInitial(data)
+    value_idx = 0
+    for theta in thetas, alpha in alphas, W in Ws, gamma in gammas, destroy_frac in destroy_fracs, segment_size in segment_sizes, long_term_update in long_term_updates
+        value_idx += 1
+        gap = []
+        for n = 1:N
+            sol, _ = ALNS(data,init_sol,time_limit,"extended",false,theta,alpha,W,gamma,destroy_frac,segment_size,long_term_update)
+            append!(gap,(init_sol.exp_obj - sol.exp_obj)/init_sol.exp_obj)
         end
+        stds[value_idx] = std(gap)
+        averages[value_idx] = mean(gap)
     end
     return stds, averages
 end
@@ -56,14 +51,10 @@ function write_tuning(filename)
     write(outFile,join(long_term_updates," ")*"\n\n")
 
     write(outFile, "Standard deviations\n")
-    for i = 1:5
-        write(outFile,join(stds[:,i]," ")*"\n")
-    end
+        write(outFile,join(stds," ")*"\n")
     write(outFile, "\n")
     write(outFile, "Average\n")
-    for i = 1:5
-        write(outFile,join(averages[:,i]," ")*"\n")
-    end
+        write(outFile,join(averages," ")*"\n")
     write(outFile, "\n")
 
     close(outFile)

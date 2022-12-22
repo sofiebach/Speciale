@@ -6,11 +6,11 @@ idx = parse(Int64, ENV["LSB_JOBINDEX"])
 
 filepath = joinpath.("dataset/test/", readdir("dataset/test/"))[idx]
 filename = split(split(filepath, ".")[1],"/")[3]
-folder = "Experiments/MIP/results/"
+folder = "Experiments/MIP/results5/"
 
 data = readInstance(filepath)
 
-x = MIPBaseline(data, "Gurobi", 0, data.timeperiod*60)
+x, gap = MIPBaseline(data, "Gurobi", 1, data.timeperiod*60*5)
 sol = MIPtoSol(data,x)
 
-writeSolution(folder * filename * "_baseline", data, sol)
+writeSolution(folder * filename * "_baseline", data, sol, gap)
