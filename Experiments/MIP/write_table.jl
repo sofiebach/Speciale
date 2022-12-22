@@ -24,7 +24,6 @@ for file in filepath
     readline(f)
     readline(f)
     time = parse.(Float64, readline(f))
-
     
     nameandtype = rsplit(split(file, "/")[4], "_", limit = 2)
     if nameandtype[2] == "baseline"
