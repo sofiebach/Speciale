@@ -286,7 +286,7 @@ function readInstance(filename)
 end
 
 # Write solution
-function writeSolution(filename, data, sol, gap = false)
+function writeSolution(filename, data, sol, gap = NaN, time = NaN)
     outFile = open(filename, "w")
     write(outFile, "T P M C\n")
     write(outFile, join([data.T, data.P, data.M, data.C]," ")*"\n\n")
@@ -341,11 +341,18 @@ function writeSolution(filename, data, sol, gap = false)
         write(outFile,join(sol.H_cap[:,m]," ")*"\n")
     end
 
-    if gap != false
+    if gap != NaN
         write(outFile, "\n")
         write(outFile, "Gap\n")
-        write(outFile, join(gap," ")*"\n\n")
+        write(outFile, join(gap," ")*"\n")
     end
+
+    if time != NaN
+        write(outFile, "\n")
+        write(outFile, "Time\n")
+        write(outFile, join(time," ")*"\n")
+    end
+
     write(outFile, "\n")
 
     close(outFile)
