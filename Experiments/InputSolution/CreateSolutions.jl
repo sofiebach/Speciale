@@ -15,7 +15,7 @@ for file in filepath
     good_sol = 0
     bad_obj = -Inf
     bad_sol = 0
-    for n = 1:100
+    for n = 1:1000
         temp_sol = randomInitial(data)
         if temp_sol.exp_obj < good_obj 
             good_obj = temp_sol.exp_obj
@@ -26,6 +26,8 @@ for file in filepath
             bad_sol = deepcopy(temp_sol)
         end
     end
+
+    
 
     folder = "Experiments/InputSolution/initials/"
     writeSolution(folder*filename*"_empty", data, empty_sol)
