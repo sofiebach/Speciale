@@ -4,14 +4,14 @@ include("../ALNS.jl")
 using Statistics
 
 function tune(thetas,alphas,Ws,gammas,destroy_fracs,segment_sizes,long_term_updates,filepath,filename) 
-    N = 5
+    N = 2
     data_idx = 0
     N_values = 5
     averages = zeros(Float64,N_values)
     stds = zeros(Float64,N_values)
     data_idx += 1
     data = readInstance(filepath)
-    time_limit = data.timeperiod * 60 
+    time_limit = data.timeperiod #* 60 
     init_sol = randomInitial(data)
     value_idx = 0
     for theta in thetas, alpha in alphas, W in Ws, gamma in gammas, destroy_frac in destroy_fracs, segment_size in segment_sizes, long_term_update in long_term_updates
