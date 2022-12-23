@@ -1,0 +1,206 @@
+include("../ReadWrite.jl")
+
+
+parameter = "alpha"
+
+avg_m = zeros(Float64, 6, 5)
+
+std_m = zeros(Float64, 6, 5)
+
+
+filenames = ["25_0_0", "25_5_0", "50_0_5", "50_10_0", "hej", "hej2"]
+
+filepath = joinpath.("tuning/results_divided/" * parameter *"//", readdir("tuning/results/" * parameter * "//"))
+
+outFile = open("tuning/" * parameter * "_table", "w")
+for file in filepath
+    f = open(file)
+    readline(f)
+    readline(f)
+    readline(f)
+    readline(f)
+    readline(f)
+    readline(f)
+    readline(f)
+    readline(f)
+    readline(f)
+    readline(f)
+    readline(f)
+    readline(f)
+    readline(f)
+    readline(f)
+    readline(f)
+    readline(f)
+    readline(f)
+    readline(f)
+    readline(f)
+    readline(f)
+    readline(f)
+    readline(f)
+    readline(f)
+    readline(f)
+    std = parse.(Float64, split(readline(f)))
+    readline(f)
+    readline(f)
+    avg = parse.(Float64, split(readline(f)))
+
+    nameandtype = rsplit(split(file, "/")[5], "_",limit = 2)
+    type = nameandtype[2][1:end-5]
+    param_num =  parse(Int64,nameandtype[2][end-4:end-4])
+    for i = 1:4
+        if nameandtype[1] == filenames[i]
+            avg_m[i,param_num] = avg[1]
+            std_m[i,param_num] = std[1]
+        end
+    end
+end
+
+for i in 1:4
+    outFile = open("tuning/results/" * parameter * "/" * filenames[i] * "_" * parameter, "w")
+    write(outFile, "Avg \n")
+    write(outFile, join(avg_m[i,:]," "))
+    write(outFile, "\n")
+    write(outFile, "Std \n")
+    write(outFile, join(std_m[i,:]," "))
+    close(outFile)
+end
+
+
+
+
+avg_sum = zeros(Float64, 5)
+std_sum = zeros(Float64, 5)
+idx = 1
+rounddigits = 3
+
+file = filepath[1]
+f = open(file)
+readline(f)
+readline(f)
+readline(f)
+if parameter == "theta"
+    tuning_param = parse.(Float64, split(readline(f)))
+else
+    readline(f)
+end
+readline(f)
+readline(f)
+if parameter == "alpha"
+    tuning_param = parse.(Float64, split(readline(f)))
+else
+    readline(f)
+end
+readline(f)
+readline(f)
+if parameter == "W"
+    tuning_param = []
+    for i = 1:5
+        push!(tuning_param, parse.(Int64, split(readline(f), " ")))
+    end
+else
+    readline(f)
+end
+readline(f)
+readline(f)
+if parameter == "gamma"
+    tuning_param = parse.(Float64, split(readline(f)))
+else
+    readline(f)
+end
+readline(f)
+readline(f)
+if parameter == "frac"
+    tuning_param = parse.(Float64, split(readline(f)))
+else
+    readline(f)
+end
+readline(f)
+readline(f)
+if parameter == "segment"
+    tuning_param = parse.(Float64, split(readline(f)))
+else
+    readline(f)
+end
+readline(f)
+readline(f)
+if parameter == "LTU"
+    tuning_param = parse.(Float64, split(readline(f)))
+else
+    readline(f)
+end
+
+for i = 1:5
+    write(outFile, " & ")
+    write(outFile, "\\multicolumn{2}{c}{")
+    write(outFile, join(tuning_param[i]," "))
+    write(outFile, "}")
+end
+write(outFile, "\\\\")
+write(outFile, "\n")
+write(outFile, "\\cmidrule(r){2-3}\\cmidrule(r){4-5}\\cmidrule(r){6-7}\\cmidrule(r){8-9}\\cmidrule(r){10-11}
+Instance & Avg. imp. (\\%) & Std & Avg. imp. (\\%) & Std & Avg. imp. (\\%) & Std & Avg. imp. (\\%) & Std & Avg. imp. (\\%) & Std \\\\
+\\midrule")
+write(outFile, "\n")
+
+for file in filepath
+    f = open(file)
+    readline(f)
+    readline(f)
+    readline(f)
+    readline(f)
+    readline(f)
+    readline(f)
+    readline(f)
+    readline(f)
+    readline(f)
+    if parameter == "W"
+        for i = 1:5
+            readline(f)
+        end
+    else
+        readline(f)
+    end
+    readline(f)
+    readline(f)
+    readline(f)
+    readline(f)
+    readline(f)
+    readline(f)
+    readline(f)
+    readline(f)
+    readline(f)
+    readline(f)
+    readline(f)
+    readline(f)
+    readline(f)
+    readline(f)
+    std = parse.(Float64, split(readline(f)))
+    readline(f)
+    readline(f)
+    avg = parse.(Float64, split(readline(f)))
+
+   
+    nameandtype = rsplit(split(file, "/")[5], "_",limit = 2)
+        write(outFile, "\$" * string(\) * "texttt{")
+        write(outFile, replace(nameandtype[1], "_" => "\\_") * "} \$")
+        for i = 1:5
+            write(outFile, " & ")
+            write(outFile, join(round(avg[i]*100,digits = rounddigits)," "))
+            write(outFile, " &  ")
+            write(outFile, join(round(std[i],digits = rounddigits)," "))
+            avg_sum[i] += avg[i]*100
+            std_sum[i] += std[i]
+        end
+            write(outFile, "\\\\")
+            write(outFile, "\n")
+end
+write(outFile, "Average")
+for i = 1:5
+    write(outFile, " &  ")
+    write(outFile, join(round(avg_sum[i]/5,digits = rounddigits)," "))
+    write(outFile, " &  ")
+    write(outFile, join(round(std_sum[i]/5,digits = rounddigits)," "))
+end
+write(outFile, "\\\\")
+
+close(outFile)

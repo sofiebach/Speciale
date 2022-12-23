@@ -33,7 +33,7 @@ function print_solution(sol)
     println("Total number of campaigns: ", sum(sol.x))
 end
 
-function drawHeatmap(data, sol, filename)       
+function drawHeatmap(data, sol, filename, pdf = 0)       
       
     staff_incl_freelancer = data.H + sol.f 
     # used_cap_inv = inventory_used ./ data.I
@@ -56,7 +56,7 @@ function drawHeatmap(data, sol, filename)
     import seaborn as sns
     from matplotlib import ticker
     
-    def heatmap(used_inv, used_prod, channels, media, filename):
+    def heatmap(used_inv, used_prod, channels, media, filename, pdf):
         timesteps = np.arange(1,(len(used_inv)+1))
         df1 = pd.DataFrame(np.transpose(used_prod), index = media)#,  columns = timesteps)
         df2 = pd.DataFrame(np.transpose(used_inv), index = channels)#,  columns = timesteps)
@@ -75,8 +75,9 @@ function drawHeatmap(data, sol, filename)
         ax1.xaxis.set_major_formatter(ticker.FormatStrFormatter('%d'))
         ax1.tick_params(axis = 'x', labelsize=12, rotation=0)
         ax1.tick_params(axis = 'y', labelsize=12)
-        ax1.set_xlabel("Time (weeks)")
+        ax1.set_xlabel("Time (weeks)", fontsize = 12)
         ax1.title.set_text('Production hours')
+        ax1.title.set_size(14)
         ax1.set_xlim([0, len(used_inv)])
 
         p2 = sns.heatmap(df2, linewidths=.5, ax = ax2, vmin=0, vmax=max_total, cbar_ax = cbar_ax, cmap = 'viridis') 
@@ -84,18 +85,21 @@ function drawHeatmap(data, sol, filename)
         ax2.xaxis.set_major_formatter(ticker.FormatStrFormatter('%d'))
         ax2.tick_params(axis = 'x', labelsize=12, rotation=0)
         ax2.tick_params(axis = 'y', labelsize=12)
-        ax2.set_xlabel("Time (weeks)")
+        ax2.set_xlabel("Time (weeks)", fontsize = 12)
        
         ax2.title.set_text('Channel inventory')
+        ax2.title.set_size(14)
         
         f.tight_layout(rect=[0, 0, .9, 1])
-
-        plt.savefig(filename + ".png")
+        if pdf == 0:
+            plt.savefig(filename + ".png")
+        else:
+            plt.savefig(filename + ".pdf")
         # plt.show()
         plt.close
     """
 
-    py"heatmap"(used_cap_inv, used_cap_prod, data.C_names, data.M_names, filename)
+    py"heatmap"(used_cap_inv, used_cap_prod, data.C_names, data.M_names, filename, pdf)
 
 end
 
