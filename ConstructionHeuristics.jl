@@ -5,21 +5,29 @@ function randomInitial(data)
     sol = Sol(data)
     
     # Randomly insert according to penalty
-    sorted_idx = sortperm(-data.penalty_S)
-    randomInsert!(data, sol, sorted_idx)
+    priorities = sortperm(-data.penalty_S)
+    randomInsert!(data, sol, priorities)
     
     return sol
 end
 
 function randomInsert!(data, sol, priorities)
     for p in priorities
-        r_times = shuffle(collect(data.start:data.stop))
-        for n = 1:data.S[p], t in r_times
+        for n = 1:data.S[p]
             if sol.k[p] == 0
                 break
             end
-            if fits(data, sol, t, p)
-                insert!(data, sol, t, p)
+            inserted = false
+            r_times = shuffle(collect(data.start:data.stop))
+            for t in r_times
+                if fits(data, sol, t, p)
+                    insert!(data, sol, t, p)
+                    inserted = true
+                    break
+                end
+            end
+            if !inserted
+                break
             end
         end
     end
