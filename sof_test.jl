@@ -5,15 +5,14 @@ include("Validation/PlotSolution.jl")
 include("Validation/ValidateSolution.jl")
 
 data = readInstance("dataset/train/25_0_0.txt")
+sol1 = randomInitial(data)
+sol1, params = ALNS(data, sol1, 60, "extended")
 
-sol = randomInitial(data)
-sol, params = ALNS(data,sol,30,"extended",false)
+sol = deepcopy(sol1)
+# drawTVSchedule(data, sol, "before", 1)
+drawHeatmap(data, sol, "before_vertical")
+verticalDestroy!(data, sol, 0.4)
+drawHeatmap(data, sol, "after_vertical")
+# drawTVSchedule(data, sol, "after", 1)
 
-drawTVSchedule(data, sol, "perfect_TV")
-drawRadioSchedule(data, sol, "perfect_Radio")
 
-drawHeatmap(data, sol, "test")
-
-sol = Sol(data)
-insert!(data,sol,5,1)
-insert!(data,sol,10,1)
