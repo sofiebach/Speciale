@@ -192,7 +192,7 @@ function modelRepair!(data, sol, type)
     MIPdata.S = deepcopy(sol.k)
 
     time_limit = 10
-    logging = 1
+    logging = 0
     sol_limit = 0
     MIPx, _, _ = MIPBaseline(MIPdata, "HiGHS", logging, time_limit, sol_limit)
 
