@@ -20,6 +20,6 @@ filename = split(split(filepath,"/")[4],".")[1]
 stds, averages = tune(thetas,alphas,Ws,gammas,destroy_fracs,segment_sizes,long_term_updates, filepath, filename) 
 
 f = "results/theta/" * filename * "_theta.txt"
-write_tuning(f)
+write_tuning(f, stds, averages)
 
 println("--- Script successful! ---")

@@ -28,7 +28,7 @@ function tune(thetas,alphas,Ws,gammas,destroy_fracs,segment_sizes,long_term_upda
 end
 
 
-function write_tuning(filename)
+function write_tuning(filename, stds, averages)
     outFile = open(filename, "w")
     write(outFile, "Tuning parameter: W\n\n")
 
