@@ -15,4 +15,4 @@ destroy_fracs
 segment_sizes
 200 350 500 650 800
 long_term_updates
-0.0025 0.005 0.01 0.025 0.5
+0.0025 0.005 0.01 0.025 0.05
