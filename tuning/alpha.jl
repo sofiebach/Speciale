@@ -11,7 +11,7 @@ destroy_fracs=[frac]
 segment_sizes=[segment]
 long_term_updates=[LTU]
 
-alphas=[0.999, 0.9995, 0.99975, 0.9999, 0.99995]
+alphas=read_ranges("alpha")
 
 idx = parse(Int64, ENV["LSB_JOBINDEX"])
 

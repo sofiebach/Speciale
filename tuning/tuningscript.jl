@@ -78,3 +78,39 @@ function read_parameters()
     LTU = parse.(Float64, readline(f))
     return theta, alpha, W, gamma, frac, segment, LTU
 end
+
+function read_ranges(parameter)
+    f = open("parameter_ranges")
+    readline(f)
+    theta = parse.(Float64,  split(readline(f)))
+    readline(f)
+    alpha = parse.(Float64,  split(readline(f)))
+    readline(f)
+    W = []
+    for i = 1:5
+        push!(W, parse.(Int64, split(readline(f), " ")))
+    end
+    readline(f)
+    gamma = parse.(Float64, split(readline(f)))
+    readline(f)
+    frac = parse.(Float64, split(readline(f)))
+    readline(f)
+    segment = parse.(Float64, split(readline(f)))
+    readline(f)
+    LTU = parse.(Float64, split(readline(f)))
+    if parameter == "theta"
+        return theta
+    elseif parameter == "alpha"
+        return alpha
+    elseif parameter == "W"
+        return W
+    elseif parameter == "gamma"
+        return gamma
+    elseif parameter == "frac"
+        return frac
+    elseif parameter == "segment"
+        return segment
+    else
+        return LTU
+    end
+end
