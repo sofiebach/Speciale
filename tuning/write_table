@@ -1,9 +1,9 @@
 include("../ReadWrite.jl")
 
 
-parameter = "LTU"
+parameter = "W"
 
-filepath = joinpath.("tuning/results/" * parameter *"//", readdir("tuning/results/" * parameter * "//"))
+filepath = joinpath.("tuning/results/" * parameter *"/", readdir("tuning/results/" * parameter * "/"))
 
 outFile = open("tuning/" * parameter * "_table", "w")
 
@@ -119,7 +119,7 @@ for file in filepath
     avg = parse.(Float64, split(readline(f)))
 
    
-    nameandtype = rsplit(split(file, "/")[5], "_",limit = 2)
+    nameandtype = rsplit(split(file, "/")[4], "_",limit = 2)
         write(outFile, "\$" * string(\) * "texttt{")
         write(outFile, replace(nameandtype[1], "_" => "\\_") * "} \$")
         for i = 1:5

@@ -1,14 +1,14 @@
 thetas
-0.05
+0.01
 alphas
-0.99975
+0.99995
 Ws
-10 5 1
+7 5 1
 gammas
 0.9
 destroy_fracs
-0.2
+0.5
 segment_sizes
-100
+500
 long_term_updates
-0.1
+0.01

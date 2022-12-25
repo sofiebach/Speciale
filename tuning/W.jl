@@ -10,9 +10,9 @@ destroy_fracs=[frac]
 segment_sizes=[segment]
 long_term_updates=[LTU]
 
-Ws = [[10,5,1], [10,5,2], [10,9,1], [10,5,5], [7,5,1]]
+Ws = [[6,5,4], [10,5,3], [7,5,3], [10,5,5], [7,5,1]]
 
-idx = parse(Int64, ENV["LSB_JOBINDEX"])
+idx = #parse(Int64, ENV["LSB_JOBINDEX"])
 
 filepath = joinpath.("../dataset/train/", readdir("../dataset/train/"))[idx]
 filename = split(split(filepath,"/")[4],".")[1]

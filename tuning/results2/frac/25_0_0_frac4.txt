@@ -1,0 +1,29 @@
+Tuning parameter: W
+
+thetas
+0.05
+
+alphas
+0.99975
+
+Ws
+10 5 1
+
+gammas
+0.9
+
+destroy_fracs
+0.4
+
+segment_sizes
+100.0
+
+long_term_update
+0.1
+
+Standard deviations
+0.004327414190998644 0.0 0.0 0.0 0.0
+
+Average
+0.31128406006948517 0.0 0.0 0.0 0.0
+
