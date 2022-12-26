@@ -10,7 +10,7 @@ destroy_fracs=[frac]
 segment_sizes=[segment]
 long_term_updates=[LTU]
 
-Ws = [[10,9,1]]
+Ws = [read_ranges("W")[3]]
 
 idx = parse(Int64, ENV["LSB_JOBINDEX"])
 
