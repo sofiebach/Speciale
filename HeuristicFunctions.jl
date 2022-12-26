@@ -104,8 +104,11 @@ end
 function relatedDestroy!(data,sol,frac)
     n_destroy = ceil(sol.num_campaigns*frac)
     while n_destroy > 0
-        
-        p = rand(findall(sol.k.>0))
+        if sum(sol.k) > 0
+            p = rand(findall(sol.k.>0))
+        else
+            p = rand(1:data.P)
+        end
         
         p_related = sortperm(-data.sim[p,:])
 
@@ -364,14 +367,12 @@ function flexibilityInsertion(data, sol, priorities)
 end
 
 function regretRepair!(data, sol, type)
-    count = 1
     while true
         priorities = sortperm(-data.penalty_S)
         t1, t2, p = regretInsertion(data, sol, priorities, type)
         if t1 != 0 && t2 != 0 && p != 0
             insert!(data, sol, t1, p)
             insert!(data, sol, t2, p)
-            count += 1
         else
             break
         end
@@ -395,22 +396,14 @@ function regretInsertion(data, sol, priorities, type)
         if t1 == 0
             continue
         end
-        temp1 = 0
-        temp2 = 0
         for t2 = data.start:data.stop
             if fits2times(data, sol, t1, t2, p)
                 delta1 = deltaCompareRegret(data, sol, t1, t2, p)
                 if delta1 < best_delta1
                     best_delta1 = delta1
-                    temp1 = t1
-                    temp2 = t2
                 end
             end
         end
-        # println("p: ", p)
-        # println("t1: ", temp1)
-        # println("t2: ", temp2)
-        # println("delta: ", best_delta1)
         for t1 = data.start:data.stop
             if fits(data, sol, t1, p)
                 for t2 = data.start:data.stop
@@ -424,24 +417,14 @@ function regretInsertion(data, sol, priorities, type)
                 end
             end
         end
-        # println("t1: ", ts[p_idx,1])
-        # println("t2: ", ts[p_idx,2])
-        # println("delta: ", best_delta2)
-        # println("----------------")
         loss[p_idx] = best_delta1 - best_delta2
     end
     
     replace!(loss, NaN=>-1)
-    # println("loss: ", loss)
     loss, idx = findmax(loss)
-    # println(loss, " ", idx)
-    # println("p: ", priorities[idx])
     best_p = priorities[idx]
     t1 = ts[idx,1]
     t2 = ts[idx,2]
-    # best_p = collect(1:data.P)[idx]
-    # println("BEST P: ",best_p)
-    # println("BEST p: ", best_p, " t1: ", t1, " t2: ", t2)
     if t1 == 0 || t2 == 0
         return 0, 0, 0
     end

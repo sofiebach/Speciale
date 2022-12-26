@@ -69,26 +69,31 @@ function drawHeatmap(data, sol, filename, pdf = 0)
         #M = 15
         #xticks = ticker.MaxNLocator(nbins=M, integer=True)
         #print(xticks())
+        fontsize = 25
         
-        p1 = sns.heatmap(df1, linewidths=.5, ax = ax1, vmin=0, vmax=max_total, cbar_ax = cbar_ax, cmap = 'viridis')
+        p1 = sns.heatmap(df1,linewidths=.5, ax = ax1, vmin=0, vmax=max_total, cbar_ax = cbar_ax, cmap = 'viridis')
         ax1.xaxis.set_ticks(np.arange(0,len(used_inv),5))
         ax1.xaxis.set_major_formatter(ticker.FormatStrFormatter('%d'))
-        ax1.tick_params(axis = 'x', labelsize=12, rotation=0)
-        ax1.tick_params(axis = 'y', labelsize=12)
-        ax1.set_xlabel("Time (weeks)", fontsize = 12)
+        ax1.tick_params(axis = 'x', labelsize=fontsize, rotation=0)
+        ax1.tick_params(axis = 'y', labelsize=fontsize)
+        ax1.set_xlabel("Time (weeks)", fontsize = fontsize)
         ax1.title.set_text('Production hours')
-        ax1.title.set_size(14)
+        ax1.title.set_size(fontsize)
         ax1.set_xlim([0, len(used_inv)])
+        cbar = ax1.collections[0].colorbar
+        cbar.ax.tick_params(labelsize=fontsize)
 
         p2 = sns.heatmap(df2, linewidths=.5, ax = ax2, vmin=0, vmax=max_total, cbar_ax = cbar_ax, cmap = 'viridis') 
         ax2.xaxis.set_ticks(np.arange(0,len(used_inv),5))
         ax2.xaxis.set_major_formatter(ticker.FormatStrFormatter('%d'))
-        ax2.tick_params(axis = 'x', labelsize=12, rotation=0)
-        ax2.tick_params(axis = 'y', labelsize=12)
-        ax2.set_xlabel("Time (weeks)", fontsize = 12)
+        ax2.tick_params(axis = 'x', labelsize=fontsize, rotation=0)
+        ax2.tick_params(axis = 'y', labelsize=fontsize)
+        ax2.set_xlabel("Time (weeks)", fontsize = fontsize)
+        cbar = ax2.collections[0].colorbar
+        cbar.ax.tick_params(labelsize=fontsize)
        
         ax2.title.set_text('Channel inventory')
-        ax2.title.set_size(14)
+        ax2.title.set_size(fontsize)
         
         f.tight_layout(rect=[0, 0, .9, 1])
         if pdf == 0:
