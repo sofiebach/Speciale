@@ -10,7 +10,7 @@ destroy_fracs=[frac]
 segment_sizes=[segment]
 long_term_updates=[LTU]
 
-gammas=[0.8, 0.85, 0.9, 0.95, 0.99]
+gammas=read_ranges("gamma")
 
 idx = parse(Int64, ENV["LSB_JOBINDEX"])
 
@@ -20,6 +20,6 @@ filename = split(split(filepath,"/")[4],".")[1]
 stds, averages = tune(thetas,alphas,Ws,gammas,destroy_fracs,segment_sizes,long_term_updates, filepath, filename) 
 
 f = "results/gamma/" * filename * "_gamma.txt"
-write_tuning(f)
+write_tuning(f, stds, averages)
 
 println("--- Script successful! ---")

@@ -10,7 +10,7 @@ destroy_fracs=[frac]
 segment_sizes=[segment]
 long_term_updates=[LTU]
 
-destroy_fracs=[0.1, 0.2, 0.3, 0.4, 0.5]
+destroy_fracs=read_ranges("frac")
 
 idx = parse(Int64, ENV["LSB_JOBINDEX"])
 
@@ -20,6 +20,6 @@ filename = split(split(filepath,"/")[4],".")[1]
 stds, averages = tune(thetas,alphas,Ws,gammas,destroy_fracs,segment_sizes,long_term_updates, filepath, filename) 
 
 f = "results/frac/" * filename * "_frac.txt"
-write_tuning(f)
+write_tuning(f, stds, averages)
 
 println("--- Script successful! ---")

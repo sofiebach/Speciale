@@ -8,9 +8,9 @@ avg_m = zeros(Float64, 6, 5)
 std_m = zeros(Float64, 6, 5)
 
 
-filenames = ["25_0_0", "25_5_0", "50_0_5", "50_10_0", "hej", "hej2"]
+filenames = ["25_0_0", "25_5_0", "50_0_5", "50_10_0", "100_0_10", "100_5_0"]
 
-filepath = joinpath.("tuning/results_divided/" * parameter *"//", readdir("tuning/results/" * parameter * "//"))
+filepath = joinpath.("tuning/results2/" * parameter *"/", readdir("tuning/results2/" * parameter * "/"))
 
 outFile = open("tuning/" * parameter * "_table", "w")
 for file in filepath
@@ -44,10 +44,10 @@ for file in filepath
     readline(f)
     avg = parse.(Float64, split(readline(f)))
 
-    nameandtype = rsplit(split(file, "/")[5], "_",limit = 2)
+    nameandtype = rsplit(split(file, "/")[4], "_",limit = 2)
     type = nameandtype[2][1:end-5]
     param_num =  parse(Int64,nameandtype[2][end-4:end-4])
-    for i = 1:4
+    for i = 1:6
         if nameandtype[1] == filenames[i]
             avg_m[i,param_num] = avg[1]
             std_m[i,param_num] = std[1]
@@ -55,7 +55,7 @@ for file in filepath
     end
 end
 
-for i in 1:4
+for i in 1:6
     outFile = open("tuning/results/" * parameter * "/" * filenames[i] * "_" * parameter, "w")
     write(outFile, "Avg \n")
     write(outFile, join(avg_m[i,:]," "))

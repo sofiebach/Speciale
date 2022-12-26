@@ -1,16 +1,16 @@
 include("../ReadWrite.jl")
 
 
-parameter = "LTU"
+parameter = "gamma"
 
-filepath = joinpath.("tuning/results/" * parameter *"//", readdir("tuning/results/" * parameter * "//"))
+filepath = joinpath.("tuning/resultsiter1/" * parameter *"/", readdir("tuning/resultsiter1/" * parameter * "/"))
 
 outFile = open("tuning/" * parameter * "_table", "w")
 
 avg_sum = zeros(Float64, 5)
 std_sum = zeros(Float64, 5)
 idx = 1
-rounddigits = 3
+rounddigits = 4
 
 file = filepath[1]
 f = open(file)
@@ -119,26 +119,26 @@ for file in filepath
     avg = parse.(Float64, split(readline(f)))
 
    
-    nameandtype = rsplit(split(file, "/")[5], "_",limit = 2)
+    nameandtype = rsplit(split(file, "/")[4], "_",limit = 2)
         write(outFile, "\$" * string(\) * "texttt{")
         write(outFile, replace(nameandtype[1], "_" => "\\_") * "} \$")
         for i = 1:5
             write(outFile, " & ")
-            write(outFile, join(round(avg[i]*100,digits = rounddigits)," "))
+            write(outFile, join(round(avg[i]*100,sigdigits = rounddigits)," "))
             write(outFile, " &  ")
-            write(outFile, join(round(std[i],digits = rounddigits)," "))
+            write(outFile, join(round(std[i],sigdigits = rounddigits)," "))
             avg_sum[i] += avg[i]*100
             std_sum[i] += std[i]
         end
-            write(outFile, "\\\\")
+            write(outFile, "\\\\ \\midrule")
             write(outFile, "\n")
 end
 write(outFile, "Average")
 for i = 1:5
     write(outFile, " &  ")
-    write(outFile, join(round(avg_sum[i]/5,digits = rounddigits)," "))
+    write(outFile, join(round(avg_sum[i]/6,sigdigits = rounddigits)," "))
     write(outFile, " &  ")
-    write(outFile, join(round(std_sum[i]/5,digits = rounddigits)," "))
+    write(outFile, join(round(std_sum[i]/6,sigdigits = rounddigits)," "))
 end
 write(outFile, "\\\\")
 

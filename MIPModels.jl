@@ -56,7 +56,7 @@ function MIPBaseline(data, solver, log=1, time_limit=60, gap=0)
     JuMP.optimize!(model)
 
     if primal_status(model) != FEASIBLE_POINT
-        return 0, 0 
+        return 0, 0, 0
     end
 
     x1 = zeros(Int64, data.T, data.P)
