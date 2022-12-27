@@ -10,16 +10,19 @@ function tune(thetas,alphas,Ws,gammas,destroy_fracs,segment_sizes,long_term_upda
     averages = zeros(Float64,N_values)
     stds = zeros(Float64,N_values)
     data_idx += 1
-    data = readInstance(filepath)
-    time_limit = data.timeperiod * 60 
-    init_sol = randomInitial(data)
+    #data = readInstance(filepath)
+    time_limit = data.timeperiod * 60
+    init_sol = []
+    for i = 1:N 
+        push!(init_sol, randomInitial(data))
+    end
     value_idx = 0
     for theta in thetas, alpha in alphas, W in Ws, gamma in gammas, destroy_frac in destroy_fracs, segment_size in segment_sizes, long_term_update in long_term_updates
         value_idx += 1
         gap = []
         for n = 1:N
-            sol, _ = ALNS(data,init_sol,time_limit,"extended",false,theta,alpha,W,gamma,destroy_frac,segment_size,long_term_update)
-            append!(gap,(init_sol.exp_obj - sol.exp_obj)/init_sol.exp_obj)
+            sol, _ = ALNS(data,init_sol[n],time_limit,"extended",false,theta,alpha,W,gamma,destroy_frac,segment_size,long_term_update)
+            append!(gap,(init_sol[n].exp_obj - sol.exp_obj)/init_sol[n].exp_obj)
         end
         stds[value_idx] = std(gap)
         averages[value_idx] = mean(gap)

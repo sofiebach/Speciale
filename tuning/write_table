@@ -1,16 +1,16 @@
 include("../ReadWrite.jl")
 
 
-parameter = "gamma"
+parameter = "segment"
 
-filepath = joinpath.("tuning/resultsiter1/" * parameter *"/", readdir("tuning/resultsiter1/" * parameter * "/"))
+filepath = joinpath.("tuning/results/" * parameter *"/", readdir("tuning/results/" * parameter * "/"))
 
 outFile = open("tuning/" * parameter * "_table", "w")
 
 avg_sum = zeros(Float64, 5)
 std_sum = zeros(Float64, 5)
 idx = 1
-rounddigits = 4
+rounddigits = 3
 
 file = filepath[1]
 f = open(file)
@@ -78,7 +78,7 @@ write(outFile, "\\\\")
 write(outFile, "\n")
 write(outFile, "\\cmidrule(r){2-3}\\cmidrule(r){4-5}\\cmidrule(r){6-7}\\cmidrule(r){8-9}\\cmidrule(r){10-11}
 Instance & Avg. imp. (\\%) & Std & Avg. imp. (\\%) & Std & Avg. imp. (\\%) & Std & Avg. imp. (\\%) & Std & Avg. imp. (\\%) & Std \\\\
-\\midrule")
+\\midrule ")
 write(outFile, "\n")
 
 for file in filepath
@@ -130,9 +130,10 @@ for file in filepath
             avg_sum[i] += avg[i]*100
             std_sum[i] += std[i]
         end
-            write(outFile, "\\\\ \\midrule")
+            write(outFile, "\\\\")
             write(outFile, "\n")
 end
+write(outFile, "\\midrule")
 write(outFile, "Average")
 for i = 1:5
     write(outFile, " &  ")
