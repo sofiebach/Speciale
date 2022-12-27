@@ -4,7 +4,7 @@ include("Validation/PlotSolution.jl")
 include("Validation/ValidateSolution.jl")
 include("MIPModels.jl")
 
-data = readInstance("dataset/test/100_0_0.txt")
+data = readInstance("dataset/test/25_0_5.txt")
 sol = randomInitial(data)
 
 sol, params = ALNS(data, sol, 300, "extended")
