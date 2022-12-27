@@ -147,19 +147,10 @@ function horizontalModelRepair!(data, sol, type)
             break
         end
         
-        # println("p: ", p)
-        c = 1
-        c2 = 1
-        
         xp = deepcopy(sol.x[:,p])
-        # println(xp)
         t = data.start
         while sum(sol.x[:,p]) > 0
-            #println("c: ", c)
-            c += 1
             while sol.x[t,p] > 0
-                #println("c2: ", c2)
-                c2 += 1
                 remove!(data, sol, t, p)
             end
             t += 1
@@ -175,7 +166,6 @@ function horizontalModelRepair!(data, sol, type)
         if MIPx == xp || MIPx == 0
             break
         end
-        #println(MIPx)
 
         for t = data.start:data.stop
             for n = 1:MIPx[t]
@@ -328,12 +318,10 @@ function bestInsertion(data, sol, priorities, type)
 end
 
 function flexibilityRepair!(data, sol, type)
-    count = 1
     while true
         t, p = flexibilityInsertion(data, sol, collect(1:data.P))
         if t != 0 && p != 0
             insert!(data, sol, t, p)
-            count += 1
         else
             break
         end
