@@ -7,8 +7,8 @@ Ws
 gammas
 0.9
 destroy_fracs
-0.2
+0.4
 segment_sizes
-100
+200
 long_term_updates
-0.1
+0.01
