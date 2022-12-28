@@ -4,8 +4,36 @@ include("Validation/PlotSolution.jl")
 include("Validation/ValidateSolution.jl")
 include("MIPModels.jl")
 
-data = readInstance("dataset/test/25_0_5.txt")
-sol = randomInitial(data)
+data = readInstance("dataset/test/50_0_10.txt")
+
+prio = 15
+sol = Sol(data)
+insert!(data, sol, data.start, prio)
+insert!(data, sol, data.stop, prio)
+
+
+t, p = bestInsertion(data, sol, prio, "extended")
+insert!(data,sol,t,p)
+t, p = bestInsertion(data, sol, prio, "extended")
+insert!(data,sol,t,p)
+
+drawTVSchedule(data, sol, "best_insersion", 4, true)
+
+sol = Sol(data)
+insert!(data, sol, data.start, prio)
+insert!(data, sol, data.stop, prio)
+t1, t2, p = regretInsertion(data, sol, prio, "extended")
+insert!(data,sol,t1,p)
+insert!(data,sol,t2,p)
+
+drawTVSchedule(data, sol, "regret_insertion", 4, true)
+
+
+for p =1:data.P
+    sol = Sol(data)
+    insert!(data, sol, data.stop, p)
+    println(checkSolution(data, sol))
+end
 
 sol, params = ALNS(data, sol, 300, "extended")
 

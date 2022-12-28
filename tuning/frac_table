@@ -1,0 +1,11 @@
+ Values  & \multicolumn{2}{c}{0.3} & \multicolumn{2}{c}{0.35} & \multicolumn{2}{c}{0.4} & \multicolumn{2}{c}{0.45} & \multicolumn{2}{c}{0.5}\\
+\cmidrule(r){2-3}\cmidrule(r){4-5}\cmidrule(r){6-7}\cmidrule(r){8-9}\cmidrule(r){10-11}
+Instance & \begin{tabular}[c]{@{}c@{}}Avg. imp. \\  (\%)\end{tabular} & Std & \begin{tabular}[c]{@{}c@{}}Avg. imp. \\  (\%)\end{tabular} & Std & \begin{tabular}[c]{@{}c@{}}Avg. imp. \\  (\%)\end{tabular} & Std & \begin{tabular}[c]{@{}c@{}}Avg. imp. \\  (\%)\end{tabular} & Std & \begin{tabular}[c]{@{}c@{}}Avg. imp. \\  (\%)\end{tabular} & Std \\
+\midrule 
+$\texttt{100\_0\_10} $ & 45.04 &  0.015 & 44.59 &  0.012 & 43.89 &  0.012 & 42.45 &  0.011 & 40.35 &  0.013\\
+$\texttt{100\_5\_0} $ & 44.96 &  0.028 & 43.59 &  0.018 & 42.46 &  0.019 & 40.68 &  0.02 & 39.46 &  0.021\\
+$\texttt{25\_0\_0} $ & 37.99 &  0.02 & 37.42 &  0.022 & 36.55 &  0.018 & 36.11 &  0.019 & 34.74 &  0.02\\
+$\texttt{25\_5\_0} $ & 39.59 &  0.027 & 38.31 &  0.031 & 37.08 &  0.024 & 36.53 &  0.027 & 35.21 &  0.023\\
+$\texttt{50\_0\_5} $ & 40.39 &  0.0085 & 39.66 &  0.0083 & 38.9 &  0.013 & 38.2 &  0.0099 & 37.48 &  0.015\\
+$\texttt{50\_10\_0} $ & 45.02 &  0.0074 & 44.44 &  0.011 & 43.35 &  0.017 & 43.43 &  0.016 & 42.21 &  0.017\\
+\midrule Average &  42.16 &  0.018 &  41.33 &  0.017 &  40.37 &  0.017 &  39.57 &  0.017 &  38.24 &  0.018\\
