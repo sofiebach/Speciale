@@ -10,7 +10,7 @@ function tune(thetas,alphas,Ws,gammas,destroy_fracs,segment_sizes,long_term_upda
     averages = zeros(Float64,N_values)
     stds = zeros(Float64,N_values)
     data_idx += 1
-    #data = readInstance(filepath)
+    data = readInstance(filepath)
     time_limit = data.timeperiod * 60
     init_sol = []
     for i = 1:N 

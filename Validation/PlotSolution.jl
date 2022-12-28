@@ -226,7 +226,7 @@ function drawTVSchedule(data, sol, filename, plot_channel = 0, pdf = false)
     unique_BC_names = unique(data.BC_names[p_tv])
 
     if plot_channel != 0
-        unique_BC_names = [data.C_names[plot_channel]]
+        unique_BC_names = [unique_BC_names[plot_channel]]
     end
 
     BC = []

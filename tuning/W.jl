@@ -12,7 +12,7 @@ long_term_updates=[LTU]
 
 Ws = read_ranges("W")
 
-idx = 3#parse(Int64, ENV["LSB_JOBINDEX"])
+idx = parse(Int64, ENV["LSB_JOBINDEX"])
 
 filepath = joinpath.("../dataset/train/", readdir("../dataset/train/"))[idx]
 filename = split(split(filepath,"/")[4],".")[1]
