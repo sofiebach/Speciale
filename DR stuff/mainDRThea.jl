@@ -15,4 +15,14 @@ for t = 1:data.T
     end
 end
 
-drawHeatmap(data,DRsol,"geh")
+drawHeatmap(data,DRsol,"DRheatmap,", 1, true)
+
+used = deepcopy(DRsol.H_cap)
+
+for i = 1:4
+    for j = 1:59
+        if used[j,i] > 0
+            used[j,i] = 0
+        end
+    end
+end

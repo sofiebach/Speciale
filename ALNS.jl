@@ -87,8 +87,8 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.2,al
     prob_repair_it = Float64[]
     T_it = Float64[]
 
-    while it < time_limit
-    #while elapsedTime(start_time) < time_limit
+    #while it < time_limit
+    while elapsedTime(start_time) < time_limit
         # Intensification
         if T < T_start*long_term_update
             sol = deepcopy(best_sol)
