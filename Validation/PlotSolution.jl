@@ -40,10 +40,14 @@ function drawHeatmap(data, sol, filename, pdf=0, DR=false)
     # used_cap_inv = inventory_used ./ data.I
     used_cap_inv = (data.I .- sol.I_cap) ./ data.I
     # used_cap_prod = staff_used ./staff_incl_freelancer
-    cap = deepcopy(sol.H_cap)
-    cap[cap .< 0.0] .= 0.0
-    used = data.H .- cap
-    used_cap_prod = (staff_incl_freelancer .- cap .+ sol.f) ./ staff_incl_freelancer
+    staff_incl_freelancer = data.H + sol.f 
+    # used_cap_inv = inventory_used ./ data.I
+    used_cap_inv = (data.I .- sol.I_cap) ./ data.I
+    # used_cap_prod = staff_used ./staff_incl_freelancer
+    used = deepcopy(sol.H_cap)
+    used[used .< 0.0] .= 0.0
+    used_cap_prod = (staff_incl_freelancer .- used) ./ staff_incl_freelancer
+
     if DR 
         used_cap_inv[used_cap_inv .> 1] .= 1.5
         used_cap_prod[used_cap_prod .> 1] .= 1.5
