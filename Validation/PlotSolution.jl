@@ -33,15 +33,21 @@ function print_solution(sol)
     println("Total number of campaigns: ", sum(sol.x))
 end
 
-function drawHeatmap(data, sol, filename, pdf = 0)       
-      
+function drawHeatmap(data, sol, filename, pdf=0, DR=false)       
+    
     staff_incl_freelancer = data.H + sol.f 
+
     # used_cap_inv = inventory_used ./ data.I
     used_cap_inv = (data.I .- sol.I_cap) ./ data.I
     # used_cap_prod = staff_used ./staff_incl_freelancer
-    used = deepcopy(sol.H_cap)
-    used[used .< 0.0] .= 0.0
-    used_cap_prod = (staff_incl_freelancer .- used) ./ staff_incl_freelancer
+    cap = deepcopy(sol.H_cap)
+    cap[cap .< 0.0] .= 0.0
+    used = data.H .- cap
+    used_cap_prod = (staff_incl_freelancer .- cap .+ sol.f) ./ staff_incl_freelancer
+    if DR 
+        used_cap_inv[used_cap_inv .> 1] .= 1.5
+        used_cap_prod[used_cap_prod .> 1] .= 1.5
+    end
 
     pd = pyimport("pandas")
     plt = pyimport("matplotlib.pyplot")
@@ -69,7 +75,7 @@ function drawHeatmap(data, sol, filename, pdf = 0)
         #M = 15
         #xticks = ticker.MaxNLocator(nbins=M, integer=True)
         #print(xticks())
-        fontsize = 25
+        fontsize = 18
         
         p1 = sns.heatmap(df1,linewidths=.5, ax = ax1, vmin=0, vmax=max_total, cbar_ax = cbar_ax, cmap = 'viridis')
         ax1.xaxis.set_ticks(np.arange(0,len(used_inv),5))
