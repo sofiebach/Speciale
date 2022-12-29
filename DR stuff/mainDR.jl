@@ -15,9 +15,17 @@ for t = 1:data.T
     end
 end
 
-pdf = 0
-DR = true
-drawHeatmap(data, DRsol, "DRheatmap", pdf, DR)
+pdf = true
+p_tv = findall(x -> x == "TV", data.campaign_type)
+p_radio = findall(x -> x == "RADIO", data.campaign_type)
+TV_BC_names = unique(data.BC_names[p_tv])
+radio_BC_names = unique(data.BC_names[p_radio])
 
+for bc = 1:length(TV_BC_names)
+    drawTVSchedule(data, DRsol, "DR stuff/schedules/tv_"*string(bc), bc, pdf)
+end
+for bc = 1:length(radio_BC_names)
+    drawRadioSchedule(data, DRsol, "DR stuff/schedules/radio_"*string(bc), bc, pdf)
+end
 
 
