@@ -21,7 +21,7 @@ end
 
 
 
-function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.2,alpha=0.99975,W=[10,5,1],gamma=0.9,destroy_frac=0.4,segment_size=50,long_term_update=0.05)    
+function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.2,alpha=0.99975,W=[10,5,1],gamma=0.9,destroy_frac=0.3,segment_size=50,long_term_update=0.05)    
     it = 1
     best_sol = deepcopy(sol)
     temp_sol = deepcopy(sol)
@@ -87,7 +87,8 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.2,al
     prob_repair_it = Float64[]
     T_it = Float64[]
 
-    while elapsedTime(start_time) < time_limit
+    while it < time_limit
+    #while elapsedTime(start_time) < time_limit
         # Intensification
         if T < T_start*long_term_update
             sol = deepcopy(best_sol)

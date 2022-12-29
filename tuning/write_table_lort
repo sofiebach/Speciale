@@ -1,7 +1,7 @@
 include("../ReadWrite.jl")
 
 
-parameter = "alpha"
+parameter = "W"
 
 avg_m = zeros(Float64, 6, 5)
 
@@ -10,11 +10,15 @@ std_m = zeros(Float64, 6, 5)
 
 filenames = ["25_0_0", "25_5_0", "50_0_5", "50_10_0", "100_0_10", "100_5_0"]
 
-filepath = joinpath.("tuning/results2/" * parameter *"/", readdir("tuning/results2/" * parameter * "/"))
+filepath = joinpath.("tuning/results/" * parameter *"/", readdir("tuning/results/" * parameter * "/"))
 
 outFile = open("tuning/" * parameter * "_table", "w")
 for file in filepath
     f = open(file)
+    readline(f)
+    readline(f)
+    readline(f)
+    readline(f)
     readline(f)
     readline(f)
     readline(f)
@@ -49,19 +53,23 @@ for file in filepath
     param_num =  parse(Int64,nameandtype[2][end-4:end-4])
     for i = 1:6
         if nameandtype[1] == filenames[i]
-            avg_m[i,param_num] = avg[1]
             std_m[i,param_num] = std[1]
+            avg_m[i,param_num] = avg[1]
         end
     end
 end
 
 for i in 1:6
     outFile = open("tuning/results/" * parameter * "/" * filenames[i] * "_" * parameter, "w")
-    write(outFile, "Avg \n")
-    write(outFile, join(avg_m[i,:]," "))
-    write(outFile, "\n")
+    for d in 1:23
+        write(outFile, "\n")
+    end
     write(outFile, "Std \n")
     write(outFile, join(std_m[i,:]," "))
+    write(outFile, "\n")
+    write(outFile, "\n")
+    write(outFile, "Avg \n")
+    write(outFile, join(avg_m[i,:]," "))
     close(outFile)
 end
 
