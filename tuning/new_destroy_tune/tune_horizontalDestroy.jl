@@ -1,20 +1,16 @@
 include("tuningscript.jl")
 
-horizontalDestroy = [0.1,0.2,0.3,0.4,0.5]
-verticalDestroy = [0.2]
-randomDestroy = [0.2]
-relatedDestroy = [0.2]
-worstIdleDestroy = [0.2]
-stackDestroy = [0.2]
+destroy_method = horizontalDestroy!
+destroy_fracs = [0.05,0.1,0.15,0.2,0.3]
 
 idx = parse(Int64, ENV["LSB_JOBINDEX"])
 
 filepath = joinpath.("dataset/train/", readdir("dataset/train/"))[idx]
 filename = split(split(filepath,"/")[3],".")[1]
 
-stds, averages = tune(horizontalDestroy,verticalDestroy,randomDestroy,relatedDestroy,worstIdleDestroy,stackDestroy,filepath) 
+stds, averages = tune(destroy_method,destroy_fracs,filepath) 
 
-f = "tuning/new_destroy_tune/results/horizontalDestroy_" * filename * ".txt"
-write_tuning(f, stds, averages)
+f = "tuning/new_destroy_tune/results/" * string(destroy_method)[1:end-1] * "/" * filename * ".txt"
+write_tuning(f, destroy_method, destroy_fracs, stds, averages)
 
 println("--- Script successful! ---")

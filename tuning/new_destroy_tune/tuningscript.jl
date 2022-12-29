@@ -3,7 +3,7 @@ include("ALNS_tunedestroy.jl")
 
 using Statistics
 
-function tune(horizontalDestroy,verticalDestroy,randomDestroy,relatedDestroy,worstIdleDestroy,stackDestroy,filepath) 
+function tune(destroy_method,destroy_fracs,filepath) 
     N = 5
     data_idx = 0
     N_values = 5
@@ -11,19 +11,17 @@ function tune(horizontalDestroy,verticalDestroy,randomDestroy,relatedDestroy,wor
     stds = zeros(Float64,N_values)
     data_idx += 1
     data = readInstance(filepath)
-    # time_limit = data.timeperiod * 60
     time_limit = 3 * 60
     init_sol = []
     for i = 1:N 
         push!(init_sol, randomInitial(data))
     end
     value_idx = 0
-    for horizontalfrac in horizontalDestroy, verticalfrac in verticalDestroy, randomfrac in randomDestroy, relatedfrac in relatedDestroy, idlefrac in worstIdleDestroy, stackfrac in stackDestroy
+    for destroy_frac in destroy_fracs
         value_idx += 1
         gap = []
-        destroy_frac = [horizontalfrac, verticalfrac, randomfrac, relatedfrac, idlefrac, stackfrac]
         for n = 1:N
-            sol, _ = ALNS(data,init_sol[n],time_limit,"extended",false,destroy_frac)
+            sol, _ = ALNS(data,init_sol[n],time_limit,destroy_method,"extended",false,destroy_frac)
             append!(gap,(init_sol[n].exp_obj - sol.exp_obj)/init_sol[n].exp_obj)
         end
         stds[value_idx] = std(gap)
@@ -33,20 +31,12 @@ function tune(horizontalDestroy,verticalDestroy,randomDestroy,relatedDestroy,wor
 end
 
 
-function write_tuning(filename, stds, averages)
+function write_tuning(filename, destroy_method, destroy_fracs, stds, averages)
     outFile = open(filename, "w")
-    write(outFile, "horizontalDestroy\n")
-    write(outFile,join(horizontalDestroy," ")*"\n\n")
-    write(outFile, "verticalDestroy\n")
-    write(outFile,join(verticalDestroy," ")*"\n\n")
-    write(outFile, "randomDestroy\n")
-    write(outFile,join(randomDestroy," ")*"\n\n")
-    write(outFile, "relatedDestroy\n")
-    write(outFile,join(relatedDestroy," ")*"\n\n")
-    write(outFile, "worstIdleDestroy\n")
-    write(outFile,join(worstIdleDestroy," ")*"\n\n")
-    write(outFile, "stackDestroy\n")
-    write(outFile,join(stackDestroy," ")*"\n\n")
+    write(outFile, "destroy_method\n")
+    write(outFile,string(destroy_method)*"\n\n")
+    write(outFile, "destroy_fracs\n")
+    write(outFile,join(destroy_fracs," ")*"\n\n")
 
     write(outFile, "Standard deviations\n")
         write(outFile,join(stds," ")*"\n")

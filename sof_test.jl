@@ -4,9 +4,12 @@ include("ALNS.jl")
 include("Validation/PlotSolution.jl")
 include("Validation/ValidateSolution.jl")
 
-data = readInstance("dataset/train/25_0_0.txt")
+data = readInstance("dataset/train/100_5_0.txt")
 sol1 = randomInitial(data)
 time_limit = 60
+
+sol, params = ALNS(data,sol1,time_limit,"extended",false)
+drawHeatmap(data, sol, "heatmap_example", 1, false)
 
 theta=0.2
 alpha=0.99975

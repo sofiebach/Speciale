@@ -21,7 +21,7 @@ end
 
 
 
-function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,destroy_fracs=[0.2,0.2,0.2,0.2,0.2,0.2],theta=0.2,alpha=0.99975,W=[10,5,1],gamma=0.9,segment_size=50,long_term_update=0.05)    
+function ALNS(data,sol,time_limit,destroy_method,type="baseline",modelRepair=false,destroy_frac=0.2,theta=0.2,alpha=0.99975,W=[10,5,1],gamma=0.9,segment_size=50,long_term_update=0.05)    
     it = 1
     best_sol = deepcopy(sol)
     temp_sol = deepcopy(sol)
@@ -45,7 +45,8 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,destroy_frac
     elseif type == "extended"
         T_start = -theta*temp_sol.exp_obj/log(0.5)
         repair_functions = [greedyRepair!, firstRepair!,flexibilityRepair!,bestRepair!,horizontalModelRepair!,regretRepair!,modelRepair!]
-        destroy_functions = [horizontalDestroy!,verticalDestroy!,randomDestroy!,relatedDestroy!,worstIdleDestroy!,stackDestroy!]
+        # destroy_functions = [horizontalDestroy!,verticalDestroy!,randomDestroy!,relatedDestroy!,worstIdleDestroy!,stackDestroy!]
+        destroy_functions = [destroy_method]
         n_d = length(destroy_functions)
         if modelRepair
             n_r = length(repair_functions)
@@ -123,8 +124,7 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,destroy_frac
         # Choose destroy method
         selected_destroy = selectMethod(prob_destroy)
         destroy_time = time_ns()
-        # println(destroy_functions[selected_destroy])
-        destroy_frac = destroy_fracs[selected_destroy]
+        println(destroy_functions[selected_destroy])
         destroy_functions[selected_destroy](data, temp_sol, destroy_frac)
         elapsed_destroy = elapsedTime(destroy_time)
 
