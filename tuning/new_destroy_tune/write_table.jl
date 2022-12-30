@@ -1,8 +1,11 @@
 include("../../ReadWrite.jl")
 
-parameter = "randomDestroy"
+parameter = "worstIdleDestroy"
 
 filepath = joinpath.("tuning/new_destroy_tune/results/" * parameter *"/", readdir("tuning/new_destroy_tune/results/" * parameter * "/"))
+if length(filepath) > 6
+    filepath = filepath[2:end]
+end
 
 outFile = open("tuning/new_destroy_tune/" * parameter * "_table", "w")
 
@@ -15,48 +18,10 @@ rounddigitsstd = 2
 file = filepath[1]
 f = open(file)
 readline(f)
-
-if parameter == "horizontalDestroy"
-    tuning_param = parse.(Float64, split(readline(f)))
-else
-    readline(f)
-end
 readline(f)
 readline(f)
-if parameter == "verticalDestroy"
-    tuning_param = parse.(Float64, split(readline(f)))
-else
-    readline(f)
-end
 readline(f)
-readline(f)
-if parameter == "randomDestroy"
-    tuning_param = parse.(Float64, split(readline(f)))
-else
-    readline(f)
-end
-readline(f)
-readline(f)
-if parameter == "relatedDestroy"
-    tuning_param = parse.(Float64, split(readline(f)))
-else
-    readline(f)
-end
-readline(f)
-readline(f)
-if parameter == "worstIdleDestroy"
-    tuning_param = parse.(Float64, split(readline(f)))
-else
-    readline(f)
-end
-readline(f)
-readline(f)
-if parameter == "stackDestroy"
-    tuning_param = parse.(Float64, split(readline(f)))
-else
-    readline(f)
-end
-
+tuning_param = parse.(Float64, split(readline(f)))
 
 write(outFile, " Values ")
 for i = 1:5
@@ -76,7 +41,7 @@ avgs=0
 for file in filepath
     f = open(file)
     count = 0
-    while count <= 18
+    while count <= 6
         readline(f)
         count += 1
     end
@@ -85,7 +50,7 @@ for file in filepath
     readline(f)
     avgs = parse.(Float64, split(readline(f)))
 
-    name = split(split(split(file, "/")[5],"_",limit=2)[2],".")[1]
+    name = split(split(file, "/")[5],".")[1]
     write(outFile, "\$" * string(\) * "texttt{")
     write(outFile, replace(name, "_" => "\\_") * "} \$")
     for i = 1:5
