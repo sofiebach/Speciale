@@ -34,19 +34,17 @@ function print_solution(sol)
 end
 
 function drawHeatmap(data, sol, filename, pdf=0, DR=false)       
-    
-    staff_incl_freelancer = data.H + sol.f 
+    if DR
+        staff_incl_freelancer = data.H
+    else
+        staff_incl_freelancer = data.H + sol.f 
+    end
 
-    # used_cap_inv = inventory_used ./ data.I
     used_cap_inv = (data.I .- sol.I_cap) ./ data.I
-    # used_cap_prod = staff_used ./staff_incl_freelancer
-    staff_incl_freelancer = data.H + sol.f 
-    # used_cap_inv = inventory_used ./ data.I
-    used_cap_inv = (data.I .- sol.I_cap) ./ data.I
-    # used_cap_prod = staff_used ./staff_incl_freelancer
-    used = deepcopy(sol.H_cap)
-    used[used .< 0.0] .= 0.0
-    used_cap_prod = (staff_incl_freelancer .- used) ./ staff_incl_freelancer
+    
+    cap = deepcopy(sol.H_cap)
+    
+    used_cap_prod = (staff_incl_freelancer .- cap) ./ staff_incl_freelancer
 
     if DR 
         used_cap_inv[used_cap_inv .> 1] .= 1.5

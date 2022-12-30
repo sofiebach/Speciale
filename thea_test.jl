@@ -4,7 +4,19 @@ include("Validation/PlotSolution.jl")
 include("Validation/ValidateSolution.jl")
 include("MIPModels.jl")
 
-data = readInstance("dataset/test/50_0_10.txt")
+data = readInstance("dataset/test/25_0_5.txt")
+
+sol1 = readSolution("Experiments/MIP/results/25_0_5_extended", data)
+
+sol2 = readSolution("Experiments/MIP/results/25_0_5_baseline", data)
+
+drawTVSchedule(data, sol1, "extendedDR1", 1, true)
+drawTVSchedule(data, sol2, "baselineDR1", 1, true)
+
+drawRadioSchedule(data, sol1, "extendedP4", 7, true)
+drawRadioSchedule(data, sol2, "baselineP4", 7, true)
+
+
 
 prio = 15
 sol = Sol(data)
