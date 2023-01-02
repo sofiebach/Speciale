@@ -18,8 +18,8 @@ bad_sol = readSolution(folder*filename*"_bad", data)
 type = "baseline"
 modelRepair = false
 N = 5
-# time_limit = data.timeperiod * 60
-time_limit = 10
+time_limit = data.timeperiod * 60
+#time_limit = 10
 
 objs = zeros(Float64, 3, N)
 for n = 1:N

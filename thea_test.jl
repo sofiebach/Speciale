@@ -4,7 +4,12 @@ include("Validation/PlotSolution.jl")
 include("Validation/ValidateSolution.jl")
 include("MIPModels.jl")
 
-data = readInstance("dataset/test/25_0_5.txt")
+data = readInstance("dataset/test/100_0_0.txt")
+
+sol = randomInitial(data)
+sol, params = ALNS_final_methodinput(data, sol, 60, "extended", [1,1,0,1,0,0,0], [1,1,1,0,0,1])
+
+probabilityTracking(params, "test")
 
 sol1 = readSolution("Experiments/MIP/results/25_0_5_extended", data)
 
@@ -16,6 +21,10 @@ drawTVSchedule(data, sol2, "baselineDR1", 1, true)
 drawRadioSchedule(data, sol1, "extendedP4", 7, true)
 drawRadioSchedule(data, sol2, "baselineP4", 7, true)
 
+
+for i in collect(StepRange(6, -1, 1))
+    println(i)
+end
 
 
 prio = 15
