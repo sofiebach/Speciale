@@ -2,8 +2,8 @@ include("../../ALNS.jl")
 include("../../ReadWrite.jl")
 include("../../ConstructionHeuristics.jl")
 
-# idx = parse(Int64, ENV["LSB_JOBINDEX"])
-idx = 4
+idx = parse(Int64, ENV["LSB_JOBINDEX"])
+#idx = 4
 
 filepath = joinpath.("dataset/train/", readdir("dataset/train/"))[idx]
 filename = split(split(filepath, ".")[1],"/")[3]
@@ -18,8 +18,8 @@ bad_sol = readSolution(folder*filename*"_bad", data)
 type = "extended"
 modelRepair = false
 N = 5
-# time_limit = data.timeperiod * 60
-time_limit = 10
+time_limit = data.timeperiod * 60
+#time_limit = 10
 
 objs = zeros(Float64, 3, N)
 for n = 1:N

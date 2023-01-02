@@ -20,7 +20,6 @@ function selectMethod(prob)
 end
 
 
-
 function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.2,alpha=0.99975,W=[10,5,1],gamma=0.9,destroy_frac=0.3,segment_size=50,long_term_update=0.05)    
     it = 1
     best_sol = deepcopy(sol)
