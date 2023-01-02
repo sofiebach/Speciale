@@ -21,7 +21,7 @@ end
 
 
 
-function ALNS(data,sol,time_limit,destroy_method,type="baseline",modelRepair=false,destroy_frac=0.2,theta=0.2,alpha=0.99975,W=[10,5,1],gamma=0.9,segment_size=50,long_term_update=0.05)    
+function ALNS(data,sol,time_limit,destroy_method,type="baseline",modelRepair=false,destroy_frac=0.2,theta=0.005,alpha=0.99975,W=[10, 9, 1],gamma=0.75,segment_size=10,long_term_update=0.0025)    
     it = 1
     best_sol = deepcopy(sol)
     temp_sol = deepcopy(sol)
