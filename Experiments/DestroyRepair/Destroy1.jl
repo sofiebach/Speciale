@@ -15,7 +15,7 @@ destroys = true*ones(Bool, 6)
 repairs = true*ones(Bool, 7)
 
 N = 5
-M = length(destroys)
+M = length(destroys)+1
 time_limit = data.timeperiod * 60
 type = "extended"
 imps = zeros(Float64, M)
@@ -23,7 +23,9 @@ stds = zeros(Float64, M)
 for i = 1:M
     objs = zeros(Float64, N)
     temp_destroys = deepcopy(destroys)
-    temp_destroys[i] = false
+    if i > 1
+        temp_destroys[i-1] = false
+    end
     for n = 1:N
         sol, params = ALNS_final(data,init_sol,time_limit,type,repairs,temp_destroys)
         objs[n] = sol.exp_obj
