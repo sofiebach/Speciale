@@ -18,18 +18,18 @@ for file in filepath
     if nameandtype[2] == "baseline"
         write(outFile, "\$" * string(\) * "texttt{")
         write(outFile, replace(nameandtype[1], "_" => "\\_") * "} \$")
-        write(outFile, " & ")
         for i = 1:length(objs)
-            write(outFile, join(objs[i]," "))
             write(outFile, " & ")
-            write(outFile, join(stds[i]," "))
+            write(outFile, join(round(objs[i],sigdigits = 4)," "))
             write(outFile, " & ")
+            write(outFile, join(round(stds[i], sigdigits = 2)," "))
         end
     else
         for i = 1:length(objs)
-            write(outFile, join(objs[i]," "))
             write(outFile, " & ")
-            write(outFile, join(stds[i]," "))
+            write(outFile, join(round(objs[i], sigdigits = 4)," "))
+            write(outFile, " & ")
+            write(outFile, join(round(stds[i], sigdigits = 2)," "))
         end
         write(outFile, "\\\\")
         write(outFile, "\n")
