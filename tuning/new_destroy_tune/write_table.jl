@@ -1,6 +1,6 @@
 include("../../ReadWrite.jl")
 
-parameter = "worstIdleDestroy"
+parameter = "horizontalDestroy"
 
 filepath = joinpath.("tuning/new_destroy_tune/results/" * parameter *"/", readdir("tuning/new_destroy_tune/results/" * parameter * "/"))
 if length(filepath) > 6
