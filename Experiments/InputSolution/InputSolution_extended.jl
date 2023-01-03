@@ -10,7 +10,7 @@ filename = split(split(filepath, ".")[1],"/")[3]
 
 data = readInstance(filepath)
 
-folder = "Experiments/InputSolution/initials/"
+folder = "Experiments/InputSolution/initials/exp/"
 empty_sol = readSolution(folder*filename*"_empty", data)
 good_sol = readSolution(folder*filename*"_good", data)
 bad_sol = readSolution(folder*filename*"_bad", data)

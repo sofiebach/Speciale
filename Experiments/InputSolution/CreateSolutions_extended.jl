@@ -29,7 +29,7 @@ for file in filepath
 
     
 
-    folder = "Experiments/InputSolution/initials/"
+    folder = "Experiments/InputSolution/initials/exp/"
     writeSolution(folder*filename*"_empty", data, empty_sol)
     writeSolution(folder*filename*"_good", data, good_sol)
     writeSolution(folder*filename*"_bad", data, bad_sol)
