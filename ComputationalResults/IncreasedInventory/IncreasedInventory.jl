@@ -2,7 +2,6 @@ include("../../ReadWrite.jl")
 include("../../MIPModels.jl")
 include("../../BasicFunctions.jl")
 
-#idx = parse(Int64, ENV["LSB_JOBINDEX"])
 idx = 1
 filepath = joinpath.("dataset/test/", readdir("dataset/test/"))[idx]
 filename = split(split(filepath, ".")[1],"/")[3]
