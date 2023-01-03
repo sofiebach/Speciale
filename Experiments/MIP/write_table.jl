@@ -2,8 +2,11 @@ include("../../ReadWrite.jl")
 
 filepath = joinpath.("Experiments/MIP/results/", readdir("Experiments/MIP/results/"))
 
-outFilebase = open("Experiments/MIP/table_base", "w")
-outFileext = open("Experiments/MIP/table_ext", "w")
+outFilebase4 = open("Experiments/MIP/table_base4", "w")
+outFileext4 = open("Experiments/MIP/table_ext4", "w")
+outFilebase1 = open("Experiments/MIP/table_base1", "w")
+outFileext1 = open("Experiments/MIP/table_ext1", "w")
+
 N = 4
 for file in filepath
     f = open(file)
@@ -26,30 +29,51 @@ for file in filepath
     time = parse.(Float64, readline(f))
     
     nameandtype = rsplit(split(file, "/")[4], "_", limit = 2)
-    if nameandtype[2] == "baseline"
-        write(outFilebase, "\$" * string(\) * "texttt{")
-        write(outFilebase, replace(nameandtype[1], "_" => "\\_") * "} \$")
-        write(outFilebase, " & ")
-        write(outFilebase, join(round(baseline, sigdigits = N)," "))
-        write(outFilebase, " &  ")
-        write(outFilebase, join(round(gap*100, sigdigits = N)," "))
-        write(outFilebase, " &  ")
-        write(outFilebase, join(round(time, sigdigits = N)," "))
-        write(outFilebase, "\\\\")
-        write(outFilebase, "\n")
+    if nameandtype[2][1] == 'b'
+        if nameandtype[2][9] == '1'
+            write(outFilebase1, "\$" * string(\) * "texttt{")
+            write(outFilebase1, replace(nameandtype[1], "_" => "\\_") * "} \$")
+            write(outFilebase1, " & ")
+            write(outFilebase1, join(round(baseline, sigdigits = N)," "))
+            write(outFilebase1, " &  ")
+            write(outFilebase1, join(round(gap*100, sigdigits = N)," "))
+            write(outFilebase1, " &  ")
+            write(outFilebase1, join(round(time, sigdigits = N)," "))
+            write(outFilebase1, "\n")
+        else
+            write(outFilebase4, " &  ")
+            write(outFilebase4, join(round(baseline, sigdigits = N)," "))
+            write(outFilebase4, " &  ")
+            write(outFilebase4, join(round(gap*100, sigdigits = N)," "))
+            write(outFilebase4, " &  ")
+            write(outFilebase4, join(round(time, sigdigits = N)," "))
+            write(outFilebase4, "\\\\")
+            write(outFilebase4, "\n")
+        end
     else
-        write(outFileext, "\$" * string(\) * "texttt{")
-        write(outFileext, replace(nameandtype[1], "_" => "\\_") * "} \$")
-        write(outFileext, " & ")
-        write(outFileext, join(round(extended, sigdigits = N)," "))
-        write(outFileext, " &  ")
-        write(outFileext, join(round(gap*100, sigdigits = N)," "))
-        write(outFileext, " &  ")
-        write(outFileext, join(round(time, sigdigits = N)," "))
-        write(outFileext, "\\\\")
-        write(outFileext, "\n")
+        if nameandtype[2][9] == '1'
+            write(outFileext1, "\$" * string(\) * "texttt{")
+            write(outFileext1, replace(nameandtype[1], "_" => "\\_") * "} \$")
+            write(outFileext1, " & ")
+            write(outFileext1, join(round(baseline, sigdigits = N)," "))
+            write(outFileext1, " &  ")
+            write(outFileext1, join(round(gap*100, sigdigits = N)," "))
+            write(outFileext1, " &  ")
+            write(outFileext1, join(round(time, sigdigits = N)," "))
+            write(outFileext1, "\n")
+        else
+            write(outFileext4, " & ")
+            write(outFileext4, join(round(baseline, sigdigits = N)," "))
+            write(outFileext4, " &  ")
+            write(outFileext4, join(round(gap*100, sigdigits = N)," "))
+            write(outFileext4, " &  ")
+            write(outFileext4, join(round(time, sigdigits = N)," "))
+            write(outFileext4, "\\\\")
+            write(outFileext4, "\n")
+        end
     end
-
 end
-close(outFilebase)
-close(outFileext)
+close(outFilebase1)
+close(outFileext1)
+close(outFilebase4)
+close(outFileext4)
