@@ -42,9 +42,6 @@ for file in filepath
             write(outFilebase1, "\n")
         else
             write(outFilebase4, " &  ")
-            write(outFilebase4, "\$" * string(\) * "texttt{")
-            write(outFilebase4, replace(nameandtype[1], "_" => "\\_") * "} \$")
-            write(outFilebase4, " & ")
             write(outFilebase4, join(round(baseline, sigdigits = N)," "))
             write(outFilebase4, " &  ")
             write(outFilebase4, join(round(gap*100, sigdigits = N)," "))
@@ -65,9 +62,6 @@ for file in filepath
             write(outFileext1, join(round(time, sigdigits = N)," "))
             write(outFileext1, "\n")
         else
-            write(outFileext4, " & ")
-            write(outFileext4, "\$" * string(\) * "texttt{")
-            write(outFileext4, replace(nameandtype[1], "_" => "\\_") * "} \$")
             write(outFileext4, " & ")
             write(outFileext4, join(round(baseline, sigdigits = N)," "))
             write(outFileext4, " &  ")
