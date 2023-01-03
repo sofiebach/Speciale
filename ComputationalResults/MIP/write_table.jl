@@ -1,11 +1,11 @@
 include("../../ReadWrite.jl")
 
-filepath = joinpath.("Experiments/MIP/results/", readdir("Experiments/MIP/results/"))
+filepath = joinpath.("ComputationalResults/MIP/results/", readdir("ComputationalResults/MIP/results/"))
 
-outFilebase4 = open("Experiments/MIP/table_base4", "w")
-outFileext4 = open("Experiments/MIP/table_ext4", "w")
-outFilebase1 = open("Experiments/MIP/table_base1", "w")
-outFileext1 = open("Experiments/MIP/table_ext1", "w")
+outFilebase4 = open("ComputationalResults/MIP/table_base4", "w")
+outFileext4 = open("ComputationalResults/MIP/table_ext4", "w")
+outFilebase1 = open("ComputationalResults/MIP/table_base1", "w")
+outFileext1 = open("ComputationalResults/MIP/table_ext1", "w")
 
 N = 4
 for file in filepath

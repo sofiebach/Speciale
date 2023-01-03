@@ -1,8 +1,8 @@
 include("../../ReadWrite.jl")
 
-filepath = joinpath.("Experiments/MIP/results/", readdir("Experiments/MIP/results/"))
+filepath = joinpath.("ComputationalResults/MIP/results/4thread/", readdir("ComputationalResults/MIP/results/4thread/"))
 
-outFile = open("Experiments/MIP/table_comparison", "w")
+outFile = open("ComputationalResults/MIP/table_comparison", "w")
 N = 4
 
 base_obj = 0
@@ -29,12 +29,12 @@ for file in filepath
     objective = parse.(Float64, split(readline(f)," "))
     close(f)
 
-    name, type = rsplit(split(file, "/")[4], "_", limit = 2)
+    name, type = rsplit(split(file, "/")[5], "_", limit = 2)
     data = readInstance("dataset/test/"*name*".txt")
     scope = round(data.lambda * objective[1], sigdigits=N)
     spread = round((1-data.lambda) * (objective[2] + objective[3]), sigdigits=N)
 
-    if type == "baseline"
+    if type[1] == 'b'
         base_scope += scope
         base_spread += spread 
         base_obj += obj
