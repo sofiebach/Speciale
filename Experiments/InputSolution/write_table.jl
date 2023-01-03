@@ -5,6 +5,7 @@ filepath = joinpath.(folder*"results/", readdir(folder*"results/"))
 
 outFile = open(folder*"table", "w")
 
+
 for file in filepath
     f = open(file)
     readline(f) # empty 	 bad 	 good 
@@ -13,7 +14,6 @@ for file in filepath
     readline(f) # blank
     readline(f) # standard deviations
     stds = parse.(Float64, split(readline(f)," "))
-    
     nameandtype = rsplit(split(file, "/")[4], "_", limit = 2)
     if nameandtype[2] == "baseline"
         write(outFile, "\$" * string(\) * "texttt{")

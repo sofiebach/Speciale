@@ -1,8 +1,7 @@
 include("../../ReadWrite.jl")
-include("ALNS_analysis.jl")
+include("../../ALNS.jl")
 
-# idx = parse(Int64, ENV["LSB_JOBINDEX"])
-idx = 4
+idx = parse(Int64, ENV["LSB_JOBINDEX"])
 
 filepath = joinpath.("dataset/train/", readdir("dataset/train/"))[idx]
 filename = split(split(filepath, ".")[1],"/")[3]
@@ -12,22 +11,21 @@ folder = "Experiments/DestroyRepair/initials/"
 init_sol = readSolution(folder*filename, data)
 init_obj = init_sol.exp_obj
 
-destroy_functions = [horizontalDestroy!,verticalDestroy!,randomDestroy!,relatedDestroy!,worstIdleDestroy!,stackDestroy!]
-repair_functions = [greedyRepair!, firstRepair!,flexibilityRepair!,bestRepair!,modelRepair!,horizontalModelRepair!,regretRepair!]
+destroys = true*ones(Bool, 6)
+repairs = true*ones(Bool, 7)
 
-N = 3
-M = length(destroy_functions)
+N = 5
+M = length(destroys)
 time_limit = data.timeperiod * 60
-time_limit = 10
 type = "extended"
 imps = zeros(Float64, M)
 stds = zeros(Float64, M)
 for i = 1:M
     objs = zeros(Float64, N)
-    destroys = deepcopy(destroy_functions)
-    deleteat!(destroys, i)
+    temp_destroys = deepcopy(destroys)
+    temp_destroys[i] = false
     for n = 1:N
-        sol, params = ALNS_analysis(data,init_sol,time_limit,type,destroys,repair_functions)
+        sol, params = ALNS_final(data,init_sol,time_limit,type,repairs,temp_destroys)
         objs[n] = sol.exp_obj
     end
     imps[i] = 100 * (init_obj - mean(objs)) / init_obj
@@ -35,8 +33,6 @@ for i = 1:M
 end
 
 outFile = open("Experiments/DestroyRepair/results/destroy/" * filename, "w")
-write(outFile, "functions\n")
-write(outFile, join(destroy_functions," ")*"\n\n")
 write(outFile, "average imps\n")
 write(outFile, join(imps," ")*"\n\n")
 write(outFile, "standard deviations\n")
