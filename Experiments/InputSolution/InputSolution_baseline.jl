@@ -20,7 +20,7 @@ modelRepair = false
 N = 5
 time_limit = data.timeperiod * 60
 
-repairs=[true,true,true,true,true,true,false]
+repairs=[true,true,true,true,true,true,true]
 destroys=[true,true,true,true,true,true]
 
 objs = zeros(Float64, 3, N)
