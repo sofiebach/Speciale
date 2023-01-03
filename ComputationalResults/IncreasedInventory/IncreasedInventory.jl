@@ -14,7 +14,7 @@ data.H = data.H * 50
 
 solver = "Gurobi"
 log = 1
-time_limit = 24 * 60
+time_limit = 24 * 60 * 60
 x, gap, time = MIPExtended(data, solver, log, time_limit)
 sol = MIPtoSol(data, x)
 
