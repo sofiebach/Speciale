@@ -21,7 +21,7 @@ function tune(thetas,alphas,Ws,gammas,destroy_fracs,segment_sizes,long_term_upda
         value_idx += 1
         gap = []
         for n = 1:N
-            sol, _ = ALNS(data,init_sol[n],time_limit,"extended",false,theta,alpha,W,gamma,destroy_frac,segment_size,long_term_update)
+            sol, _ = ALNS(data,init_sol[n],time_limit,"extended",true,theta,alpha,W,gamma,destroy_frac,segment_size,long_term_update)
             append!(gap,(init_sol[n].exp_obj - sol.exp_obj)/init_sol[n].exp_obj)
         end
         stds[value_idx] = std(gap)
