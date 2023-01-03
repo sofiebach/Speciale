@@ -19,14 +19,16 @@ type = "baseline"
 modelRepair = false
 N = 5
 time_limit = data.timeperiod * 60
-#time_limit = 10
+
+repairs=[true,true,true,true,true,true,false]
+destroys=[true,true,true,true,true,true]
 
 objs = zeros(Float64, 3, N)
 for n = 1:N
     # Run ALNS on input solutions
-    sol1, params1 = ALNS_final(data, empty_sol, time_limit, type, modelRepair)
-    sol2, params2 = ALNS_final(data, bad_sol, time_limit, type, modelRepair)
-    sol3, params3 = ALNS_final(data, good_sol, time_limit, type, modelRepair)
+    sol1, params1 = ALNS_final(data, empty_sol, time_limit, type, repairs, destroys)
+    sol2, params2 = ALNS_final(data, bad_sol, time_limit, type, repairs, destroys)
+    sol3, params3 = ALNS_final(data, good_sol, time_limit, type, repairs, destroys)
     objs[1, n] = sol1.base_obj
     objs[2, n] = sol2.base_obj
     objs[3, n] = sol3.base_obj
