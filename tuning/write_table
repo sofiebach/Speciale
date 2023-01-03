@@ -1,7 +1,7 @@
 include("../ReadWrite.jl")
 
 
-parameter = "W"
+parameter = "frac"
 
 filepath = joinpath.("tuning/results/" * parameter *"/", readdir("tuning/results/" * parameter * "/"))
 

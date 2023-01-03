@@ -24,9 +24,9 @@ time_limit = data.timeperiod * 60
 objs = zeros(Float64, 3, N)
 for n = 1:N
     # Run ALNS on input solutions
-    sol1, params1 = ALNS(data, empty_sol, time_limit, type, modelRepair)
-    sol2, params2 = ALNS(data, bad_sol, time_limit, type, modelRepair)
-    sol3, params3 = ALNS(data, good_sol, time_limit, type, modelRepair)
+    sol1, params1 = ALNS_final(data, empty_sol, time_limit, type, modelRepair)
+    sol2, params2 = ALNS_final(data, bad_sol, time_limit, type, modelRepair)
+    sol3, params3 = ALNS_final(data, good_sol, time_limit, type, modelRepair)
     objs[1, n] = sol1.exp_obj
     objs[2, n] = sol2.exp_obj
     objs[3, n] = sol3.exp_obj
