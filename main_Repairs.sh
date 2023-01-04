@@ -17,7 +17,7 @@
 ### -- specify that we want the job to get killed if it exceeds 3 GB per core/slot --
 #BSUB -M 3GB
 ### -- set walltime limit: hh:mm --
-#BSUB -W 24:00
+#BSUB -W 48:00
 ### -- set the email address --
 ##BSUB -u s174500student.dtu.dk
 ### -- send notification at start --
