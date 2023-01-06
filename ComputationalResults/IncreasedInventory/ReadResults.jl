@@ -6,7 +6,6 @@ filepath = joinpath.("dataset/test/", readdir("dataset/test/"))[idx]
 filename = split(split(filepath, ".")[1],"/")[3]
 
 data = readInstance(filepath)
-filename="dummy"
 sol = readSolution("ComputationalResults/IncreasedInventory/results/"*filename, data)
 
 init_I = data.I * 50
