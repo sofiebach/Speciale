@@ -4,11 +4,27 @@ include("Validation/PlotSolution.jl")
 include("Validation/ValidateSolution.jl")
 include("MIPModels.jl")
 
-data = readInstance("dataset/test/100_0_0.txt")
+data = readInstance("dataset/test/50_0_0.txt")
+
+for i = 1:10
+    sol = randomInitial(data)
+
+    sol1, params = ALNS_final(data, sol, 180, "extended")
+
+    probabilityTracking(params, "testplots/probs_"* string(i))
+    solutionTracking(params, "testplots/solutuin_"* string(i))
+    writeParameters("params_" * string(i), params)
+end
+
 
 sol = randomInitial(data)
 
-params, sol = ALNS_final(data, sol, 120, "extended")
+sol1, params = ALNS_final(data, sol, 120, "extended", [true,true,true,true,true,true,true],[true,true,true,true,false,true])
+
+probabilityTracking(params, "testplots/probs_horizontal")
+solutionTracking(params, "testplots/solutuin_horizontal")
+
+
 
 drawTVSchedule(data, sol, "theatest/empty", 1, true)
 

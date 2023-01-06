@@ -261,7 +261,7 @@ function ALNS_final(data,sol,time_limit,type="baseline",repairs=[true,true,true,
     visited_g = Float64[]
     visited_L = Float64[]
     
-    theta = 0.001
+    theta = 0.01
     alpha = 0.99975
     W = [10,5,2]
     gamma = 0.75
@@ -507,5 +507,5 @@ function ALNS_final(data,sol,time_limit,type="baseline",repairs=[true,true,true,
     return best_sol, (prob_destroy=prob_destroy, prob_repair=prob_repair, destroys=destroys,  prob_destroy_it = prob_destroy_it,
     prob_repair_it = prob_repair_it, repairs=repairs, current_obj=current_obj, current_best=current_best, status=status, 
     time_repair=time_repair, time_destroy=time_destroy, num_repair=num_repair, num_destroy=num_destroy, destroy_names = destroy_names,
-    repair_names = repair_names, iter = it, T_it = T_it, w_repair=w_repair, w_destroy=w_destroy, W = W)
+    repair_names = repair_names, iter = it, T_it = T_it, w_repair=w_repair, w_destroy=w_destroy, W = W, segment = segment_size)
 end
