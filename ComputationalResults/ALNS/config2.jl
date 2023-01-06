@@ -5,7 +5,7 @@ include("../../ALNS.jl")
 
 function dummyfunction()
     idx = parse(Int64, ENV["LSB_JOBINDEX"])
-    idx = 4
+    #idx = 4
 
     configuration = "config2/"
 
@@ -15,12 +15,12 @@ function dummyfunction()
     data = readInstance(filepath)
 
     timelimit = data.timeperiod*60
-    timelimit = 5
+    #timelimit = 5
     best_i = 0
     best_obj = 1000
 
-    #N = 20
-    N = 3
+    N = 20
+    #N = 3
     for i = 1:N
         sol = randomInitial(data)
         sol, params = ALNS_final(data, sol, timelimit, "extended", [false,false,false,true,true,false,false],[true,false,true,false,false,false])
