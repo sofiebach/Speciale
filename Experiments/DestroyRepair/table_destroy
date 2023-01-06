@@ -1,8 +1,9 @@
-Without \& Avg. imp. (\%) \& Std. \\idrulele 
-Nothing & 21.96 & NaN \\ 
-horizontalDestroy! & 28.11 & NaN \\ 
-verticalDestroy! & 35.46 & NaN \\ 
-randomDestroy! & 26.57 & NaN \\ 
-relatedDestroy! & 30.79 & NaN \\ 
-worstIdleDestroy! & 22.2 & NaN \\ 
-stackDestroy! & 36.36 & NaN \\ 
+Without & Avg. imp. (\%) & Std. \\ 
+\midrule 
+Nothing & 45.55 & 0.1 \\ 
+horizontalDestroy! & 45.64 & 0.13 \\ 
+verticalDestroy! & 45.69 & 0.097 \\ 
+randomDestroy! & 44.37 & 0.26 \\ 
+relatedDestroy! & 45.67 & 0.12 \\ 
+worstIdleDestroy! & 45.62 & 0.14 \\ 
+stackDestroy! & 45.53 & 0.12 \\ 

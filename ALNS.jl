@@ -261,9 +261,9 @@ function ALNS_final(data,sol,time_limit,type="baseline",repairs=[true,true,true,
     visited_g = Float64[]
     visited_L = Float64[]
     
-    theta = 0.005
+    theta = 0.001
     alpha = 0.99975
-    W = [10,9,1]
+    W = [10,5,2]
     gamma = 0.75
     segment_size = 10
     long_term_update = 0.0025

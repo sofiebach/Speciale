@@ -71,7 +71,7 @@ function drawHeatmap(data, sol, filename, pdf=0, DR=false)
 
         f,(ax1,ax2) = plt.subplots(2,1, figsize = (12,8), gridspec_kw={'height_ratios': [1, 2]})
         
-        max_total = max(df1.max().max(),df2.max().max())
+        max_total = max(max(df1.max().max(),df2.max().max()),1)
         cbar_ax = f.add_axes([.91, .05, .02, .92])
         
         #M = 15

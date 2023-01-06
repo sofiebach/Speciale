@@ -7,6 +7,24 @@ include("MIPModels.jl")
 data = readInstance("dataset/test/100_0_0.txt")
 
 sol = randomInitial(data)
+
+params, sol = ALNS_final(data, sol, 120, "extended")
+
+drawTVSchedule(data, sol, "theatest/empty", 1, true)
+
+drawHeatmap(data, sol, "theatest/emptyheat", true)
+
+insert!(data, sol, 11, 1)
+
+drawHeatmap(data, sol, "theatest/insertedheat", true)
+drawTVSchedule(data, sol, "theatest/inserted", 1, true)
+
+insert!(data, sol, 11, 1)
+
+drawHeatmap(data, sol, "theatest/inserted2heat", true)
+drawTVSchedule(data, sol, "theatest/inserted2", 1, true)
+
+sol = randomInitial(data)
 sol, params = ALNS_final_methodinput(data, sol, 60, "extended", [1,1,0,1,0,0,0], [1,1,1,0,0,1])
 
 probabilityTracking(params, "test")
