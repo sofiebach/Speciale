@@ -255,6 +255,7 @@ function ALNS_final(data,sol,time_limit,type="baseline",repairs=[true,true,true,
     best_sol = deepcopy(sol)
     temp_sol = deepcopy(sol)
     start_time = time_ns()
+    new_best_time = 0
 
     visited_obj = Float64[]
     visited_k = Float64[]
@@ -317,6 +318,7 @@ function ALNS_final(data,sol,time_limit,type="baseline",repairs=[true,true,true,
     n_r = length(repair_functions)
 
     T = T_start
+    
 
     rho_destroy = ones(n_d)
     w_destroy = zeros(Int64, n_d, length(W))
@@ -467,6 +469,7 @@ function ALNS_final(data,sol,time_limit,type="baseline",repairs=[true,true,true,
             w_destroy[selected_destroy, 1] += 1
             println("New best")
             println(temp_obj)
+            new_best_time = elapsedTime(start_time)
         elseif temp_obj < sol_obj && unvisited
             sol = deepcopy(temp_sol)
             w = W[2]
@@ -507,5 +510,5 @@ function ALNS_final(data,sol,time_limit,type="baseline",repairs=[true,true,true,
     return best_sol, (prob_destroy=prob_destroy, prob_repair=prob_repair, destroys=destroys,  prob_destroy_it = prob_destroy_it,
     prob_repair_it = prob_repair_it, repairs=repairs, current_obj=current_obj, current_best=current_best, status=status, 
     time_repair=time_repair, time_destroy=time_destroy, num_repair=num_repair, num_destroy=num_destroy, destroy_names = destroy_names,
-    repair_names = repair_names, iter = it, T_it = T_it, w_repair=w_repair, w_destroy=w_destroy, W = W, segment = segment_size)
+    repair_names = repair_names, iter = it, T_it = T_it, w_repair=w_repair, w_destroy=w_destroy, W = W, segment = segment_size, new_best_time = new_best_time)
 end

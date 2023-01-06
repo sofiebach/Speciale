@@ -474,6 +474,12 @@ function writeParameters(filename, params)
 
     write(outFile, "W\n")
     write(outFile, join(params.W," ")*"\n\n")
+
+    write(outFile, "Segment size\n")
+    write(outFile, join(params.segment," ")*"\n\n")
+
+    write(outFile, "Time for new best\n")
+    write(outFile, join(params.new_best_time," ")*"\n\n")
     close(outFile)
 end
 
@@ -538,11 +544,17 @@ function readParameters(filename)
     readline(f) # blank
     readline(f) # W
     W = parse.(Float64,split(readline(f)))
+    readline(f) # blank
+    readline(f) # segment size
+    segment = parse.(Int64, readline(f))
+    readline(f) # blank
+    readline(f) # time for new best
+    time = parse.(Float64, readline(f))
     
     return (prob_destroy=prob_destroy, prob_repair=prob_repair, destroys=destroys, prob_destroy_it = prob_destroy_it,
     prob_repair_it = prob_repair_it, repairs=repairs, current_obj=current_obj, current_best=current_best, status=status, 
     time_repair=time_repair, time_destroy=time_destroy, num_repair=num_repair, num_destroy=num_destroy, 
-    destroy_names=destroy_names, repair_names=repair_names, iter = iter, T_it = T_it, W = W)
+    destroy_names=destroy_names, repair_names=repair_names, iter = iter, T_it = T_it, W = W, segment = segment, new_best_time = time)
 end
 
 function findSimilarity(data)
