@@ -2,7 +2,9 @@ include("../../ReadWrite.jl")
 
 folder = "Experiments/InputSolution/"
 filepath = joinpath.(folder*"results/", readdir(folder*"results/"))
-
+if length(filepath) > 2*6
+    filepath = filepath[2:end]
+end
 outFile = open(folder*"table", "w")
 
 

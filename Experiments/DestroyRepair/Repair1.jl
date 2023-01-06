@@ -2,7 +2,6 @@ include("../../ReadWrite.jl")
 include("../../ALNS.jl")
 
 idx = parse(Int64, ENV["LSB_JOBINDEX"])
-
 filepath = joinpath.("dataset/train/", readdir("dataset/train/"))[idx]
 filename = split(split(filepath, ".")[1],"/")[3]
 
@@ -15,12 +14,15 @@ destroys = true*ones(Bool, 6)
 repairs = true*ones(Bool, 7)
 
 N = 5
-M = length(destroys)+1
+M = length(repairs)+1
 time_limit = data.timeperiod * 60
 type = "extended"
 imps = zeros(Float64, M)
 stds = zeros(Float64, M)
 for i = 1:M
+    if i < M 
+        continue 
+    end
     objs = zeros(Float64, N)
     temp_repairs = deepcopy(repairs)
     if i > 1
