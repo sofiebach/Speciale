@@ -20,9 +20,6 @@ type = "extended"
 imps = zeros(Float64, M)
 stds = zeros(Float64, M)
 for i = 1:M
-    if i < M 
-        continue 
-    end
     objs = zeros(Float64, N)
     temp_repairs = deepcopy(repairs)
     if i > 1
