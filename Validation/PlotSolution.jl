@@ -104,10 +104,7 @@ function drawHeatmap(data, sol, filename, pdf=0, DR=false)
         ax2.title.set_size(fontsize)
         
         f.tight_layout(rect=[0, 0, .9, 1])
-        if pdf == 0:
-            plt.savefig(filename + ".png")
-        else:
-            plt.savefig(filename + ".pdf")
+        plt.savefig(filename)
         # plt.show()
         plt.close
     """
@@ -139,7 +136,7 @@ function solutionTracking(params, filename)
         plt.legend(["Accepted", "New best"], fontsize="15")
         plt.tick_params(axis='x', labelsize=15)
         plt.tick_params(axis='y', labelsize=15)
-        plt.savefig(filename + ".png")
+        plt.savefig(filename)
         # plt.show()
         plt.close
     """
@@ -169,7 +166,7 @@ function solutionTracking_all(params, filename)
         plt.legend(["Accepted", "New best"], fontsize="15")
         plt.tick_params(axis='x', labelsize=15)
         plt.tick_params(axis='y', labelsize=15)
-        plt.savefig(filename + ".png")
+        plt.savefig(filename)
         # plt.show()
         plt.close
     """
@@ -191,7 +188,7 @@ function temperatureTracking(params, filename)
     def tempPlot(params, filename):
         plt.figure()
         plt.plot(params.T_it)
-        plt.savefig(filename + ".png")
+        plt.savefig(filename)
         # plt.show()
         plt.close
     """
@@ -229,14 +226,14 @@ function probabilityTracking(params, filename)
             ax2.title.set_text('Repair')
             ax2.set_ylim(0,1)
             i += 1
-        plt.savefig(filename + ".png")
+        plt.savefig(filename)
         # plt.show()
         plt.close
     """
     py"progDR"(params, filename)
 end
 
-function drawTVSchedule(data, sol, filename, plot_channel = 0, pdf = false)
+function drawTVSchedule(data, sol, filename, plot_channel = 0)
     p_tv = findall(x -> x == "TV", data.campaign_type)
     unique_BC_names = unique(data.BC_names[p_tv])
 
@@ -311,11 +308,8 @@ function drawTVSchedule(data, sol, filename, plot_channel = 0, pdf = false)
     width = data.T+offset + 2
     col = distinguishable_colors(length(unique_P_names)+1)[2:(length(unique_P_names)+1)]
 
-    if pdf
-        Drawing(width*scalar, height*scalar, filename * ".pdf")
-    else
-        Drawing(width*scalar, height*scalar, filename * ".png")
-    end
+    Drawing(width*scalar, height*scalar, filename)
+
     background("white") # color of background
     origin() 
 
@@ -419,7 +413,7 @@ end
 
 
 
-function drawRadioSchedule(data, sol, filename, plot_channel = 0, pdf = false)
+function drawRadioSchedule(data, sol, filename, plot_channel = 0)
     p_radio = findall(x -> x == "RADIO", data.campaign_type)
     unique_BC_names = unique(data.BC_names[p_radio])
     
@@ -494,11 +488,8 @@ function drawRadioSchedule(data, sol, filename, plot_channel = 0, pdf = false)
     width = data.T+offset + 2
     col = distinguishable_colors(length(unique_P_names)+1)[2:(length(unique_P_names)+1)]
 
-    if pdf
-        Drawing(width*scalar, height*scalar, filename * ".pdf")
-    else
-        Drawing(width*scalar, height*scalar, filename * ".png")
-    end
+    Drawing(width*scalar, height*scalar, filename)
+
     background("white") # color of background
     origin() 
 
@@ -625,7 +616,7 @@ function plotWparams(params, filename)
         ax.bar_label(rects2, padding=3)
         ax.bar_label(rects3, padding=3)
         fig.tight_layout()
-        plt.savefig(filename + "_barRepair.png")
+        plt.savefig(filename)
         #plt.show()
         plt.close
 
@@ -649,12 +640,67 @@ function plotWparams(params, filename)
         ax.bar_label(rects2, padding=3)
         ax.bar_label(rects3, padding=3)
         fig.tight_layout()
-        plt.savefig(filename + "_barDestroy.png")
+        plt.savefig(filename)
         #plt.show()
         plt.close
     """
     py"wPlot"(params, filename)
 end
 
+function plotWparamsInput(params, w_destroy, w_repair, filename)
+    py"""
+    import matplotlib.pyplot as plt
+    import numpy as np
+    def wPlot(params, w_destroy, w_repair, filename):
+        # Repair plot
+        labels = params.repair_names
+        best = w_repair[:,0]
+        improving = w_repair[:,1]
+        accepted = w_repair[:,2]
+        x = np.arange(len(labels))  # the label locations
+        width = 0.2  # the width of the bars
+        fig, ax = plt.subplots()
+        rects1 = ax.bar(x - width, best, width, label='Best')
+        rects2 = ax.bar(x, improving, width, label='Improving')
+        rects3 = ax.bar(x + width, accepted, width, label='Accepted')
+        ax.set_ylabel('Scores')
+        ax.set_title('Scores of repair methods')
+        ax.set_xticks(x, labels)
+        plt.xticks(rotation=45)
+        ax.legend()
+        ax.bar_label(rects1, padding=3)
+        ax.bar_label(rects2, padding=3)
+        ax.bar_label(rects3, padding=3)
+        fig.tight_layout()
+        plt.savefig(filename)
+        #plt.show()
+        plt.close
+
+        # Destroy plot
+        labels = params.destroy_names
+        best = w_destroy[:,0]
+        improving = w_destroy[:,1]
+        accepted = w_destroy[:,2]
+        x = np.arange(len(labels))  # the label locations
+        width = 0.2  # the width of the bars
+        fig, ax = plt.subplots()
+        rects1 = ax.bar(x - width, best, width, label='Best')
+        rects2 = ax.bar(x, improving, width, label='Improving')
+        rects3 = ax.bar(x + width, accepted, width, label='Accepted')
+        ax.set_ylabel('Scores')
+        ax.set_title('Scores of repair methods')
+        ax.set_xticks(x, labels)
+        plt.xticks(rotation=45)
+        ax.legend()
+        ax.bar_label(rects1, padding=3)
+        ax.bar_label(rects2, padding=3)
+        ax.bar_label(rects3, padding=3)
+        fig.tight_layout()
+        plt.savefig(filename)
+        #plt.show()
+        plt.close
+    """
+    py"wPlot"(params,w_destroy, w_repair, filename)
+end
 
 

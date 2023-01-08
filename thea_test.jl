@@ -4,22 +4,56 @@ include("Validation/PlotSolution.jl")
 include("Validation/ValidateSolution.jl")
 include("MIPModels.jl")
 
-data = readInstance("dataset/test/50_0_0.txt")
+data = readInstance("dataset/test/100_0_0.txt")
+
+sol = readSolution("ComputationalResults/ALNS/results/config1/100_0_0/solution_15", data)
+params = readParameters("ComputationalResults/ALNS/results/config1/100_0_0/params_15")
+
+w_destroy = zeros(Int64,length(params.num_destroy), 3)
+w_repair = zeros(Int64,length(params.num_repair), 3)
+
+for i = 1:length(params.status)
+    if params.status[i] == params.W[1]
+        w_destroy[params.destroys[i], 1] += 1
+        w_repair[params.repairs[i], 1] += 1
+    end
+    if params.status[i] == params.W[2]
+        w_destroy[params.destroys[i], 2] += 1
+        w_repair[params.repairs[i], 2] += 1
+    end
+    if params.status[i] == params.W[3]
+        w_destroy[params.destroys[i], 3] += 1
+        w_repair[params.repairs[i], 3] += 1
+    end
+end
+
+probabilityTracking(params, "ComputationalResults/ALNS/plots/config1_probability")
+plotWparamsInput(params, w_destroy, w_repair, "ComputationalResults/ALNS/plots/config1_bar")
+solutionTracking(params,  "ComputationalResults/ALNS/plots/config1_SA")
+drawTVSchedule(data, sol, "ComputationalResults/ALNS/plots/config1_schedule")
+
+
+firstRepair!(data, sol, "extended")
+
+drawTVSchedule(data,sol,"hej")
 
 for i = 1:10
     sol = randomInitial(data)
 
-    sol1, params = ALNS_final(data, sol, 180, "extended")
+    sol1, params = ALNS_final(data, sol, 10, "extended")
 
     probabilityTracking(params, "testplots/probs_"* string(i))
     solutionTracking(params, "testplots/solutuin_"* string(i))
     writeParameters("params_" * string(i), params)
 end
 
+writeParameters("params_", params)
+params2 = 
+readParameters("params_").new_best_time
 
 sol = randomInitial(data)
 
-sol1, params = ALNS_final(data, sol, 120, "extended", [true,true,true,true,true,true,true],[true,true,true,true,false,true])
+sol1, params = ALNS_final(data, sol, 5*60, "extended", [false,false,false,true,true,true,false],[true,false,true,false,false,true])
 
 probabilityTracking(params, "testplots/probs_horizontal")
 solutionTracking(params, "testplots/solutuin_horizontal")
