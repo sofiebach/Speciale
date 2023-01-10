@@ -14,7 +14,7 @@ function dummyfunction()
     folder = "ComputationalResults/ALNS/results/"
     data = readInstance(filepath)
 
-    timelimit = data.timeperiod*60
+    timelimit = 30*60
     #timelimit = 5
     best_i = 0
     best_obj = 1000
