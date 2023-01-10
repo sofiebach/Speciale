@@ -14,8 +14,8 @@ function dummyfunction()
     
     if (!isdir(folder * configuration * filename))
         mkpath(folder * configuration * filename)
-        io = open(folder * configuration * filename * "/file.txt", "w")
-        close(io)
+        #io = open(folder * configuration * filename * "/file.txt", "w")
+        #close(io)
     end
 
     timelimit = 30*60
