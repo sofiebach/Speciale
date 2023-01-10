@@ -33,4 +33,4 @@ module load gurobi/9.5.2
 module load julia/1.7.0
 
 # here follow the commands you want to execute
-julia-current Experiments/MIP/main_extended_1thread.jl &> results_MIP_extended1.txt
+julia-current ComputationalResults/MIP/main_extended_1thread.jl &> results_MIP_extended1.txt
