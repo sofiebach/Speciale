@@ -79,7 +79,7 @@ function worstIdleDestroy!(data, sol, frac)
     end
 end
 
-function stackDestroy!(data, sol, frac)
+function concurrentDestroy!(data, sol, frac)
     n_destroy = ceil(sol.num_campaigns*frac)
     while n_destroy > 0
         val, idx = findmax(sol.g)
@@ -101,7 +101,7 @@ function stackDestroy!(data, sol, frac)
     end
 end
 
-function relatedDestroy!(data,sol,frac)
+function similarityDestroy!(data,sol,frac)
     n_destroy = ceil(sol.num_campaigns*frac)
     while n_destroy > 0
         if sum(sol.k) > 0
