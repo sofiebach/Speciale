@@ -9,7 +9,7 @@ filename = split(split(filepath, ".")[1],"/")[3]
 folder = "Experiments/MIP/results/"
 data = readInstance(filepath)
 
-timelimit = data.timeperiod*60
+timelimit = 30*60
 
 
 
