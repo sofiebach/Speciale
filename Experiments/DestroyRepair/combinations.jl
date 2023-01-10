@@ -2,14 +2,14 @@ include("../../ReadWrite.jl")
 include("../../ALNS.jl")
 
 idx = parse(Int64, ENV["LSB_JOBINDEX"])
-idx=3
+#idx=3
 filepath = joinpath.("dataset/train/", readdir("dataset/train/"))[idx]
 filename = split(split(filepath, ".")[1],"/")[3]
 
 data = readInstance(filepath)
 sol = randomInitial(data)
 time_limit = data.timeperiod*60
-time_limit=10
+#time_limit=10
 sol, params = ALNS_final(data, sol, time_limit, "extended")
 
 folder = "Experiments/DestroyRepair/results/combinations/"
