@@ -34,7 +34,7 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.005,
     if type == "baseline"
         T_start = -theta*temp_sol.base_obj/log(0.5)
         repair_functions = [greedyRepair!,firstRepair!,flexibilityRepair!,bestRepair!,modelRepair!]
-        destroy_functions = [horizontalDestroy!,verticalDestroy!,randomDestroy!,relatedDestroy!]
+        destroy_functions = [horizontalDestroy!,verticalDestroy!,randomDestroy!,similarityDestroy!]
         n_d = length(destroy_functions)
         if modelRepair
             n_r = length(repair_functions)
@@ -44,7 +44,7 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.005,
     elseif type == "extended"
         T_start = -theta*temp_sol.exp_obj/log(0.5)
         repair_functions = [greedyRepair!, firstRepair!,flexibilityRepair!,bestRepair!,horizontalModelRepair!,regretRepair!,modelRepair!]
-        destroy_functions = [horizontalDestroy!,verticalDestroy!,randomDestroy!,relatedDestroy!,worstIdleDestroy!,stackDestroy!]
+        destroy_functions = [horizontalDestroy!,verticalDestroy!,randomDestroy!,similarityDestroy!,worstIdleDestroy!,concurrentDestroy!]
         n_d = length(destroy_functions)
         if modelRepair
             n_r = length(repair_functions)
@@ -270,13 +270,13 @@ function ALNS_final(data,sol,time_limit,type="baseline",repairs=[true,true,true,
     long_term_update = 0.0025
 
     repair_functions = [greedyRepair!, firstRepair!,flexibilityRepair!,bestRepair!,horizontalModelRepair!,regretRepair!,modelRepair!]
-    destroy_functions = [horizontalDestroy!,verticalDestroy!,randomDestroy!,relatedDestroy!,worstIdleDestroy!,stackDestroy!]
+    destroy_functions = [horizontalDestroy!,verticalDestroy!,randomDestroy!,similarityDestroy!,worstIdleDestroy!,concurrentDestroy!]
     destroy_fracs = [0.1,0.05,0.05,0.1,0.3,0.15]
 
     if type == "baseline"
         T_start = -theta*temp_sol.base_obj/log(0.5)
         # repair_functions = [greedyRepair!,firstRepair!,flexibilityRepair!,bestRepair!,modelRepair!]
-        # destroy_functions = [horizontalDestroy!,verticalDestroy!,randomDestroy!,relatedDestroy!]
+        # destroy_functions = [horizontalDestroy!,verticalDestroy!,randomDestroy!,similarityDestroy!]
         # destroy_fracs = [0.1,0.05,0.05,0.1]
         # for i in collect(StepRange(length(repair_functions), -1, 1))
         #     if !repairs[i]
@@ -297,7 +297,7 @@ function ALNS_final(data,sol,time_limit,type="baseline",repairs=[true,true,true,
     elseif type == "extended"
         T_start = -theta*temp_sol.exp_obj/log(0.5)
         # repair_functions = [greedyRepair!, firstRepair!,flexibilityRepair!,bestRepair!,horizontalModelRepair!,regretRepair!,modelRepair!]
-        # destroy_functions = [horizontalDestroy!,verticalDestroy!,randomDestroy!,relatedDestroy!,worstIdleDestroy!,stackDestroy!]
+        # destroy_functions = [horizontalDestroy!,verticalDestroy!,randomDestroy!,similarityDestroy!,worstIdleDestroy!,concurrentDestroy!]
         # destroy_fracs = [0.1,0.05,0.05,0.1,0.3,0.15]
         # for i in collect(StepRange(length(repair_functions), -1, 1))
         #     if repairs[i] == 0

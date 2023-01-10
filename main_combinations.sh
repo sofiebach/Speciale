@@ -5,7 +5,7 @@
 ### -- set the job Name --
 #BSUB -J tester
 ### -- set the job Name AND the job array --
-#BSUB -J config1[1-6]
+#BSUB -J comb[1-6]
 ### -- ask for number of cores (default: 1) --
 #BSUB -n 1
 ### -- specify model

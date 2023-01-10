@@ -38,5 +38,5 @@ insert!(data, sol, 9, 5)
 frac = 0.1
 pdf=true
 drawTVSchedule(data, sol, "BeforeAfter/before_stack", 1, pdf)
-stackDestroy!(data, sol, frac)
+concurrentDestroy!(data, sol, frac)
 drawTVSchedule(data, sol, "BeforeAfter/after_stack", 1,pdf)

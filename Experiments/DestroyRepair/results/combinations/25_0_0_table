@@ -1,0 +1,8 @@
+& horizontalDestroy! & verticalDestroy! & randomDestroy! & similarityDestroy! & worstIdleDestroy! & concurrentDestroy!\\ 
+greedyRepair! & 0 & 0 & 0 & 0 & 0 & 0\\ 
+firstRepair! & 0 & 10 & 12 & 0 & 10 & 0\\ 
+flexibilityRepair! & 0 & 0 & 0 & 0 & 0 & 10\\ 
+bestRepair! & 0 & 2 & 0 & 20 & 10 & 12\\ 
+horizontalModelRepair! & 0 & 0 & 0 & 0 & 0 & 10\\ 
+regretRepair! & 0 & 0 & 0 & 0 & 0 & 0\\ 
+modelRepair! & 0 & 0 & 0 & 0 & 0 & 10\\ 
