@@ -2,14 +2,15 @@ include("../../ReadWrite.jl")
 include("../../MIPModels.jl")
 include("../../BasicFunctions.jl")
 
-idx = parse(Int64, ENV["LSB_JOBINDEX"])
-
+#idx = parse(Int64, ENV["LSB_JOBINDEX"])
+idx = 4
 filepath = joinpath.("dataset/test/", readdir("dataset/test/"))[idx]
 filename = split(split(filepath, ".")[1],"/")[3]
-folder = "Experiments/MIP/results/"
+folder = "ComputationalResults/MIP/results/"
 data = readInstance(filepath)
 
 timelimit = 30*60
+timelimit = 30
 
 
 
