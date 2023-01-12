@@ -2,7 +2,7 @@ include("../../ReadWrite.jl")
 include("../../ALNS.jl")
 
 method = "repair"
-# methods = [horizontalDestroy!,verticalDestroy!,randomDestroy!,similarityDestroy!,worstIdleDestroy!,concurrentDestroy!]
+# methods = [HorizontalRemoval,VerticalRemoval,RandomRemoval,SimilarityRemoval,WorstIdleRemoval,ConcurrentRemoval]
 methods = [greedyRepair!, firstRepair!,flexibilityRepair!,bestRepair!,horizontalModelRepair!,regretRepair!,modelRepair!]
    
 folder = "Experiments/DestroyRepair/results/"*method*"/"

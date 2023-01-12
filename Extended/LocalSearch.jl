@@ -21,7 +21,7 @@ function pertubate!(data, sol)
     init_sol = deepcopy(sol)
     while true
         valid = true
-        randomDestroy!(data, sol, 0.2)
+        RandomRemoval(data, sol, 0.2)
         greedyRepair!(data, sol)
         # Check if P_bar constraint is exceeded
         for p_bar in data.P_bar 

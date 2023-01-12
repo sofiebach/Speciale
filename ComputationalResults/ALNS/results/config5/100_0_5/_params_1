@@ -40,7 +40,7 @@ time repair
 1.4019999999999988 3.277999999999999
 
 destroy names
-horizontalDestroy! randomDestroy!
+HorizontalRemoval RandomRemoval
 
 repair names
 bestRepair! horizontalModelRepair!

@@ -1,6 +1,6 @@
 include("tuningscript.jl")
 
-destroy_method = verticalDestroy!
+destroy_method = VerticalRemoval
 destroy_fracs = [0.05,0.1,0.15,0.2,0.3]
 
 idx = parse(Int64, ENV["LSB_JOBINDEX"])

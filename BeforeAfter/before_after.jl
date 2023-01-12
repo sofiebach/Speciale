@@ -16,13 +16,13 @@ pdf = true
 # Vertical removal
 sol = deepcopy(sol1)
 drawRadioSchedule(data, sol1, "BeforeAfter/before_vertical", 7, pdf)
-verticalDestroy!(data, sol, frac)
+VerticalRemoval(data, sol, frac)
 drawRadioSchedule(data, sol, "BeforeAfter/after_vertical", 7, pdf)
 
 # Horizontal removal
 sol = deepcopy(sol1)
 drawTVSchedule(data, sol1, "BeforeAfter/before_horizontal", 1, pdf)
-horizontalDestroy!(data, sol, frac)
+HorizontalRemoval(data, sol, frac)
 drawTVSchedule(data, sol, "BeforeAfter/after_horizontal", 1,pdf)
 
 # Stack removal
@@ -38,5 +38,5 @@ insert!(data, sol, 9, 5)
 frac = 0.1
 pdf=true
 drawTVSchedule(data, sol, "BeforeAfter/before_stack", 1, pdf)
-concurrentDestroy!(data, sol, frac)
+ConcurrentRemoval(data, sol, frac)
 drawTVSchedule(data, sol, "BeforeAfter/after_stack", 1,pdf)

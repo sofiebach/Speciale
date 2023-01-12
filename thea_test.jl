@@ -135,7 +135,7 @@ x = MIPBaseline(data, "Gurobi", 1, 13*60)
 
 sol = randomInitial(data)
 
-randomDestroy!(data, sol, 0.4)
+RandomRemoval(data, sol, 0.4)
 println(sol.exp_obj)
 horizontalModelRepair!(data,sol,"extended")
 println(sol.exp_obj)
@@ -255,7 +255,7 @@ params.status[8530]
 rho_repair_it = reshape(params.rho_repair_it, length(params.num_repair),:)
 rho_repair_it[:,8525:8535]
 
-concurrentDestroy!(data,sol,0.3)
+ConcurrentRemoval(data,sol,0.3)
 clusterDestroy!(data,sol,0.3)
 
 drawTVSchedule(data,sol,"hej")
@@ -307,7 +307,7 @@ probabilityTracking(params,"hej_test")
 
 
 println(sol.exp_obj)
-randomDestroy!(data,sol,0.2)
+RandomRemoval(data,sol,0.2)
 println(sol.exp_obj)
 flexibilityRepair!(data,sol,"extended")
 println(sol.exp_obj)

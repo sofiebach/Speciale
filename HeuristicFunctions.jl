@@ -1,6 +1,6 @@
 include("BasicFunctions.jl")
 
-function randomDestroy!(data, sol, frac)
+function RandomRemoval(data, sol, frac)
     n_destroy = ceil(sol.num_campaigns*frac)
     while n_destroy > 0 
         n = rand(1:sol.num_campaigns)
@@ -10,7 +10,7 @@ function randomDestroy!(data, sol, frac)
     end
 end
 
-function horizontalDestroy!(data, sol, frac)
+function HorizontalRemoval(data, sol, frac)
     n_destroy = ceil(sol.num_campaigns*frac)
     while n_destroy > 0
         n = rand(1:sol.num_campaigns)
@@ -27,7 +27,7 @@ function horizontalDestroy!(data, sol, frac)
     end
 end
 
-function verticalDestroy!(data, sol, frac)
+function VerticalRemoval(data, sol, frac)
     n_destroy = ceil(sol.num_campaigns*frac)
     if sol.num_campaigns != 0
         n = rand(1:sol.num_campaigns)
@@ -42,7 +42,7 @@ function verticalDestroy!(data, sol, frac)
     end   
 end
 
-function worstIdleDestroy!(data, sol, frac)
+function WorstIdleRemoval(data, sol, frac)
     n_destroy = ceil(sol.num_campaigns*frac)
     spread_obj = zeros(Float64, data.P)
     for p = 1:data.P
@@ -79,7 +79,7 @@ function worstIdleDestroy!(data, sol, frac)
     end
 end
 
-function concurrentDestroy!(data, sol, frac)
+function ConcurrentRemoval(data, sol, frac)
     n_destroy = ceil(sol.num_campaigns*frac)
     while n_destroy > 0
         val, idx = findmax(sol.g)
@@ -101,7 +101,7 @@ function concurrentDestroy!(data, sol, frac)
     end
 end
 
-function similarityDestroy!(data,sol,frac)
+function SimilarityRemoval(data,sol,frac)
     n_destroy = ceil(sol.num_campaigns*frac)
     while n_destroy > 0
         if sum(sol.k) > 0

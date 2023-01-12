@@ -1,8 +1,10 @@
-& horizontalDestroy! & verticalDestroy! & randomDestroy! & similarityDestroy! & worstIdleDestroy! & concurrentDestroy!\\ 
-greedyRepair! & 0 & 0 & 0 & 0 & 0 & 0\\ 
-firstRepair! & 0 & 10 & 12 & 0 & 10 & 0\\ 
-flexibilityRepair! & 0 & 0 & 0 & 0 & 0 & 10\\ 
-bestRepair! & 0 & 2 & 0 & 20 & 10 & 12\\ 
-horizontalModelRepair! & 0 & 0 & 0 & 0 & 0 & 10\\ 
-regretRepair! & 0 & 0 & 0 & 0 & 0 & 0\\ 
-modelRepair! & 0 & 0 & 0 & 0 & 0 & 10\\ 
+& & \multicolumn{6}{c}{Destroys}\\ 
+& & horizontal& vertical& random& related& worstIdle& stack\\ 
+\cmidrule(r){3-8} 
+\multirow{7}{*}{\rotatebox[origin=c]{90}{Repairs}}& \multicolumn{1}{r|}{greedy} & 0.026 & 0.037 & 0.044 & 0.0 & 0.0 & 0.044\\ 
+& \multicolumn{1}{r|}{first} & 0.072 & 0.1 & 0.061 & 0.072 & 0.0 & 0.056\\ 
+& \multicolumn{1}{r|}{flexibility} & 0.0047 & 0.047 & 0.019 & 0.016 & 0.0 & 0.047\\ 
+& \multicolumn{1}{r|}{best} & 1.4 & 1.5 & 13.0 & 8.4 & 0.021 & 18.0\\ 
+& \multicolumn{1}{r|}{horizontalModel} & 1.6 & 2.5 & 13.0 & 14.0 & 0.0 & 25.0\\ 
+& \multicolumn{1}{r|}{regret} & 0.028 & 0.0047 & 0.021 & 0.012 & 0.0047 & 0.012\\ 
+& \multicolumn{1}{r|}{model} & 0.068 & 0.098 & 0.065 & 0.028 & 0.0 & 0.079\\ 

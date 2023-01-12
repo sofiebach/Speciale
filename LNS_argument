@@ -49,7 +49,7 @@ time repair
 0.053000000000000005 0.029 0.05700000000000001 20.55200000000002 39.90800000000068 1.0110000000000003 42.835
 
 destroy names
-horizontalDestroy! verticalDestroy! randomDestroy! similarityDestroy! worstIdleDestroy! concurrentDestroy!
+HorizontalRemoval VerticalRemoval RandomRemoval SimilarityRemoval WorstIdleRemoval ConcurrentRemoval
 
 repair names
 greedyRepair! firstRepair! flexibilityRepair! bestRepair! horizontalModelRepair! regretRepair! modelRepair!
