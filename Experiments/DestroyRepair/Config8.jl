@@ -10,7 +10,7 @@ folder = "Experiments/DestroyRepair/initials/"
 init_sol = readSolution(folder*filename, data)
 init_obj = init_sol.exp_obj
 
-# destroy_functions = [horizontalDestroy!,verticalDestroy!,randomDestroy!,relatedDestroy!,worstIdleDestroy!,stackDestroy!]
+# destroy_functions = [HorizontalRemoval,verticalRemoval,RandomRemoval,SimilarityRemoval,WorstIdleRemoval,ConcurrentRemoval]
 # repair_functions = [greedyRepair!, firstRepair!,flexibilityRepair!,bestRepair!,horizontalModelRepair!,regretRepair!,modelRepair!]
 config = "config8/"
 destroys = [false, true, false, false, false, false]
