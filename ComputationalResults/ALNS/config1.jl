@@ -12,7 +12,13 @@ function dummyfunction()
     folder = "ComputationalResults/ALNS/results/"
     data = readInstance(filepath)
     
-    timelimit = data.timeperiod*60
+    if (!isdir(folder * configuration * filename))
+        mkpath(folder * configuration * filename)
+        #io = open(folder * configuration * filename * "/file.txt", "w")
+        #close(io)
+    end
+
+    timelimit = 30*60
     #timelimit = 5
     best_i = 0
     best_obj = 1000
@@ -30,7 +36,7 @@ function dummyfunction()
         writeParameters(folder * configuration * filename * "/params_" * string(i), params)
     end
     
-    println("---- best i is " * string(best_i)* " ----")
+    #println("---- best i is " * string(best_i)* " ----")
 end
 
 dummyfunction()

@@ -5,9 +5,9 @@
 ### -- set the job Name --
 #BSUB -J tester
 ### -- set the job Name AND the job array --
-#BSUB -J extended4[1-9]
+#BSUB -J config8[1-6]
 ### -- ask for number of cores (default: 1) --
-#BSUB -n 4
+#BSUB -n 1
 ### -- specify model
 #BSUB -R "select[model == XeonE5_2660v3]"
 ### -- specify that the cores must be on the same host --
@@ -19,7 +19,7 @@
 ### -- set walltime limit: hh:mm --
 #BSUB -W 24:00
 ### -- set the email address --
-##BSUB -u s161996student.dtu.dk
+##BSUB -u s174500student.dtu.dk
 ### -- send notification at start --
 #BSUB -B
 ### -- send notification at completion --
@@ -33,4 +33,4 @@ module load gurobi/9.5.2
 module load julia/1.7.0
 
 # here follow the commands you want to execute
-julia-current ComputationalResults/MIP/main_extended_4threads.jl &> results_MIP_extended4.txt
+julia-current Experiments/DestroyRepair/Config8.jl &> results_config8.txt
