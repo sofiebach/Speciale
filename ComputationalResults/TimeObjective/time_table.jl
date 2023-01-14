@@ -16,8 +16,8 @@ def timeplot(time_limits, MIPobjs, ALNSobjs, title, filename):
     plt.tick_params(axis='x', labelsize=15)
     plt.tick_params(axis='y', labelsize=15)
     plt.legend(["Solver", "ALNS"], fontsize="15")
-    plt.show()
-    #plt.savefig(filename)
+    #plt.show()
+    plt.savefig(filename, bbox_inches='tight')
     plt.close()
 """
 
