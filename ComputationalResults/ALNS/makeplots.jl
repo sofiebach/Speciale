@@ -3,8 +3,14 @@ include("../../Validation/PlotSolution.jl")
 
 data = readInstance("dataset/test/100_0_0.txt")
 
-config = "config1"
-nummer = "15"
+config = "config2"
+nummer = "14"
+
+start2 = 4750
+stop2 = 5450
+
+start1 = 7150
+stop1 = 7455
 
 sol = readSolution("ComputationalResults/ALNS/results/" * config * "/100_0_0/solution_" * nummer, data)
 params = readParameters("ComputationalResults/ALNS/results/" * config * "/100_0_0/params_" * nummer)
@@ -27,14 +33,19 @@ for i = 1:length(params.status)
     end
 end
 
-probabilityTracking(params, "ComputationalResults/ALNS/plots/"* config *"_probability.pdf")
+
+include("../../Validation/PlotSolution.jl")
+probabilityTrackingInterval(params, "ComputationalResults/ALNS/plots/"* config *"_probabilityzoom.pdf", start1, stop1)
 plotWparamsInput(params, w_destroy, w_repair, "ComputationalResults/ALNS/plots/"* config *"_bar.pdf")
 solutionTracking(params,  "ComputationalResults/ALNS/plots/" *config *"_SA.pdf")
-drawTVSchedule(data, sol, "ComputationalResults/ALNS/plots/"*config *"_TVschedule.pdf")
-drawRadioSchedule(data, sol, "ComputationalResults/ALNS/plots/"* config *"_Radioschedule.pdf")
 
 
-sol2 = readSolution("ComputationalResults/MIP/results/1thread/100_0_0_extended1thread", data)
 
-drawTVSchedule(data, sol, "ComputationalResults/ALNS/plots/MIP_TVschedule.pdf")
-drawRadioSchedule(data, sol, "ComputationalResults/ALNS/plots/MIP_Radioschedule.pdf")
+drawTVSchedule(data, sol, "ComputationalResults/ALNS/plots/"*config *"_TVschedule.pdf", 1)
+drawRadioSchedule(data, sol, "ComputationalResults/ALNS/plots/"* config *"_Radioschedule.pdf", 4)
+
+
+sol2 = readSolution("ComputationalResults/MIP/results/100_0_0_extended1thread", data)
+
+drawTVSchedule(data, sol2, "ComputationalResults/ALNS/plots/MIP_TVschedule.pdf", 1)
+drawRadioSchedule(data, sol2, "ComputationalResults/ALNS/plots/MIP_Radioschedule.pdf", 4)
