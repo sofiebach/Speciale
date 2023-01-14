@@ -2,7 +2,6 @@ include("../../ReadWrite.jl")
 include("../../ALNS.jl")
 
 idx = parse(Int64, ENV["LSB_JOBINDEX"])
-idx = 1
 
 filepath = joinpath.("dataset/test/", readdir("dataset/test/"))[idx]
 filename = split(split(filepath, ".")[1],"/")[3]
@@ -11,9 +10,7 @@ data = readInstance(filepath)
 
 digit = 2
 N = 20
-N = 2
 time_limits = [10, 30, 60, 120, 300, 600]
-time_limits = [10, 30]
 T = length(time_limits)
 average_objs = zeros(Float64, T)
 mip_objs = zeros(Float64, T)
