@@ -15,7 +15,7 @@ for t = 1:data.T
     end
 end
 
-drawHeatmap(data,DRsol,"DRheatmap,", 1, true)
+drawHeatmap(data,DRsol,"DRheatmap.pdf", 1, true)
 
 used = deepcopy(DRsol.H_cap)
 

@@ -5,7 +5,6 @@ include("Validation/PlotSolution.jl")
 
 data = readInstance("dataset/train/100_5_0.txt")
 sol = randomInitial(data)
-time_limit=60
-sol, params = ALNS(data, sol, time_limit, "extended")
+sol,params = ALNS(data,sol,60,"extended")
+drawHeatmap(data,sol,"heatmap_example.pdf")
 
-solutionTracking_all(params, "sof_test")

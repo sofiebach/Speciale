@@ -33,17 +33,18 @@ function print_solution(sol)
     println("Total number of campaigns: ", sum(sol.x))
 end
 
-function drawHeatmap(data, sol, filename, pdf=0, DR=false)       
+function drawHeatmap(data, sol, filename, pdf=0, DR=false)  
+    cap = deepcopy(sol.H_cap)
+
     if DR
         staff_incl_freelancer = data.H
     else
         staff_incl_freelancer = data.H + sol.f 
+        cap[cap .< 0] .= 0
     end
 
     used_cap_inv = (data.I .- sol.I_cap) ./ data.I
-    
-    cap = deepcopy(sol.H_cap)
-    
+
     used_cap_prod = (staff_incl_freelancer .- cap) ./ staff_incl_freelancer
 
     if DR 
@@ -84,8 +85,8 @@ function drawHeatmap(data, sol, filename, pdf=0, DR=false)
         ax1.xaxis.set_major_formatter(ticker.FormatStrFormatter('%d'))
         ax1.tick_params(axis = 'x', labelsize=fontsize, rotation=0)
         ax1.tick_params(axis = 'y', labelsize=fontsize)
-        ax1.set_xlabel("Time (weeks)", fontsize = fontsize)
-        ax1.title.set_text('Production hours')
+        ax1.set_xlabel("Time steps", fontsize = fontsize)
+        ax1.title.set_text('Used media inventory')
         ax1.title.set_size(fontsize)
         ax1.set_xlim([0, len(used_inv)])
         cbar = ax1.collections[0].colorbar
@@ -96,11 +97,11 @@ function drawHeatmap(data, sol, filename, pdf=0, DR=false)
         ax2.xaxis.set_major_formatter(ticker.FormatStrFormatter('%d'))
         ax2.tick_params(axis = 'x', labelsize=fontsize, rotation=0)
         ax2.tick_params(axis = 'y', labelsize=fontsize)
-        ax2.set_xlabel("Time (weeks)", fontsize = fontsize)
+        ax2.set_xlabel("Time steps", fontsize = fontsize)
         cbar = ax2.collections[0].colorbar
         cbar.ax.tick_params(labelsize=fontsize)
        
-        ax2.title.set_text('Channel inventory')
+        ax2.title.set_text('Used channel inventory')
         ax2.title.set_size(fontsize)
         
         f.tight_layout(rect=[0, 0, .9, 1])
