@@ -1,5 +1,5 @@
 using XLSX
-using PlotlyJS
+#using PlotlyJS
 using Statistics
 
 function read_DR_solution()
