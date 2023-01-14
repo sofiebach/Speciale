@@ -135,8 +135,12 @@ function solutionTracking(params, filename)
         plt.plot(better, np.array(params.current_obj)[better.astype(int)-1],'o',color='darkorange',markersize = 6)
         # plt.legend(["Rejected", "Accepted", "New best"])
         plt.legend(["Accepted", "New best"], fontsize="15")
+        plt.xlabel('Iterations', fontsize = 15)
+        plt.ylabel('Objecitve', fontsize = 15)
         plt.tick_params(axis='x', labelsize=15)
         plt.tick_params(axis='y', labelsize=15)
+        plt.title("Configuration 1", fontsize = "15")
+        
         plt.savefig(filename)
         # plt.show()
         plt.close
@@ -196,6 +200,9 @@ function temperatureTracking(params, filename)
     py"tempPlot"(params, filename)
 end
 
+
+
+
 function probabilityTracking(params, filename)
    
     py"""
@@ -206,33 +213,115 @@ function probabilityTracking(params, filename)
     from matplotlib import ticker
 
     def progDR(params, filename):
-        f,(ax1,ax2) = plt.subplots(2,1, figsize = (10,10))
+        f,(ax1,ax2) = plt.subplots(2,1, figsize = (7,9))
+
         i = 0
         probs = params.prob_destroy_it[i][::params.segment]
         segments = range(1,len(probs)+1)
         while i < len(params.num_destroy):
             ax1.plot(segments, params.prob_destroy_it[i][::params.segment])
-            ax1.legend(params.destroy_names)
-            ax1.set_xlabel("Segments")
-            ax1.title.set_text('Probability')
+            ax1.legend(params.destroy_names, fontsize = "15",loc='upper left')
+            ax1.set_xlabel("Segments", fontsize = 15)
+            ax1.set_ylabel('Probabilities', fontsize = 15)
             ax1.title.set_text('Destroy')
+            ax1.title.set_size('15')
+            ax1.tick_params(axis='x', labelsize=15)
+            ax1.tick_params(axis='y', labelsize=15)
             ax1.set_ylim(0,1)
             i += 1
         i = 0
         while i < len(params.num_repair):
             ax2.plot(segments, params.prob_repair_it[i][::params.segment])
-            ax2.legend(params.repair_names)
-            ax2.set_xlabel("Segments")
-            ax2.title.set_text('Probability')
+            ax2.legend(params.repair_names, fontsize = "15",loc='upper left')
+            ax2.set_xlabel("Segments", fontsize = 15)
+            ax2.set_ylabel('Probabilities', fontsize = 15)
             ax2.title.set_text('Repair')
+            ax2.title.set_size('15')
+            ax2.tick_params(axis='x', labelsize=15)
+            ax2.tick_params(axis='y', labelsize=15)
             ax2.set_ylim(0,1)
             i += 1
+        f.tight_layout()
+        #plt.subplots_adjust(bottom=0.1,
+        #            top=0.9,
+        #            wspace=0.4,
+        #            hspace=0.4)
         plt.savefig(filename)
         # plt.show()
         plt.close
     """
     py"progDR"(params, filename)
 end
+
+function probabilityTrackingInterval(params, filename, start, stop)
+   
+    py"""
+    import pandas as pd
+    import numpy as np
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+    from matplotlib import ticker
+
+    def progDR(params, filename, start, stop):
+        f,((ax1,ax2),(ax3,ax4)) = plt.subplots(2,2, figsize = (14,9))
+        i = 0
+        probs = params.prob_destroy_it[i][::params.segment]
+        segments = range(1,len(probs)+1)
+        segments_interval = np.arange(start,stop)
+        while i < len(params.num_destroy):
+            ax1.plot(segments, params.prob_destroy_it[i][::params.segment])
+            ax1.legend(params.destroy_names, fontsize = "15",loc='upper left')
+            ax1.set_xlabel("Segments", fontsize = 15)
+            ax1.set_ylabel('Probabilities', fontsize = 15)
+            ax1.set_title('Destroy')
+            ax1.title.set_size('15')
+            ax1.tick_params(axis='x', labelsize=15)
+            ax1.tick_params(axis='y', labelsize=15)
+            ax1.set_ylim(0,1)
+            
+            ax3.plot(segments_interval, params.prob_destroy_it[i][start*params.segment:stop*params.segment:params.segment])
+            ax3.legend(params.destroy_names, fontsize = "15",loc='upper left')
+            ax3.set_xlabel("Segments", fontsize = 15)
+            ax3.set_ylabel('Probabilities', fontsize = 15)
+            ax3.set_title('Destroy')
+            ax3.title.set_size('15')
+            ax3.tick_params(axis='x', labelsize=15)
+            ax3.tick_params(axis='y', labelsize=15)
+            ax3.set_ylim(0,1)
+            i += 1
+        i = 0
+        while i < len(params.num_repair):
+            ax2.plot(segments, params.prob_repair_it[i][::params.segment])
+            ax2.legend(params.repair_names, fontsize = "15",loc='upper left')
+            ax2.set_xlabel("Segments", fontsize = 15)
+            ax2.set_ylabel('Probabilities', fontsize = 15)
+            ax2.set_title('Repair')
+            ax2.title.set_size('15')
+            ax2.tick_params(axis='x', labelsize=15)
+            ax2.tick_params(axis='y', labelsize=15)
+            ax2.set_ylim(0,1)
+            
+            
+            ax4.plot(segments_interval, params.prob_repair_it[i][start*params.segment:stop*params.segment:params.segment])
+            ax4.legend(params.repair_names, fontsize = "15", loc='upper left')
+            ax4.set_xlabel("Segments", fontsize = 15)
+            ax4.set_ylabel('Probabilities', fontsize = 15)
+            ax4.set_title('Repair')
+            ax4.title.set_size('15')
+            ax4.tick_params(axis='x', labelsize=15)
+            ax4.tick_params(axis='y', labelsize=15)
+            ax4.set_ylim(0,1)
+            i += 1
+        f.tight_layout()
+        f.suptitle('Configuration 1', fontsize=20)
+        plt.subplots_adjust(top=0.9)
+        plt.savefig(filename)
+        # plt.show()
+        plt.close
+    """
+    py"progDR"(params, filename, start,stop)
+end
+
 
 function drawTVSchedule(data, sol, filename, plot_channel = 0)
     p_tv = findall(x -> x == "TV", data.campaign_type)
@@ -411,8 +500,6 @@ function drawTVSchedule(data, sol, filename, plot_channel = 0)
     finish()
     preview()
 end
-
-
 
 function drawRadioSchedule(data, sol, filename, plot_channel = 0)
     p_radio = findall(x -> x == "RADIO", data.campaign_type)
@@ -603,7 +690,7 @@ function plotWparams(params, filename)
         improving = params.w_repair[:,1]
         accepted = params.w_repair[:,2]
         x = np.arange(len(labels))  # the label locations
-        width = 0.2  # the width of the bars
+        width = 0.3  # the width of the bars
         fig, ax = plt.subplots()
         rects1 = ax.bar(x - width, best, width, label='Best')
         rects2 = ax.bar(x, improving, width, label='Improving')
@@ -649,33 +736,34 @@ function plotWparams(params, filename)
 end
 
 function plotWparamsInput(params, w_destroy, w_repair, filename)
+    path, filetype = rsplit(filename, ".", limit = 2)
     py"""
     import matplotlib.pyplot as plt
     import numpy as np
-    def wPlot(params, w_destroy, w_repair, filename):
+    def wPlot(params, w_destroy, w_repair, path, filetype):
         # Repair plot
         labels = params.repair_names
         best = w_repair[:,0]
         improving = w_repair[:,1]
         accepted = w_repair[:,2]
         x = np.arange(len(labels))  # the label locations
-        width = 0.2  # the width of the bars
-        fig, ax = plt.subplots()
-        rects1 = ax.bar(x - width, best, width, label='Best')
-        rects2 = ax.bar(x, improving, width, label='Improving')
-        rects3 = ax.bar(x + width, accepted, width, label='Accepted')
-        ax.set_ylabel('Scores')
-        ax.set_title('Scores of repair methods')
-        ax.set_xticks(x, labels)
-        plt.xticks(rotation=45)
-        ax.legend()
-        ax.bar_label(rects1, padding=3)
-        ax.bar_label(rects2, padding=3)
-        ax.bar_label(rects3, padding=3)
-        fig.tight_layout()
-        plt.savefig(filename)
+        width = 0.25  # the width of the bars
+        fig, (ax1, ax2) = plt.subplots(1,2, figsize = (10,4))
+        rects1 = ax1.bar(x - width, best, width, label='Best', color='darkorange')
+        rects2 = ax1.bar(x, improving, width, label='Improving', color='tab:blue')
+        rects3 = ax1.bar(x + width, accepted, width, label='Accepted', color = 'yellowgreen')
+        ax1.set_title('Repair methods')
+        #ax.title.set_size('15')
+        ax1.set_xticks(x, labels)
+        #plt.xticks(rotation=45)
+        ax1.legend()
+        ax1.bar_label(rects1)
+        ax1.bar_label(rects2)
+        ax1.bar_label(rects3)
+        #fig.tight_layout()
+        #plt.savefig(path + "_destroy." + filetype)
         #plt.show()
-        plt.close
+        #plt.close
 
         # Destroy plot
         labels = params.destroy_names
@@ -683,25 +771,25 @@ function plotWparamsInput(params, w_destroy, w_repair, filename)
         improving = w_destroy[:,1]
         accepted = w_destroy[:,2]
         x = np.arange(len(labels))  # the label locations
-        width = 0.2  # the width of the bars
-        fig, ax = plt.subplots()
-        rects1 = ax.bar(x - width, best, width, label='Best')
-        rects2 = ax.bar(x, improving, width, label='Improving')
-        rects3 = ax.bar(x + width, accepted, width, label='Accepted')
-        ax.set_ylabel('Scores')
-        ax.set_title('Scores of repair methods')
-        ax.set_xticks(x, labels)
-        plt.xticks(rotation=45)
-        ax.legend()
-        ax.bar_label(rects1, padding=3)
-        ax.bar_label(rects2, padding=3)
-        ax.bar_label(rects3, padding=3)
+        width = 0.25  # the width of the bars
+        rects1 = ax2.bar(x - width, best, width, label='Best', color='darkorange')
+        rects2 = ax2.bar(x, improving, width, label='Improving', color='tab:blue')
+        rects3 = ax2.bar(x + width, accepted, width, label='Accepted', color = 'yellowgreen')
+        ax2.set_title('Destroy methods')
+        ax2.set_xticks(x, labels)
+        #plt.xticks(rotation=45)
+        ax2.legend()
+        ax2.bar_label(rects1)
+        ax2.bar_label(rects2)
+        ax2.bar_label(rects3)
         fig.tight_layout()
-        plt.savefig(filename)
+        fig.suptitle('Configuration 1', fontsize=15)
+        plt.subplots_adjust(top=0.9)
+        plt.savefig(path + "_repair." + filetype) 
         #plt.show()
         plt.close
     """
-    py"wPlot"(params,w_destroy, w_repair, filename)
+    py"wPlot"(params,w_destroy, w_repair, path, filetype)
 end
 
 
