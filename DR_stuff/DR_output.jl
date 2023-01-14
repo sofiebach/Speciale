@@ -8,7 +8,7 @@ function read_DR_solution()
     # [DR1, DR2, Ramasjang, P1, P2, P3, P4, P5, P6, P8, digital, SOME]
     mapping = XLSX.readdata("data/data_staffing_constraint.xlsx", "Mapping", "B2:C38")
 
-    data = readInstance("DR stuff/DRdata.txt")
+    data = readInstance("DR_stuff/DRdata.txt")
     x = zeros(Int64,data.T,data.P)
 
     MP_ids = unique(output[:,1])

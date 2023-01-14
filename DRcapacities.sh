@@ -31,4 +31,4 @@ module load gurobi/9.5.2
 module load julia/1.7.0
 
 # here follow the commands you want to execute
-julia-current DR stuff/DRcapacities.jl.jl &> results_DRcap.txt
+julia-current DR_stuff/DRcapacities.jl.jl &> results_DRcap.txt

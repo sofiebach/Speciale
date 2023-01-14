@@ -14,11 +14,11 @@ data.timeperiod = timeperiod
 data.I = data.I[1:T,:]
 data.H = data.H[1:T,:]
 
-writeInstance("DR stuff/DRdata.txt", data)
+writeInstance("DR_stuff/DRdata.txt", data)
 
 
 # Create dataset that corresponds to DRs plan
-data = readInstance("DR stuff/DRdata.txt")
+data = readInstance("DR_stuff/DRdata.txt")
 x = read_DR_solution()
 DRsol = Sol(data)
 
@@ -50,4 +50,4 @@ for t = 1:DRdata.T
     end
 end
 
-writeInstance("DR stuff/DRcapacitiesData.txt", DRdata)
+writeInstance("DR_stuff/DRcapacitiesData.txt", DRdata)

@@ -2,7 +2,7 @@ include("../ReadWrite.jl")
 include("../ALNS.jl")
 include("DR_output.jl")
 
-data = readInstance("DR stuff/DRcapacitiesData.txt")
+data = readInstance("DR_stuff/DRcapacitiesData.txt")
 
 #x = read_DR_solution()
 #DRsol = Sol(data)
@@ -20,5 +20,5 @@ data = readInstance("DR stuff/DRcapacitiesData.txt")
 sol = randomInitial(data)
 sol, params = ALNS_final(data, sol, 10, "extended", [false,false,false,true,true,false,false],[true,false,true,false,false,false])
 
-writeSolution("DR stuff/ALNS_sol", data, sol)
-writeParameters("DR stuff/ALNS_params", params)
+writeSolution("DR_stuff/ALNS_sol", data, sol)
+writeParameters("DR_stuff/ALNS_params", params)

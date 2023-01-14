@@ -3,7 +3,7 @@ include("../ReadWrite.jl")
 include("../BasicFunctions.jl")
 include("../Validation/PlotSolution.jl")
 
-data = readInstance("DR stuff/DRdata.txt")
+data = readInstance("DR_stuff/DRdata.txt")
 x = read_DR_solution()
 DRsol = Sol(data)
 
@@ -22,10 +22,10 @@ TV_BC_names = unique(data.BC_names[p_tv])
 radio_BC_names = unique(data.BC_names[p_radio])
 
 for bc = 1:length(TV_BC_names)
-    drawTVSchedule(data, DRsol, "DR stuff/schedules/tv_"*string(bc), bc, pdf)
+    drawTVSchedule(data, DRsol, "DR_stuff/schedules/tv_"*string(bc), bc, pdf)
 end
 for bc = 1:length(radio_BC_names)
-    drawRadioSchedule(data, DRsol, "DR stuff/schedules/radio_"*string(bc), bc, pdf)
+    drawRadioSchedule(data, DRsol, "DR_stuff/schedules/radio_"*string(bc), bc, pdf)
 end
 
 n_digits = 3
