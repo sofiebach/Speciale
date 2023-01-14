@@ -16,8 +16,8 @@ def timeplot(time_limits, MIPobjs, ALNSobjs, title, filename):
     plt.tick_params(axis='x', labelsize=15)
     plt.tick_params(axis='y', labelsize=15)
     plt.legend(["Solver", "ALNS"], fontsize="15")
-    #plt.show()
-    plt.savefig(filename)
+    plt.show()
+    #plt.savefig(filename)
     plt.close()
 """
 
@@ -31,8 +31,8 @@ write(MIP_table, "& \\multicolumn{6}{c}{\\textbf{Time (s)}} \\\\ \n")
 write(ALNS_table, "& \\multicolumn{6}{c}{\\textbf{Time (s)}} \\\\ \n")
 
 counter = 0
-sum_objs_MIP = zeros(Float64, length(time_limits))
-sum_objs_ALNS = zeros(Float64, length(time_limits))
+sum_objs_MIP = zeros(Float64, 6)
+sum_objs_ALNS = zeros(Float64, 6)
 for file in filepath 
     counter += 1
     name = split(file, "/")[end]
