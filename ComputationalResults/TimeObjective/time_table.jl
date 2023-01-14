@@ -4,7 +4,7 @@ using PyCall
 
 py"""
 import matplotlib.pyplot as plt 
-def timeplot(time_limits, MIPobjs, ALNSobjs, title):
+def timeplot(time_limits, MIPobjs, ALNSobjs, title, filename):
     plt.figure()
     plt.plot(time_limits, MIPobjs,'o',color='tab:blue',markersize = 6)
     plt.plot(time_limits, ALNSobjs,'o',color='darkorange',markersize = 6)
@@ -16,7 +16,8 @@ def timeplot(time_limits, MIPobjs, ALNSobjs, title):
     plt.tick_params(axis='x', labelsize=15)
     plt.tick_params(axis='y', labelsize=15)
     plt.legend(["Solver", "ALNS"], fontsize="15")
-    plt.show()
+    #plt.show()
+    plt.savefig(filename)
     plt.close()
 """
 
@@ -62,7 +63,7 @@ for file in filepath
         title = split(name, "_")[1] * "-instances"
         avg_objs_MIP = round.(sum_objs_MIP/3, digits=2)
         avg_objs_ALNS = round.(sum_objs_ALNS/3, digits=2)
-        py"timeplot"(time_limits, avg_objs_MIP, avg_objs_ALNS, title)
+        py"timeplot"(time_limits, avg_objs_MIP, avg_objs_ALNS, title, title*".pdf")
         write(MIP_table, "\\midrule \n")
         write(MIP_table, "Average & "*join(avg_objs_MIP, " & ")*"\\\\ \n")
         write(MIP_table, "\\midrule \n")
