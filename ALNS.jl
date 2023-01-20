@@ -103,20 +103,20 @@ function ALNS(data,sol,time_limit,type="baseline",modelRepair=false,theta=0.005,
         end
 
         # update probabilities
-        # if (it % segment_size == 0)
-        #     w_destroy_mean = (w_destroy_sum ./ w_destroy_count)
-        #     replace!(w_destroy_mean, NaN=>0)
-        #     w_repair_mean = (w_repair_sum ./ w_repair_count)
-        #     replace!(w_repair_mean, NaN=>0)
-        #     rho_destroy = gamma*rho_destroy + (1-gamma) .* w_destroy_mean
-        #     rho_repair = gamma*rho_repair + (1-gamma) .* w_repair_mean
-        #     prob_destroy = setProb(rho_destroy)
-        #     prob_repair = setProb(rho_repair)
-        #     w_destroy_sum = zeros(n_d)
-        #     w_destroy_count = zeros(n_d)
-        #     w_repair_sum = zeros(n_r)
-        #     w_repair_count = zeros(n_r)
-        # end
+        if (it % segment_size == 0)
+            w_destroy_mean = (w_destroy_sum ./ w_destroy_count)
+            replace!(w_destroy_mean, NaN=>0)
+            w_repair_mean = (w_repair_sum ./ w_repair_count)
+            replace!(w_repair_mean, NaN=>0)
+            rho_destroy = gamma*rho_destroy + (1-gamma) .* w_destroy_mean
+            rho_repair = gamma*rho_repair + (1-gamma) .* w_repair_mean
+            prob_destroy = setProb(rho_destroy)
+            prob_repair = setProb(rho_repair)
+            w_destroy_sum = zeros(n_d)
+            w_destroy_count = zeros(n_d)
+            w_repair_sum = zeros(n_r)
+            w_repair_count = zeros(n_r)
+        end
 
         # Choose destroy method
         selected_destroy = selectMethod(prob_destroy)
