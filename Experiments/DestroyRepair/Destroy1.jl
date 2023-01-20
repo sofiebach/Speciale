@@ -14,7 +14,7 @@ init_obj = init_sol.exp_obj
 destroys = true*ones(Bool, 6)
 repairs = true*ones(Bool, 7)
 
-N = 5
+N = 1
 M = length(destroys)+1
 time_limit = data.timeperiod * 60
 type = "extended"
