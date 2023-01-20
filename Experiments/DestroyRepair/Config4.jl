@@ -13,9 +13,8 @@ init_obj = init_sol.exp_obj
 # destroy_functions = [HorizontalRemoval,VerticalRemoval,RandomRemoval,SimilarityRemoval,WorstIdleRemoval,ConcurrentRemoval]
 # repair_functions = [greedyRepair!, firstRepair!,flexibilityRepair!,bestRepair!,horizontalModelRepair!,regretRepair!,modelRepair!]
 config = "config4/"
-destroys = [false, false, true, false, false, true]
-repairs = [false, false, false, true, false, true, false]
-
+destroys = [true, true, true, true, false, true]
+repairs = [false, false, false, true, true, false, false]
 N = 5
 time_limit = data.timeperiod * 60
 type = "extended"
