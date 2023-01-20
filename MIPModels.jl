@@ -184,13 +184,11 @@ function MIPpriority(data, p, xp, log=0, time_limit=10)
     M_T = data.T + 1
     M_S = data.S[p] + 1
     epsilon = 0.5
-    lambda = 3/4
 
     @objective(model, Min, 
-        lambda * (data.penalty_S[p]*k +                  # Penalty for not fulfilled Scope
-        data.penalty_g[p] * sum(g[t] for t=1:data.T)) -  # Penalty for stacking
-        (1-lambda) * (data.weight_idle[p] * L +          # Reward for spreading
-        data.weight_idle[p] * y)                         # Penalty for spreading too much
+        data.lambda * sum(data.penalty_S[p] * k) +                     # Penalty for not fulfilled Scope
+        (1-data.lambda) * (sum(data.penalty_g[p] * g[t] for t=1:data.T) +    # Penalty for stacking
+        data.weight_idle[p] * (-L+y) + 1)                        # Penalty for no spreading
     )
 
     for t = data.start:data.stop
