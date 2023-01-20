@@ -6,8 +6,16 @@ include("MIPModels.jl")
 
 data = readInstance("dataset/test/100_0_0.txt")
 
+MIPExtended(data, "Gurobi", 1, 180)
 sol1 = readSolution("ComputationalResults/ALNS/results/config2/100_0_0/solution_14", data)
 sol2 = readSolution("ComputationalResults/MIP/results/100_0_0_extended1thread", data)
+
+
+
+
+
+
+sol = Sol(data)
 
 function analyzeObjective(data, sol, p)
     k_penalty = sum(data.penalty_S[p] * sol.k[p])                    # Penalty for not fulfilled Scope
@@ -17,5 +25,25 @@ function analyzeObjective(data, sol, p)
     return k_penalty, g_penalty, L_penalty
 end
 
-k1, g1, L1 = analyzeObjective(data, sol1, 7)
-k2, g2, L2 = analyzeObjective(data, sol2, 7)
+k2, g2, L2 = analyzeObjective(data, sol, 1)
+
+insert!(data, sol, 20, 1)
+
+k1, g1, L1 = analyzeObjective(data, sol, 33)
+
+
+
+sol1 = Sol(data)
+
+insert!(data, sol1, data.start, 1)
+insert!(data, sol1, data.start, 1)
+insert!(data, sol1, 10, 1)
+insert!(data, sol1, 20, 1)
+
+sol2 = Sol(data)
+
+insert!(data, sol2, data.start, 1)
+insert!(data, sol2, data.start, 1)
+insert!(data, sol2, 20, 1)
+insert!(data, sol2, 20, 1)
+
