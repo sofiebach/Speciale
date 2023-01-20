@@ -325,7 +325,7 @@ function deltaInsert(data, sol, t, p)
 end
 
 function elapsedTime(start_time)
-    return round((time_ns()-start_time)/1e9, digits = 3)
+    return round((time_ns()-start_time)/1e9, digits = 5)
 end
 
 # function deltaRemove(data, sol, t, p)
