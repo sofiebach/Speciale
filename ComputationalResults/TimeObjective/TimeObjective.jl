@@ -26,7 +26,7 @@ for i = 1:T
         remaining_time = time_limit - elapsedTime(start_time)
         println("remaining: ", remaining_time)
         if remaining_time > 0
-            sol, params = ALNS_final(data, sol, remaining_time, "extended", [false,false,false,true,true,false,false],[true,false,true,false,false,false])
+            sol, params = ALNS_final(data, sol, remaining_time, "extended", [false, false, false, true, true, false, false], [false, true, true, false, false, false])
         end
         ALNS_objs += sol.exp_obj
     end
