@@ -19,7 +19,7 @@ sol = randomInitial(data)
 timelimit = 30*60
 
 sol = randomInitial(data)
-sol, params = ALNS_final(data, sol, timelimit, "extended", [false, false, false, true, true, false, false], [false, true, true, false, false, false])
+sol, params = ALNS_final(data, sol, timelimit, "extended", [false, false, false, true, true, false, false],[false, true, true, false, false, true])
 
 writeSolution("DR_stuff/ALNS_sol", data, sol)
 writeParameters("DR_stuff/ALNS_params", params)

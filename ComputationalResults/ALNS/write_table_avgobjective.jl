@@ -1,10 +1,10 @@
 include("../../ReadWrite.jl")
 
-config = "config3"
+config = "config7"
 
 filepath = joinpath.("ComputationalResults/ALNS/results/"*config * "/", readdir("ComputationalResults/ALNS/results/"*config * "/"))
 
-out = open("ComputationalResults/ALNS/avgobjectives", "w")
+out = open("ComputationalResults/ALNS/avgobjectives" * config, "w")
 lambda = 3/4
 N = 4
 for file in filepath
