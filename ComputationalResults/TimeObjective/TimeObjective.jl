@@ -24,9 +24,12 @@ for i = 1:T
         start_time = time_ns()
         sol = randomInitial(data)
         remaining_time = time_limit - elapsedTime(start_time)
-        println("remaining: ", remaining_time)
         if remaining_time > 0
-            sol, params = ALNS_final(data, sol, remaining_time, "extended", [false, false, false, true, true, false, false], [false, true, true, false, false, false])
+            if data.time_period < 30
+                sol, params = ALNS_final(data, sol, remaining_time, "extended", [false, false, false, false, true, false, false],[false, false, true, false, false, false])
+            else
+                sol, params = ALNS_final(data, sol, remaining_time, "extended", [false, false, false, true, true, false, false], [false, true, true, false, false, false])
+            end
         end
         ALNS_objs += sol.exp_obj
     end
