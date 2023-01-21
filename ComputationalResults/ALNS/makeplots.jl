@@ -4,7 +4,18 @@ include("../../Validation/PlotSolution.jl")
 data = readInstance("dataset/test/100_0_0.txt")
 
 config = "config3"
-nummer = "14"
+nummer = "13"
+
+sol = readSolution("ComputationalResults/ALNS/results/" * config * "/100_0_0/solution_" * nummer, data)
+params = readParameters("ComputationalResults/ALNS/results/" * config * "/100_0_0/params_" * nummer)
+drawTVSchedule(data, sol, "ComputationalResults/ALNS/plots/"*config *"_TVschedule.pdf", 1)
+
+for i = 1:20
+    nummer = string(i)
+    sol = readSolution("ComputationalResults/ALNS/results/" * config * "/100_0_0/solution_" * nummer, data)
+    params = readParameters("ComputationalResults/ALNS/results/" * config * "/100_0_0/params_" * nummer)
+    drawTVSchedule(data, sol, "ComputationalResults/ALNS/plots/"*config *"_TVschedule.pdf", 1)
+end
 
 start2 = 4750
 stop2 = 5450
@@ -35,9 +46,9 @@ end
 
 
 include("../../Validation/PlotSolution.jl")
-probabilityTracking(params, "ComputationalResults/ALNS/plots/"* config *"_probabilityzoom.pdf")
+probabilityTracking(params, "ComputationalResults/ALNS/plots/"* config *"_probabilityzoom_13.png")
 plotWparamsInput(params, w_destroy, w_repair, "ComputationalResults/ALNS/plots/"* config *"_bar.pdf")
-solutionTracking(params,  "ComputationalResults/ALNS/plots/" *config *"_SA.pdf")
+solutionTracking(params,  "ComputationalResults/ALNS/plots/" *config *"_SA_13.png")
 
 
 

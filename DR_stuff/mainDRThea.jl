@@ -70,3 +70,7 @@ sol = readSolution("DR_stuff/ALNS_sol", data)
 params = readParameters("DR_stuff/ALNS_params")
 
 drawRadioSchedule(data, sol, "ALNSwithDRcap_radio.pdf", 4)
+
+drawTVSchedule(data, sol, "ALNSwithDRcap.pdf", 1)
+
+drawHeatmap(data, sol, "new_ALNS_heatmap.pdf")

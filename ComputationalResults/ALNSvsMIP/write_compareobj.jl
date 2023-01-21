@@ -1,6 +1,6 @@
-include("../ReadWrite.jl")
+include("../../ReadWrite.jl")
 
-filepath = joinpath.("ComputationalResults/ALNS/results/config1/", readdir("ComputationalResults/ALNS/results/config1/"))
+filepath = joinpath.("ComputationalResults/ALNS/results/config3/", readdir("ComputationalResults/ALNS/results/config3/"))
 
 
 
@@ -14,7 +14,7 @@ for file in filepath
 
     idx = 1
     best_obj1 = 1000
-    filepath2 = joinpath.("ComputationalResults/ALNS/results/config1/" * instance * "/", readdir("ComputationalResults/ALNS/results/config1/" * instance * "/"))
+    filepath2 = joinpath.("ComputationalResults/ALNS/results/config3/" * instance * "/", readdir("ComputationalResults/ALNS/results/config3/" * instance * "/"))
     for file2 in filepath2
         if split(file2, "/")[6][1] == 's'
             f = open(file2)
@@ -42,7 +42,7 @@ for file in filepath
 
     idx = 1
     best_obj2 = 1000
-    filepath2 = joinpath.("ComputationalResults/ALNS/results/config2/" * instance * "/", readdir("ComputationalResults/ALNS/results/config2/" * instance * "/"))
+    filepath2 = joinpath.("ComputationalResults/ALNS/results/config7/" * instance * "/", readdir("ComputationalResults/ALNS/results/config7/" * instance * "/"))
     for file2 in filepath2
         if split(file2, "/")[6][1] == 's'
             f = open(file2)
@@ -72,8 +72,8 @@ for file in filepath
     println("obj: ", best_obj1)
     println("best2: ", best2)
     println("obj: ", best_obj2)
-    paths = ["ComputationalResults/ALNS/results/config1/" * instance * "/" * string(best1),
-    "ComputationalResults/ALNS/results/config2/" * instance * "/" * string(best2),
+    paths = ["ComputationalResults/ALNS/results/config3/" * instance * "/" * string(best1),
+    "ComputationalResults/ALNS/results/config7/" * instance * "/" * string(best2),
     "ComputationalResults/MIP/results/" * instance * "_extended1thread"]
 
     write(out, "\$" * string(\) * "texttt{")
