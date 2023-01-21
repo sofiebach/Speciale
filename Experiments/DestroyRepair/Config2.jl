@@ -12,8 +12,8 @@ init_obj = init_sol.exp_obj
 
 # destroy_functions = [HorizontalRemoval,VerticalRemoval,RandomRemoval,SimilarityRemoval,WorstIdleRemoval,ConcurrentRemoval]
 # repair_functions = [greedyRepair!, firstRepair!,flexibilityRepair!,bestRepair!,horizontalModelRepair!,regretRepair!,modelRepair!]
-config = "config2/"
-destroys = [true, false, true, false, false, false]
+config = "config7/"
+destroys = [true, true, true, false, false, true]
 repairs = [false, false, false, true, true, false, false]
 
 N = 5

@@ -1,9 +1,9 @@
 Without & Avg. imp. (\%) & Std. \\ 
 \midrule 
-Nothing & 43.92 & NaN \\ 
-HorizontalRemoval & 44.31 & NaN \\ 
-VerticalRemoval & 44.52 & NaN \\ 
-RandomRemoval & 41.75 & NaN \\ 
-SimilarityRemoval & 44.21 & NaN \\ 
-WorstIdleRemoval & 42.96 & NaN \\ 
-ConcurrentRemoval & 43.99 & NaN \\ 
+Nothing & 45.77 & NaN \\ 
+HorizontalRemoval & 45.97 & NaN \\ 
+VerticalRemoval & 44.27 & NaN \\ 
+RandomRemoval & 42.15 & NaN \\ 
+SimilarityRemoval & 45.66 & NaN \\ 
+WorstIdleRemoval & 43.97 & NaN \\ 
+ConcurrentRemoval & 45.38 & NaN \\ 

@@ -1,10 +1,10 @@
 Without & Avg. imp. (\%) & Std. \\ 
 \midrule 
-Nothing & 43.92 & NaN \\ 
-greedyRepair! & 44.46 & NaN \\ 
-firstRepair! & 42.88 & NaN \\ 
-flexibilityRepair! & 44.02 & NaN \\ 
-bestRepair! & 43.15 & NaN \\ 
-horizontalModelRepair! & 43.32 & NaN \\ 
-regretRepair! & 44.26 & NaN \\ 
-modelRepair! & 44.35 & NaN \\ 
+Nothing & 44.92 & NaN \\ 
+greedyRepair! & 45.52 & NaN \\ 
+firstRepair! & 44.41 & NaN \\ 
+flexibilityRepair! & 45.38 & NaN \\ 
+bestRepair! & 43.89 & NaN \\ 
+horizontalModelRepair! & 44.61 & NaN \\ 
+regretRepair! & 45.55 & NaN \\ 
+modelRepair! & 44.67 & NaN \\ 
