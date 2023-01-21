@@ -1,1 +1,14 @@
-DUMMY
+HorizontalRemoval & 0.0002 \\ 
+VerticalRemoval & 0.0001 \\ 
+RandomRemoval & 0.0001 \\ 
+SimilarityRemoval & 0.031 \\ 
+WorstIdleRemoval & 0.013 \\ 
+ConcurrentRemoval & 0.0018 \\ 
+\midrule 
+GreedyRepair & 0.02 \\ 
+FirstRepair & 0.0284 \\ 
+FlexibilityRepair & 0.0852 \\ 
+BestRepair & 0.0213 \\ 
+HorizontalRepair & 0.8219 \\ 
+RegretRepair & 0.9266 \\ 
+ModelRepair & 7.0693 \\ 

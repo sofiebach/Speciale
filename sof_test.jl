@@ -3,8 +3,10 @@ include("ConstructionHeuristics.jl")
 include("ALNS.jl")
 include("Validation/PlotSolution.jl")
 
-data = readInstance("dataset/train/100_5_0.txt")
+data = readInstance("dataset/test/100_0_0.txt")
 sol = randomInitial(data)
-sol,params = ALNS(data,sol,60,"extended")
-drawHeatmap(data,sol,"heatmap_example.pdf")
 
+
+sol, params = ALNS_final(data, sol, 300, "extended", [false,false,false,true,true,false,false],[true,false,true,false,false,false])
+
+probabilityTracking(params, "TEST.png")
