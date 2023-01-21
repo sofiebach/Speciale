@@ -16,20 +16,20 @@ def tradeoffIllustration(x, y, lambdas, filename):
     fig, ax = plt.subplots()
     fig.set_figheight(7)
     fig.set_figwidth(7)
-    ax.plot(x, y, '--', linewidth=1, color="black")
-    ax.plot(x, y, '.', markersize=20, color='tab:blue')
+    ax.plot(x, y, '--', linewidth=1, color="black", dashes=(5, 5))
+    ax.plot(x, y, 'o', markersize=10, color='tab:blue')
     # for j in range(len(lambdas)):
     #     ax.plot(x[j], y[j], '.', markersize=10)
     # for j, txt in enumerate(lambdas):
     #     ax.annotate(txt, (x[j], y[j]))
     # plt.legend(lambdas)
-    ax.tick_params(axis='x', labelsize=15)
-    ax.tick_params(axis='y', labelsize=15)
+    ax.tick_params(axis='x', labelsize=20)
+    ax.tick_params(axis='y', labelsize=20)
     # plt.title("Trade-off between terms in cost function",fontsize="20")
     plt.title("Data instance: " + filename,fontsize="20")
-    plt.xlabel("Scope-violation",fontsize="20")
-    plt.ylabel("Campaign spread and concurrency",fontsize="20")
-    plt.savefig("TradeOff/" + filename + ".png")
+    plt.xlabel("Scope term",fontsize="20")
+    plt.ylabel("Distribution term",fontsize="20")
+    plt.savefig("TradeOff/" + filename + ".pdf")
     plt.close()
 
 """

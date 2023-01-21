@@ -134,7 +134,7 @@ def cumsumplot(cumsum, method, filename):
     fig, ax = plt.subplots()
     fig.set_figheight(7)
     fig.set_figwidth(7)
-    plt.axhline(y = 80, color = 'gray', linestyle = '--', dashes=(5, 5))
+    #plt.axhline(y = 80, color = 'gray', linestyle = '--', dashes=(5, 5))
     ax.plot(cumsum, '-', linewidth=2, color='tab:blue')
     ax.plot(cumsum, '.', markersize=20, color='tab:blue')
     ax.tick_params(axis='x', labelsize=15)
