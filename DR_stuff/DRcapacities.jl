@@ -15,6 +15,7 @@ data = readInstance("DR_stuff/DRcapacitiesData.txt")
 #    end
 #end
 
+sol = randomInitial(data)
 timelimit = 30*60
 
 sol = randomInitial(data)
