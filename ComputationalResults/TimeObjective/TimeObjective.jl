@@ -25,7 +25,7 @@ for i = 1:T
         sol = randomInitial(data)
         remaining_time = time_limit - elapsedTime(start_time)
         if remaining_time > 0
-            if data.time_period < 30
+            if data.timeperiod < 30
                 sol, params = ALNS_final(data, sol, remaining_time, "extended", [false, false, false, false, true, false, false],[false, false, true, false, false, false])
             else
                 sol, params = ALNS_final(data, sol, remaining_time, "extended", [false, false, false, true, true, false, false], [false, true, true, false, false, false])
