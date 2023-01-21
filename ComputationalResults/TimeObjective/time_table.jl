@@ -15,7 +15,7 @@ def timeplot(time_limits_MIP, time_limits_ALNS, MIPobjs, ALNSobjs, title, filena
     plt.title(title, fontsize="15")
     plt.tick_params(axis='x', labelsize=15)
     plt.tick_params(axis='y', labelsize=15)
-    plt.legend(["Solver", "ALNS"], fontsize="15", loc='upper right')
+    plt.legend(["Solver", "LNS"], fontsize="15", loc='upper right')
     #plt.show()
     plt.savefig(filename, bbox_inches='tight')
     plt.close()
@@ -36,8 +36,12 @@ sum_objs_ALNS = zeros(Float64, 6)
 count_MIP = zeros(Float64, 6)
 count_ALNS = zeros(Float64, 6)
 for file in filepath 
-    counter += 1
     name = split(file, "/")[end]
+    if name == ".DS_Store"
+        continue
+    end
+    counter += 1
+    println(name)
     f = open(file)
     readline(f)
     time_limits = parse.(Int64,split(readline(f)))
