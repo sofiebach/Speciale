@@ -15,11 +15,14 @@ data = readInstance("DR_stuff/DRcapacitiesData.txt")
 #    end
 #end
 
-sol = randomInitial(data)
-timelimit = 30*60
+for i = 1:10
 
-sol = randomInitial(data)
-sol, params = ALNS_final(data, sol, timelimit, "extended", [false, false, false, true, true, false, false],[false, true, true, false, false, true])
+    sol = randomInitial(data)
+    timelimit = 30*60
 
-writeSolution("DR_stuff/ALNS_sol", data, sol)
-writeParameters("DR_stuff/ALNS_params", params)
+    sol = randomInitial(data)
+    sol, params = ALNS_final(data, sol, timelimit, "extended", [false, false, false, true, true, false, false],[false, true, true, false, false, true])
+
+    writeSolution("DR_stuff/ALNS_sol_" * string(i), data, sol)
+    writeParameters("DR_stuff/ALNS_params_" * string(i), params)
+end
