@@ -1,6 +1,6 @@
 include("../../ReadWrite.jl")
 
-config = "config1"
+config = "config6"
 
 filepath = joinpath.("ComputationalResults/ALNS/results/"*config * "/", readdir("ComputationalResults/ALNS/results/"*config * "/"))
 
