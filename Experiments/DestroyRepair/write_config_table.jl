@@ -1,7 +1,7 @@
 include("../../ReadWrite.jl")
 include("../../ALNS.jl")
 
-configs = ["config1","config2","config3","config4","config5", "config6", "config7", "config8","config9"]
+configs = ["config5","config9","config7","config8","config4", "config6", "config3", "config1","config2"]
 stddigit = 2
 impdigit = 4
 outFile = open("Experiments/DestroyRepair/table_config", "w")

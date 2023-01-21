@@ -1,9 +1,9 @@
 include("../../ReadWrite.jl")
 include("../../ALNS.jl")
 
-method = "destroy"
-methods = [HorizontalRemoval,VerticalRemoval,RandomRemoval,SimilarityRemoval,WorstIdleRemoval,ConcurrentRemoval]
-#methods = [greedyRepair!, firstRepair!,flexibilityRepair!,bestRepair!,horizontalModelRepair!,regretRepair!,modelRepair!]
+method = "repair"
+#methods = [HorizontalRemoval,VerticalRemoval,RandomRemoval,SimilarityRemoval,WorstIdleRemoval,ConcurrentRemoval]
+methods = [greedyRepair!, firstRepair!,flexibilityRepair!,bestRepair!,horizontalModelRepair!,regretRepair!,modelRepair!]
    
 folder = "Experiments/DestroyRepair/results/"*method*"/"
 filepath = joinpath.(folder, readdir(folder))

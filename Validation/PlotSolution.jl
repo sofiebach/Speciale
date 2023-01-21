@@ -139,7 +139,7 @@ function solutionTracking(params, filename)
         plt.ylabel('Objecitve', fontsize = 15)
         plt.tick_params(axis='x', labelsize=15)
         plt.tick_params(axis='y', labelsize=15)
-        plt.title("Configuration 1", fontsize = "15")
+        plt.title("Configuration 3", fontsize = "15")
         
         plt.savefig(filename)
         # plt.show()
@@ -213,7 +213,7 @@ function probabilityTracking(params, filename)
     from matplotlib import ticker
 
     def progDR(params, filename):
-        f,(ax1,ax2) = plt.subplots(2,1, figsize = (7,9))
+        f,(ax1,ax2) = plt.subplots(1,2, figsize = (14,5))
 
         i = 0
         probs = params.prob_destroy_it[i][::params.segment]
@@ -227,7 +227,7 @@ function probabilityTracking(params, filename)
             ax1.title.set_size('15')
             ax1.tick_params(axis='x', labelsize=15)
             ax1.tick_params(axis='y', labelsize=15)
-            ax1.set_ylim(0,1)
+            ax1.set_ylim(-0.05,1.05)
             i += 1
         i = 0
         while i < len(params.num_repair):
@@ -239,7 +239,7 @@ function probabilityTracking(params, filename)
             ax2.title.set_size('15')
             ax2.tick_params(axis='x', labelsize=15)
             ax2.tick_params(axis='y', labelsize=15)
-            ax2.set_ylim(0,1)
+            ax2.set_ylim(-0.05,1.05)
             i += 1
         f.tight_layout()
         #plt.subplots_adjust(bottom=0.1,
@@ -313,7 +313,7 @@ function probabilityTrackingInterval(params, filename, start, stop)
             ax4.set_ylim(0,1)
             i += 1
         f.tight_layout()
-        f.suptitle('Configuration 1', fontsize=20)
+        f.suptitle('Configuration 3', fontsize=20)
         plt.subplots_adjust(top=0.9)
         plt.savefig(filename)
         # plt.show()
@@ -783,7 +783,7 @@ function plotWparamsInput(params, w_destroy, w_repair, filename)
         ax2.bar_label(rects2)
         ax2.bar_label(rects3)
         fig.tight_layout()
-        fig.suptitle('Configuration 1', fontsize=15)
+        fig.suptitle('Configuration 3', fontsize=15)
         plt.subplots_adjust(top=0.9)
         plt.savefig(path + "_repair." + filetype) 
         #plt.show()

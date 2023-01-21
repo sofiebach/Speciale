@@ -3,14 +3,14 @@ include("../../Validation/PlotSolution.jl")
 
 data = readInstance("dataset/test/100_0_0.txt")
 
-config = "config2"
+config = "config3"
 nummer = "14"
 
 start2 = 4750
 stop2 = 5450
 
-start1 = 7150
-stop1 = 7455
+start1 = 10
+stop1 = 10
 
 sol = readSolution("ComputationalResults/ALNS/results/" * config * "/100_0_0/solution_" * nummer, data)
 params = readParameters("ComputationalResults/ALNS/results/" * config * "/100_0_0/params_" * nummer)
@@ -35,7 +35,7 @@ end
 
 
 include("../../Validation/PlotSolution.jl")
-probabilityTrackingInterval(params, "ComputationalResults/ALNS/plots/"* config *"_probabilityzoom.pdf", start1, stop1)
+probabilityTracking(params, "ComputationalResults/ALNS/plots/"* config *"_probabilityzoom.pdf")
 plotWparamsInput(params, w_destroy, w_repair, "ComputationalResults/ALNS/plots/"* config *"_bar.pdf")
 solutionTracking(params,  "ComputationalResults/ALNS/plots/" *config *"_SA.pdf")
 
