@@ -6,6 +6,34 @@ include("MIPModels.jl")
 
 data = readInstance("dataset/test/100_0_0.txt")
 
+sol = randomInitial(data)
+
+[greedyRepair!, firstRepair!,flexibilityRepair!,bestRepair!,horizontalModelRepair!,regretRepair!,modelRepair!]
+
+sol, params = ALNS_final(data, sol, 60, "extended", [false, false, false, false, true, false, false], [false, false, true, false, false, false] )
+
+
+
+RandomRemoval(data, sol, 0.4)
+
+
+sol = Sol(data)
+horizontalModelRepair!(data, sol, "extended")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 MIPExtended(data, "Gurobi", 1, 180)
 sol1 = readSolution("ComputationalResults/ALNS/results/config2/100_0_0/solution_14", data)
 sol2 = readSolution("ComputationalResults/MIP/results/100_0_0_extended1thread", data)
