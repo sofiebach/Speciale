@@ -27,7 +27,7 @@ function dummyfunction()
     #N = 3
     for i = 1:N
         sol = randomInitial(data)
-        sol, params = ALNS_final(data, sol, timelimit, "extended", [false, false, false, true, true, false, false],[false, true, true, false, false, true])
+        sol, params = ALNS_final(data, sol, timelimit, "extended", [false, false, false, true, false, false, false],[false, false, true, false, false, false])
         if sol.exp_obj < best_obj
             best_obj = sol.exp_obj
             best_i = i

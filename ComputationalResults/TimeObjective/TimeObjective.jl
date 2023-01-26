@@ -28,7 +28,7 @@ for i = 1:T
             if data.timeperiod < 30
                 sol, params = ALNS_final(data, sol, remaining_time, "extended", [false, false, false, false, true, false, false],[false, false, true, false, false, false])
             else
-                sol, params = ALNS_final(data, sol, remaining_time, "extended", [false, false, false, true, true, false, false], [false, true, true, false, false, false])
+                sol, params = ALNS_final(data, sol, remaining_time, "extended", [false, false, false, true, true, false, false], [false, true, true, false, false, true])
             end
         end
         ALNS_objs += sol.exp_obj
