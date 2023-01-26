@@ -19,6 +19,10 @@ filename = split(split(filepath,"/")[4],".")[1]
 
 stds, averages = tune(thetas,alphas,Ws,gammas,destroy_fracs,segment_sizes,long_term_updates, filepath, filename) 
 
+if (!isdir("results/theta/"))
+    mkpath("results/theta/")
+end
+
 f = "results/theta/" * filename * "_theta.txt"
 write_tuning(f, stds, averages)
 

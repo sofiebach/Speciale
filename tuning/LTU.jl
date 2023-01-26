@@ -19,6 +19,10 @@ filename = split(split(filepath,"/")[4],".")[1]
 
 stds, averages = tune(thetas,alphas,Ws,gammas,destroy_fracs,segment_sizes,long_term_updates, filepath, filename) 
 
+if (!isdir("results/LTU/"))
+    mkpath("results/LTU/")
+end
+
 f = "results/LTU/" * filename * "_LTU.txt"
 write_tuning(f, stds, averages)
 
